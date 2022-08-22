@@ -9,6 +9,10 @@ def repeatrange(repeat, *args):
     return np.repeat(np.arange(*args)[None, :], repeat, axis=0).ravel()
 
 
+def issorted(array):
+    return np.all(array[:-1] <= array[1:])
+
+
 class SPZ:
     def __init__(self, arrays, shape=None, structure=None):
         if not isinstance(arrays, (list, tuple)):
@@ -170,6 +174,43 @@ class SPZ:
         self._pointers = pointers
         # TODO: can we detect and change sparsity type to be more efficient?
         # For example, so we don't need to store a pointers or indices.
+
+    def _validate(self):
+        indices = self._indices
+        pointers = self._pointers
+        structure = self._structure
+        ndim = self.ndim
+        assert len(indices) == len(pointers) + 1 == ndim
+        for idx in indices:
+            assert idx.dtype == int
+        for ptr in pointers:
+            assert ptr.dtype == int
+        for idx, ptr in zip(indices[:-1], pointers):
+            assert len(ptr) == len(idx) + 1
+        for idx, ptr in zip(indices[1:], pointers):
+            assert ptr[0] == 0
+            assert ptr[-1] == len(idx)
+        for ptr in pointers:
+            assert issorted(ptr)
+        assert issorted(indices[0])
+        for idx, ptr in zip(indices[1:], pointers):
+            for start, stop in zip(ptr[:-1], ptr[1:]):
+                assert issorted(idx[start:stop])
+        assert structure[-1] == S
+        for i, (sparsity, idx, ptr) in enumerate(zip(structure[:-1], indices, pointers[:-1])):
+            if sparsity == C:
+                if i == 0:
+                    assert len(idx) == self.shape[0]
+                elif structure[i - 1] != S:
+                    assert len(idx) == len(self._indices[i - 1]) * self.shape[i]
+            elif sparsity == S:
+                assert len(idx) == len(indices[i + 1])
+            elif sparsity == DC:
+                if i == 0:
+                    assert len(idx) == len(set(idx))
+                assert len(ptr) == len(set(ptr))
+            else:  # pragma: no cover
+                raise AssertionError()
 
     def as_structure(self, structure):
         return SPZ(self.arrays, self.shape, structure)

@@ -67,7 +67,7 @@ def abbreviate(*types):
 
 def unabbreviate(abbr):
     rv = []
-    for sub in abbr.replace("D-", "DC-").strip("-").split("DC"):
+    for sub in abbr.replace("D-", "DC-").replace("-", "").split("DC"):
         for c in sub:
             rv.append(to_type(c))
         rv.append(DC)
