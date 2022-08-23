@@ -26,6 +26,7 @@ def test_indices1(indices1, shape):
         structure = "".join(sparsity) + "S"
         spz = SPZ(indices1, shape, structure)
         spz._validate()
+        # spz._repr_svg_()
         df2 = pd.DataFrame(spz.arrays).T
         pd.testing.assert_frame_equal(df, df2)
 
@@ -37,6 +38,7 @@ def test_rank1():
                 array = np.array(array)
                 spz = SPZ([array], (size,), "S")
                 spz._validate()
+                # spz._repr_svg_()
                 [index] = spz.arrays
                 assert np.array_equal(array, index)
 
@@ -54,6 +56,7 @@ def test_rank2():
                     for sparsity in ["S", "C", "DC"]:
                         spz = SPZ([x, y], (nrows, ncols), sparsity + "S")
                         spz._validate()
+                        # spz._repr_svg_()
                         rows, cols = spz.arrays
                         assert np.array_equal(x, rows)
                         assert np.array_equal(y, cols)
@@ -75,6 +78,7 @@ def test_rank3():
                             structure = "".join(sparsity) + "S"
                             spz = SPZ([x, y, z], (nx, ny, nz), structure)
                             spz._validate()
+                            # spz._repr_svg_()
                             x2, y2, z2 = spz.arrays
                             assert np.array_equal(x, x2)
                             assert np.array_equal(y, y2)
@@ -103,6 +107,7 @@ def test_rankN(N):
         indices.append(array % shape[-1])
         spz = SPZ(indices, shape, structure)
         spz._validate()
+        # spz._repr_svg_()
         arrays = spz.arrays
         for index, arr in zip(indices, arrays):
             assert np.array_equal(index, arr)

@@ -29,6 +29,8 @@ def _to_level(indices, pointers, level=0, start=0, stop=None):
 
 def index_levels(self):
     levels = list(_to_level(self._indices, self._pointers))
+    if self.ndim == 1:
+        return [levels]
     rv = []
     rv.append([x for x, _ in levels])
     for _ in range(len(self._pointers) - 1):
@@ -58,6 +60,8 @@ def _to_group(indices, pointers, group=None, start=0, stop=None):
 
 def index_groups(self):
     groups = list(_to_group(self._indices, self._pointers))
+    if self.ndim == 1:
+        return [groups]
     rv = []
     rv.append([x for x, _ in groups])
     for _ in range(len(self._pointers) - 1):
@@ -83,13 +87,18 @@ def get_layout(self, *, squared=False):
 
     # Now we need to determins Ys.  Get initial guesses.
     groups = index_groups(self)
-    yoffsets = [list(np.arange(len(index)) * 3) for index in indices[:-2]]
-    last_in_group = np.diff(groups[-1])[pointers[-1][:-2]].astype(bool)
-    diffed = np.diff(pointers[-1])[:-1]
-    yoffsets.append(
-        np.pad((np.maximum(2, diffed + last_in_group) + 1 + squared).cumsum(), (1, 0)).tolist()
-    )
-    yoffsets.append(list(range(len(indices[-1]))))  # We handle constraints in the line above
+    if self.ndim > 1:
+        yoffsets = [list(np.arange(len(index)) * 3) for index in indices[:-2]]
+        last_in_group = np.diff(np.pad(groups[-2], (0, 1)))[
+            [min(x, len(groups[-2]) - 1) for x in pointers[-1][:-2]]
+        ].astype(bool)
+        diffed = np.diff(pointers[-1])[:-1]
+        yoffsets.append(
+            np.pad((np.maximum(2, diffed + last_in_group) + 1 + squared).cumsum(), (1, 0)).tolist()
+        )
+        yoffsets.append(list(range(len(indices[-1]))))  # We handle constraints in the line above
+    else:
+        yoffsets = [list(range(len(indices[-1])))]
 
     # Now update by matching level ys
     levels = index_levels(self)
