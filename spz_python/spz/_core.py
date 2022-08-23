@@ -181,6 +181,7 @@ class SPZ:
         pointers = self._pointers
         structure = self._structure
         ndim = self.ndim
+        shape = self.shape
         assert len(indices) == len(pointers) + 1 == ndim
         for idx in indices:
             assert idx.dtype == int
@@ -194,16 +195,21 @@ class SPZ:
         for ptr in pointers:
             assert issorted(ptr)
         assert issorted(indices[0])
-        for idx, ptr in zip(indices[1:], pointers):
+        assert indices[0][0] >= 0
+        assert indices[0][-1] < shape[0]
+        for i, (idx, ptr) in enumerate(zip(indices[1:], pointers), 1):
             for start, stop in zip(ptr[:-1], ptr[1:]):
                 assert issorted(idx[start:stop])
+                if start < stop:
+                    assert idx[start] >= 0
+                assert idx[stop - 1] < shape[i]
         assert structure[-1] == S
         for i, (sparsity, idx, ptr) in enumerate(zip(structure[:-1], indices, pointers[:-1])):
             if sparsity == C:
                 if i == 0:
-                    assert len(idx) == self.shape[0]
+                    assert len(idx) == shape[0]
                 elif structure[i - 1] != S:
-                    assert len(idx) == len(self._indices[i - 1]) * self.shape[i]
+                    assert len(idx) == len(self._indices[i - 1]) * shape[i]
             elif sparsity == S:
                 assert len(idx) == len(indices[i + 1])
             elif sparsity == DC:

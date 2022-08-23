@@ -75,6 +75,9 @@ def test_rank3():
                         y = array // nz % ny
                         z = array % nz
                         for sparsity in itertools.product(["S", "C", "DC"], ["S", "C", "DC"]):
+                            if random.random() < 2 / 3:
+                                # Randomly skip two thirds of cases to speed up testing
+                                continue
                             structure = "".join(sparsity) + "S"
                             spz = SPZ([x, y, z], (nx, ny, nz), structure)
                             spz._validate()
@@ -86,7 +89,7 @@ def test_rank3():
 
 
 @pytest.mark.slow
-@pytest.mark.parametrize("N", [3, 4, 5, 6, 7])
+@pytest.mark.parametrize("N", range(1, 7))
 def test_rankN(N):
     sparsities = [["S", "C", "DC"]] * (N - 1)
     for sparsity in itertools.product(*sparsities):
@@ -101,12 +104,31 @@ def test_rankN(N):
         while len(flat_idx) < num:
             flat_idx.add(random.randrange(size))
         array = np.array(sorted(flat_idx))
-        indices = [array // np.multiply.reduce(shape[1:])]
+        if N == 1:
+            indices = []
+        else:
+            indices = [array // int(np.multiply.reduce(shape[1:]))]
         for i in range(1, N - 1):
             indices.append(array // np.multiply.reduce(shape[i + 1 :]) % shape[i])
         indices.append(array % shape[-1])
-        spz = SPZ(indices, shape, structure)
-        spz._validate()
+        try:
+            spz = SPZ(indices, shape, structure)
+        except Exception:  # pragma: no cover
+            print("N:", N)
+            print("array:", array)
+            print("structure:", structure)
+            print("shape:", shape)
+            print("indices:", indices)
+            raise
+        try:
+            spz._validate()
+        except Exception:  # pragma: no cover
+            print("structure:", spz.structure)
+            print("shape:", spz.shape)
+            print("indices:", spz._indices)
+            print("pointers:", spz._pointers)
+            print(spz)
+            raise
         # spz._repr_svg_()
         arrays = spz.arrays
         for index, arr in zip(indices, arrays):
