@@ -40,6 +40,7 @@ class SPZ:
                 raise ValueError("index in array is out of bounds")
         else:
             self._shape = tuple(int(array.max()) + 1 for array in arrays)
+        shape = self._shape
 
         if structure is None:  # Assume CSF
             self._structure = [DC] * (len(arrays) - 1) + [S]
@@ -258,6 +259,18 @@ class SPZ:
     @property
     def arrays(self):
         return [np.array(array) for array in zip(*_to_coo(self._indices, self._pointers))]
+
+    def _repr_svg_(self):
+        try:
+            from ._formatting import to_svg
+        except ImportError:
+            return
+        return to_svg(self)
+
+    def __repr__(self):
+        from ._formatting import to_text
+
+        return to_text(self)
 
 
 def _to_coo(indices, pointers, start=0, stop=None):
