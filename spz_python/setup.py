@@ -1,5 +1,6 @@
-import versioneer
 from setuptools import find_packages, setup
+
+import versioneer
 
 install_requires = open("requirements.txt").read().strip().split("\n")
 extras_require = {

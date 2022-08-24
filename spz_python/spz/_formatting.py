@@ -89,8 +89,8 @@ def get_layout(self, *, squared=False):
     groups = index_groups(self)
     if self.ndim > 1:
         yoffsets = [list(np.arange(len(index)) * 3) for index in indices[:-2]]
-        last_in_group = np.diff(np.pad(groups[-2], (0, 1)))[
-            [min(x, len(groups[-2]) - 1) for x in pointers[-1][:-2]]
+        last_in_group = np.diff(np.pad(groups[-1], (0, 1)))[
+            [min(x, len(groups[-1]) - 1) for x in pointers[-1][:-2]]
         ].astype(bool)
         diffed = np.diff(pointers[-1])[:-1]
         yoffsets.append(
@@ -217,7 +217,7 @@ def draw_bendy_line(canvas, x, y1, y2, w, *, dashed=False, squared=False):
 
 @autoexpand
 def draw_pointer(canvas, x, y, w, ptr, *, center_right=False, skip_if_nonempty=False):
-    if center_right:
+    if center_right and w % 2 != len(str(ptr)) % 2:
         sptr = str(ptr).center(w + 1)[:-1]
     else:
         sptr = str(ptr).center(w)

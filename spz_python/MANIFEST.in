@@ -1,0 +1,6 @@
+recursive-include spz *.py
+include setup.py
+include README.md
+include LICENSE
+include MANIFEST.in
+include versioneer.py
