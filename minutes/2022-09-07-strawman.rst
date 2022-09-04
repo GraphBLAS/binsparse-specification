@@ -1,0 +1,1574 @@
+-  **Author:** `Erik Welch <https://github.com/eriknw>`__
+-  **Date:** 2022-09-07
+-  **Purpose:** Strawman proposal to help discuss `PR
+   #3 <https://github.com/GraphBLAS/binsparse-specification/pull/3>`__
+   and its
+   `proposal <https://github.com/GraphBLAS/binsparse-specification/blob/main/design_docs/01_rankN_arrays.md>`__
+-  https://github.com/GraphBLAS/binsparse-specification
+
+High level perspective
+======================
+
+Let’s call our binary sparse storage format ``binsparse`` in this
+document.
+
+For high level design, let’s assume we will use existing data storage
+formats that can store **metadata** and **arrays** including the shape
+and data type of arrays:
+
+.. code:: mermaid
+
+   flowchart TB
+       high[binsparse: high level metadata]-->mid[containers for metadata and arrays]-->low[(files)]
+
+Example data storage formats:
+
+.. code:: mermaid
+
+   flowchart TB
+       binsparse-->NetCDF4
+       binsparse-->HDF5
+       binsparse-->Zarr
+       binsparse-->n5
+       binsparse-->ASDF
+       binsparse<-->anndata
+
+These containers are higher level than e.g. ZIP, LMDB, and Tar files,
+and handle data types, multidimensional arrays, endianness, compression,
+etc.
+
+Our current design goal, then, is to determine the high level metadata
+and arrays for sparse arrays.
+
+Version 1.0
+===========
+
+-  Very limited scope
+
+   -  Simple and opinionated with no options
+   -  Easy to explain and understand
+   -  Smooth transition to version 2.0
+
+-  Sparse formats: COO, CSR, CSC, DCSR, DCSC, sparse vector
+-  Indices must be lexicographically sorted by dim0, dim1
+-  No duplicate indices allowed
+
+   -  Applies to COO
+   -  Applies to row indices in DCSR
+
+-  May support dense and bitmap formats
+-  May allow attributes such as ``is_symmetric``, ``ndiag``, etc.
+
+Assume all metadata contains format type and version, such as:
+
+.. code:: json
+
+   {
+     "spec_version": "https://purl.org/binsparse/spec/core/1.0"
+   }
+
+.. raw:: html
+
+   <table style="text-align:left; border:1px solid #ccc;">
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   <th>
+
+CSR
+
+.. raw:: html
+
+   </th>
+
+.. raw:: html
+
+   <th>
+
+CSC
+
+.. raw:: html
+
+   </th>
+
+.. raw:: html
+
+   <th>
+
+DCSR
+
+.. raw:: html
+
+   </th>
+
+.. raw:: html
+
+   <th>
+
+DCSC
+
+.. raw:: html
+
+   </th>
+
+.. raw:: html
+
+   <th>
+
+COO
+
+.. raw:: html
+
+   </th>
+
+.. raw:: html
+
+   <th>
+
+Vector
+
+.. raw:: html
+
+   </th>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   <td>
+
+.. code:: json
+
+   {
+     "format": "CSR",
+     "shape": [m, n]
+   }
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   <td>
+
+.. code:: json
+
+   {
+     "format": "CSC",
+     "shape": [m, n]
+   }
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   <td>
+
+.. code:: json
+
+   {
+     "format": "DCSR",
+     "shape": [m, n]
+   }
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   <td>
+
+.. code:: json
+
+   {
+     "format": "DCSC",
+     "shape": [m, n]
+   }
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   <td>
+
+.. code:: json
+
+   {
+     "format": "COO",
+     "shape": [m, n]
+   }
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   <td>
+
+.. code:: json
+
+   {
+     "format": "COO",
+     "shape": [n]
+   }
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   <td>
+
+::
+
+   Data:
+    - pointers_0
+    - indices_1
+    - values
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   <td>
+
+::
+
+   Data:
+    - pointers_0
+    - indices_1
+    - values
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   <td>
+
+::
+
+   Data:
+    - indices_0
+    - pointers_0
+    - indices_1
+    - values
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   <td>
+
+::
+
+   Data:
+    - indices_0
+    - pointers_0
+    - indices_1
+    - values
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   <td>
+
+::
+
+   Data:
+    - indices_0
+    - indices_1
+    - values
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   <td>
+
+::
+
+   Data:
+    - indices_0
+    - values
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   </table>
+
+Questions
+~~~~~~~~~
+
+-  Should we save datatypes or defer to the storage container?
+
+   -  e.g.,
+      ``{"data_types": {"indices_0": "uint64", "values": "float64"}``
+   -  If so, should we indicate endianness such as ``"<i4"``?
+
+-  Should we add ``"COOR"`` and ``"COOC"`` (or ``"COO-R"`` and
+   ``"COO-C"``) formats that are sorted by row then column and column
+   then row?
+-  Should ``"COO"`` format be “special” and allowed to be unsorted
+   and/or have duplicates?
+-  Should we always include ``dim_types`` (see below)?
+
+Version 2.0
+===========
+
+-  Version 2.x is an extension of and can read version 1.x
+-  Support multidimensional sparse arrays
+-  Support duplicated indices
+
+   -  common for COO
+
+-  Support unordered indices
+
+   -  common for COO
+   -  “jumbled” columns in SuiteSparse:GraphBLAS CSR and DCSR
+
+-  Support multiple value arrays, no value arrays, and iso-valued arrays
+-  Support per-dimension, per-values, and global attributes
+-  Allow extensions
+
+.. raw:: html
+
+   <table style="text-align:left; border:1px solid #ccc;">
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   <th>
+
+CSR
+
+.. raw:: html
+
+   </th>
+
+.. raw:: html
+
+   <th>
+
+CSC
+
+.. raw:: html
+
+   </th>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   <td>
+
+.. code:: json
+
+   {
+     "format": "CSR",
+     "shape": [m, n],
+
+     "dim_types": ["compressed", "sparse"],
+     "dim_order": [0, 1],
+
+     "dim_properties": {1: {"is_ordered": true}},
+     "properties": {"has_duplicates": false},
+
+     "dim_sizes": [m, n],
+     "dim_taco": ["dense", "compressed"]
+   }
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   <td>
+
+.. code:: json
+
+   {
+     "format": "CSC",
+     "shape": [m, n],
+
+     "dim_types": ["compressed", "sparse"],
+     "dim_order": [1, 0],
+
+     "dim_properties": {1: {"is_ordered": true}},
+     "properties": {"has_duplicates": false},
+
+     "dim_sizes": [n, m],
+     "dim_taco": ["dense", "compressed"]
+   }
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   <th>
+
+DCSR
+
+.. raw:: html
+
+   </th>
+
+.. raw:: html
+
+   <th>
+
+DCSC
+
+.. raw:: html
+
+   </th>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   <td>
+
+.. code:: json
+
+   {
+     "format": "DCSR",
+     "shape": [m, n],
+
+     "dim_types": ["doubly_compressed", "sparse"],
+     "dim_order": [0, 1],
+
+     "dim_properties": {
+       0: {"is_ordered": true, "is_unique": true},
+       1: {"is_ordered": true}
+     },
+     "properties": {"has_duplicates": false},
+
+     "dim_sizes": [m, n],
+     "dim_taco": ["compressed", "compressed"]
+   }
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   <td>
+
+.. code:: json
+
+   {
+     "format": "DCSC",
+     "shape": [m, n],
+
+     "dim_types": ["doubly_compressed", "sparse"],
+     "dim_order": [1, 0],
+
+     "dim_properties": {
+       0: {"is_ordered": true, "is_unique": true},
+       1: {"is_ordered": true}
+     },
+     "properties": {"has_duplicates": false},
+
+     "dim_sizes": [n, m],
+     "dim_taco": ["compressed", "compressed"]
+   }
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   <th>
+
+COO
+
+.. raw:: html
+
+   </th>
+
+.. raw:: html
+
+   <th>
+
+Vector
+
+.. raw:: html
+
+   </th>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   <td>
+
+.. code:: json
+
+   {
+     "format": "COO",
+     "shape": [m, n],
+
+     "dim_types": ["sparse", "sparse"],
+     "dim_order": [0, 1],
+
+     "dim_properties": {
+       0: {"is_ordered": true},
+       1: {"is_ordered": true}
+     },
+     "properties": {"has_duplicates": false},
+
+     "dim_sizes": [m, n],
+     "dim_taco": ["compressed-nonunique", "singleton"]
+   }
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   <td>
+
+.. code:: json
+
+   {
+     "format": "COO",
+     "shape": [n],
+
+     "dim_types": ["sparse"],
+     "dim_order": [0],
+
+     "dim_properties": {
+       0: {"is_ordered": true}
+     },
+     "properties": {"has_duplicates": false},
+
+     "dim_sizes": [n],
+     "dim_taco": ["compressed"]
+   }
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   </table>
+
+``dim_types``
+~~~~~~~~~~~~~
+
+-  Each dimension is one of ``"sparse"``, ``"compressed"``, or
+   ``"doubly_compressed"`` as described here:
+
+   -  https://github.com/GraphBLAS/binsparse-specification/blob/main/design_docs/01_rankN_arrays.md
+
+-  Design choices
+
+   -  required, even in version 1.0
+   -  required *except* for formats in version 1.0
+   -  not required if it can be inferred from the format name
+
+      -  Example: ``"format": "SCSR"`` –>
+         ``"dim_types": ["sparse", "compressed", "sparse"]``
+
+   -  make ``format`` optional if ``dim_types`` is given?
+
+``dim_order``
+~~~~~~~~~~~~~
+
+-  Logically reorders dimensions
+
+   -  Like ``dimOrdering`` in `MLIR sparse
+      tensor <https://mlir.llvm.org/docs/Dialects/SparseTensorOps/>`__
+   -  ``shape = [dim_sizes[i] for i in dim_order]``
+   -  ``dim_sizes = [shape[i] for i in argsort(dim_order)]``
+
+-  Optional; defaults to ``[0, 1, ..., N-1]``
+-  *(choice)* May infer from last character in ``format`` if
+   ``dim_types`` can also be inferred:
+
+   -  ``"R"`` results in ``[0, 1, ..., N-1]``
+   -  ``"C"`` results in ``[N-1, ..., 1, 0]``
+   -  otherwise ``dim_order`` is required (or choose a character like
+      ``"X"`` to mean this)
+
+-  *(choice)* Make required like ``dim_types``?
+
+``dim_properties``
+~~~~~~~~~~~~~~~~~~
+
+-  Optional; dictionary of properties for specified dimensions
+-  Default properties:
+
+   -  ``"compressed"``: ``{}``
+   -  ``"sparse"``: ``{"is_ordered": true}``
+   -  ``"doubly_compressed"``:
+      ``{"is_ordered": true, "is_unique": true}``
+
+-  ``is_ordered`` property
+
+   -  Are the indices in ``indices_i`` in order for ``"sparse"`` or
+      ``"doubly_compressed"`` dimensions?
+   -  Indicates whether ``indices_0`` is sorted
+   -  Indicates whether ``indices_i`` with the same previous indices
+      (i.e., between ``pointers_{i-1}`` boundaries) is sorted
+   -  TACO (paper) calls this ``ordered``
+   -  SuiteSparse:GraphBLAS uses ``jumbled``
+
+-  ``is_unique`` property
+
+   -  Indicates whether ``indices_i`` has no duplicates for
+      ``"doubly_compressed"`` dimensions
+   -  TACO (paper) calls this ``unique``
+   -  If ``false``, then this conceptually splits a single index tree
+      into multiple trees
+
+``properties``
+~~~~~~~~~~~~~~
+
+-  Overall properties of the entire sparse index structure
+-  Optional; defaults to ``{"has_duplicates": false}``
+-  ``has_duplicates`` property
+
+   -  Indicates whether the sparse array has values with the same
+      indices
+
+-  May add ``is_symmetric``, ``ndiag``, ``fill_value``, etc
+
+``dim_sizes``
+~~~~~~~~~~~~~
+
+-  Optional; allowed for clarity
+-  Determined from ``dim_order`` and ``shape``
+
+   -  ``shape = [dim_sizes[i] for i in dim_order]``
+   -  ``dim_sizes = [shape[i] for i in argsort(dim_order)]``
+
+``dim_taco``
+~~~~~~~~~~~~
+
+-  Dimension names for TACO and MLIR sparse
+-  Optional; allowed for clarity
+-  Determined by ``dim_types`` (when possible)
+-  Each dimension is one of ``"compressed"``, ``"dense"``,
+   ``"singleton"``, or ``"compressed-nonunique"``
+
+Value arrays
+------------
+
+Still being explored; don’t yet have a complete strawman proposal.
+
+Some ideas:
+
+.. raw:: html
+
+   <table style="text-align:left; border:1px solid #ccc;">
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   <th>
+
+Full v1
+
+.. raw:: html
+
+   </th>
+
+.. raw:: html
+
+   <th>
+
+Bitmap v1
+
+.. raw:: html
+
+   </th>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   <td>
+
+.. code:: json
+
+   {
+     "format": "Full",
+     "shape": [m, n],
+   }
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   <td>
+
+.. code:: json
+
+   {
+     "format": "Bitmap",
+     "shape": [m, n],
+   }
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   <td>
+
+::
+
+   Data:
+    - values
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   <td>
+
+::
+
+   Data:
+    - values
+    - bitmap
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   <th>
+
+Full v2
+
+.. raw:: html
+
+   </th>
+
+.. raw:: html
+
+   <th>
+
+Bitmap v2
+
+.. raw:: html
+
+   </th>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   <td>
+
+.. code:: json
+
+   {
+     "format": "Full",
+     "shape": [m, n],
+
+     "dim_types": ["full", "full"],
+     "dim_order": [0, 1],
+
+     "dim_properties": {},
+     "properties": {"has_duplicates": false},
+
+     "dim_sizes": [m, n],
+     "dim_taco": ["dense", "dense"]
+   }
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   <td>
+
+.. code:: json
+
+   {
+     "format": "Bitmap",
+     "shape": [m, n],
+
+     "dim_types": ["full", "full"],
+     "dim_order": [0, 1],
+
+     "dim_properties": {},
+     "properties": {"has_duplicates": false},
+
+     "dim_sizes": [m, n],
+     "dim_taco": ["dense", "dense"],
+
+     "value_bitmaps": {"values": "bitmap"}
+   }
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   <td>
+
+::
+
+   Data:
+    - values
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   <td>
+
+::
+
+   Data:
+    - values
+    - bitmap
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   <th>
+
+CSR (bitmap)
+
+.. raw:: html
+
+   </th>
+
+.. raw:: html
+
+   <th>
+
+DCSC (iso)
+
+.. raw:: html
+
+   </th>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   <td>
+
+.. code:: json
+
+   {
+     "format": "CSR",
+     "shape": [m, n],
+
+     "dim_types": ["compressed", "sparse"],
+     "dim_order": [0, 1],
+
+     "dim_properties": {1: {"is_ordered": true}},
+     "properties": {"has_duplicates": false},
+
+     "dim_sizes": [m, n],
+     "dim_taco": ["dense", "compressed"],
+
+     "value_bitmaps": {"values": "bitmap"}
+   }
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   <td>
+
+.. code:: json
+
+   {
+     "format": "DCSC",
+     "shape": [m, n],
+
+     "dim_types": ["doubly_compressed", "sparse"],
+     "dim_order": [1, 0],
+
+     "dim_properties": {
+       0: {"is_ordered": true, "is_unique": true},
+       1: {"is_ordered": true}
+     },
+     "properties": {"has_duplicates": false},
+
+     "dim_sizes": [n, m],
+     "dim_taco": ["compressed", "compressed"],
+
+     "value_isovalues": {"values": 0}  // needs data_type!
+   }
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   <td>
+
+::
+
+   Data:
+    - pointers_0
+    - indices_1
+    - values
+    - bitmap
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   <td>
+
+::
+
+   Data:
+    - indices_0
+    - pointers_0
+    - indices_1
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   <th>
+
+CSC (many value arrays)
+
+.. raw:: html
+
+   </th>
+
+.. raw:: html
+
+   <th>
+
+DCSC (structure-only)
+
+.. raw:: html
+
+   </th>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   <td>
+
+.. code:: json
+
+   {
+     "format": "CSC",
+     "shape": [m, n],
+
+     "dim_types": ["compressed", "sparse"],
+     "dim_order": [1, 0],
+
+     "dim_properties": {1: {"is_ordered": true}},
+     "properties": {"has_duplicates": false},
+
+     "dim_sizes": [n, m],
+     "dim_taco": ["dense", "compressed"],
+
+     "value_names": ["foo", "bar"],
+   }
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   <td>
+
+.. code:: json
+
+   {
+     "format": "DCSR",
+     "shape": [m, n],
+
+     "dim_types": ["doubly_compressed", "sparse"],
+     "dim_order": [0, 1],
+
+     "dim_properties": {
+       0: {"is_ordered": true, "is_unique": true},
+       1: {"is_ordered": true}
+     },
+     "properties": {"has_duplicates": false},
+
+     "dim_sizes": [m, n],
+     "dim_taco": ["compressed", "compressed"],
+
+     "value_names": [],
+   }
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   <td>
+
+::
+
+   Data:
+    - pointers_0
+    - indices_1
+    - foo
+    - bar
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   <td>
+
+::
+
+   Data:
+    - indices_0
+    - pointers_0
+    - indices_1
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   <th>
+
+semi-COO
+
+.. raw:: html
+
+   </th>
+
+.. raw:: html
+
+   <th>
+
+CSR (array values)
+
+.. raw:: html
+
+   </th>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   <td>
+
+.. code:: json
+
+   {
+     "format": "SFR",
+     "shape": [m, n],
+
+     "dim_types": ["sparse", "full"],
+     "dim_order": [0, 1],
+
+     "dim_properties": {0: {"is_ordered": true}},
+     "properties": {"has_duplicates": false},
+
+     "dim_sizes": [m, n],
+     "dim_taco": ["compressed-nonunique", "dense"]
+   }
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   <td>
+
+.. code:: json
+
+   {
+     "format": "CSFR",
+     "shape": [m, n, o],
+
+     "dim_types": ["compressed", "sparse", "full"],
+     "dim_order": [0, 1, 2],
+
+     "dim_properties": {
+       0: {"is_ordered": true},
+       1: {"is_ordered": true}
+     },
+     "properties": {"has_duplicates": false},
+
+     "dim_sizes": [m, n, o],
+     "dim_taco": ["dense", "compressed", "dense"],
+   }
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   <td>
+
+.. code:: c
+
+   Data:
+    - indices_0
+    - values  // shape = [len(indices_0), n]
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   <td>
+
+.. code:: c
+
+   Data:
+    - pointers_0
+    - indices_1
+    - values  // shape = [len(indices_1), o]
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   <th>
+
+CSR (multigraph)
+
+.. raw:: html
+
+   </th>
+
+.. raw:: html
+
+   <th>
+
+CSR (variable-size datatype)
+
+.. raw:: html
+
+   </th>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   <td>
+
+.. code:: json
+
+   {
+     "format": "CSR",
+     "shape": [m, n],
+
+     "dim_types": ["compressed", "doubly_compressed"],
+     "dim_order": [0, 1],
+
+     "dim_properties":
+       {1: {"is_ordered": true, "is_unique": true}
+     },
+     "properties": {"has_duplicates": true},
+
+     "dim_sizes": [m, n],
+     "dim_taco": null,
+   }
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   <td>
+
+.. code:: json
+
+   {
+     "format": "CSR",
+     "shape": [m, n],
+
+     "dim_types": ["compressed", "sparse"],
+     "dim_order": [0, 1],
+
+     "dim_properties": {1: {"is_ordered": true}},
+     "properties": {"has_duplicates": false},
+
+     "dim_sizes": [m, n],
+     "dim_taco": ["dense", "compressed"],
+
+     "value_pointers": {"values": "valptr"}
+   }
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   <tr>
+
+.. raw:: html
+
+   <td>
+
+::
+
+   Data:
+    - pointers_0
+    - indices_1
+    - pointers_1
+    - values
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   <td>
+
+::
+
+   Data:
+    - pointers_0
+    - indices_1
+    - values
+    - valptr
+
+.. raw:: html
+
+   </td>
+
+.. raw:: html
+
+   </tr>
+
+.. raw:: html
+
+   </table>
