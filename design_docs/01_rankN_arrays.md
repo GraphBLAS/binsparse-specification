@@ -146,9 +146,7 @@ For larger dimensions, it is sometimes more clear to separate the abbreviated st
 
 See more examples of different compression types on a rank 4 array here:
 
-https://nbviewer.org/github/eriknw/binsparse-specification/blob/spz/spz_python/notebooks/Example_Rank4.ipynb
-
-<!-- TODO: update link to not use eriknw -->
+https://nbviewer.org/github/GraphBLAS/binsparse-specification/blob/main/spz_python/notebooks/Example_Rank4.ipynb
 
 #### COO
 
@@ -246,3 +244,4 @@ Sometimes compression can be improved by using different compression schemes for
 - MM-CSF: https://par.nsf.gov/servlets/purl/10172913
 
 This may be challenging or complicated to support.
+

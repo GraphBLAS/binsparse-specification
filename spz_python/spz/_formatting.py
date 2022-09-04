@@ -40,7 +40,9 @@ def index_levels(self):
     return rv
 
 
-def _to_group(indices, pointers, group=None, start=0, stop=None):
+def _to_group(indices, pointers, group=None, start=0, stop=None, *, compact=None):
+    if compact is None:
+        compact = True
     index, *indices = indices
     if stop is None:
         stop = len(index)
@@ -51,15 +53,31 @@ def _to_group(indices, pointers, group=None, start=0, stop=None):
             else:
                 yield group
         return
+    if index.size == 0:  # Can this happen?
+        return
     ptrs, *pointers = pointers
-    for i, (start, stop) in enumerate(zip(ptrs[start:stop], ptrs[start + 1 : stop + 1])):
-        cur_group = i if group is None else group
+    i = 0
+    prev_idx = index[0]
+    for idx, start, stop in zip(index, ptrs[start:stop], ptrs[start + 1 : stop + 1]):
+        if group is not None:
+            cur_group = group
+        elif not compact:
+            cur_group = i
+            i += 1
+        elif idx != prev_idx:
+            i += 1
+            cur_group = i
+            prev_idx = idx
+        else:
+            cur_group = i
         groups = list(_to_group(indices, pointers, cur_group, start, stop))
         yield [cur_group, groups]
 
 
-def index_groups(self):
-    groups = list(_to_group(self._indices, self._pointers))
+def index_groups(self, *, compact=None):
+    if compact is None:
+        compact = True
+    groups = list(_to_group(self._indices, self._pointers, compact=compact))
     if self.ndim == 1:
         return [groups]
     rv = []
@@ -71,7 +89,7 @@ def index_groups(self):
     return rv
 
 
-def get_layout(self, *, squared=False):
+def get_layout(self, *, squared=False, compact=None):
     indices = self._indices
     pointers = self._pointers
 
@@ -86,17 +104,37 @@ def get_layout(self, *, squared=False):
     xoffsets = np.cumsum(widths)
 
     # Now we need to determins Ys.  Get initial guesses.
-    groups = index_groups(self)
+    groups = index_groups(self, compact=compact)
     if self.ndim > 1:
         yoffsets = [list(np.arange(len(index)) * 3) for index in indices[:-2]]
         last_in_group = np.diff(np.pad(groups[-1], (0, 1)))[
             [min(x, len(groups[-1]) - 1) for x in pointers[-1][:-2]]
         ].astype(bool)
-        diffed = np.diff(pointers[-1])[:-1]
+        diffed = np.diff(pointers[-1])
         yoffsets.append(
-            np.pad((np.maximum(2, diffed + last_in_group) + 1 + squared).cumsum(), (1, 0)).tolist()
+            np.pad(
+                (np.maximum(2, diffed[:-1] + last_in_group) + 1 + squared).cumsum(), (1, 0)
+            ).tolist()
         )
-        yoffsets.append(list(range(len(indices[-1]))))  # We handle constraints in the line above
+
+        # I think compact here only affects 2d layouts
+        if compact:
+            final_offsets = list(range(len(indices[-1])))  # defer to previous constraints
+        else:
+            final_offsets = []
+            it = zip(groups[-1], indices[-1])
+            cur = 0
+            prev_group = 0
+            for count in diffed:
+                for _ in range(count):
+                    group, index = next(it)
+                    if group != prev_group:
+                        cur += 1
+                        prev_group = group
+                    final_offsets.append(cur)
+                    cur += 1
+                cur += 1
+        yoffsets.append(final_offsets)
     else:
         yoffsets = [list(range(len(indices[-1])))]
 
@@ -229,10 +267,12 @@ def draw_pointer(canvas, x, y, w, ptr, *, center_right=False, skip_if_nonempty=F
         canvas[y][x + i] = c
 
 
-def to_text(self, *, squared=False):
+def to_text(self, *, squared=False, compact=None):
     indices = self._indices
     pointers = self._pointers
-    index_widths, pointers_widths, xoffsets, yoffsets = get_layout(self, squared=squared)
+    index_widths, pointers_widths, xoffsets, yoffsets = get_layout(
+        self, squared=squared, compact=compact
+    )
     # Doesn't need to be perfect: we'll expand the canvas as needed
     xmax = max(xoffsets) + 1
     ymax = max(concat(yoffsets)) + 1
@@ -294,8 +334,8 @@ def to_text(self, *, squared=False):
     return "\n".join(hrows + rows)
 
 
-def to_svg(self):
+def to_svg(self, *, squared=False, compact=None):
     from sphinxcontrib.svgbob._svgbob import to_svg as _to_svg
 
-    text = to_text(self)
+    text = to_text(self, squared=squared, compact=compact)
     return _to_svg(text)

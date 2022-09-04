@@ -3,7 +3,7 @@ class StructureType:
         return self.name
 
     def __eq__(self, other):
-        return self.name == to_type(other).name
+        return other is not None and self.name == to_type(other).name
 
     def __hash__(self):
         return hash(self.name)
@@ -42,6 +42,7 @@ _STR_TO_TYPE = {
     "d": DC,
     "doubly_compressed": DC,
     "doubly compressed": DC,
+    "doubly-compressed": DC,
     "doublycompressed": DC,
 }
 
