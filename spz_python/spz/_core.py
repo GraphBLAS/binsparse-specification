@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from itertools import zip_longest
 
 from .sparsetype import DC, C, S, abbreviate, unabbreviate
 
@@ -218,6 +219,7 @@ class SPZ:
                 assert len(ptr) == len(set(ptr))
             else:  # pragma: no cover
                 raise AssertionError()
+        self.taco_structure
 
     def as_structure(self, structure):
         return SPZ(self.arrays, self.shape, structure)
@@ -265,6 +267,25 @@ class SPZ:
     @property
     def arrays(self):
         return [np.array(array) for array in zip(*_to_coo(self._indices, self._pointers))]
+
+    @property
+    def taco_structure(self):
+        # I'm not 100% certain of the use of "singleton" and "compressed-nonunique"
+        rv = []
+        L = [DC] + self._structure
+        for i, (prev, cur, nxt) in enumerate(zip_longest(L[:-1], L[1:], L[2:])):
+            if cur == C:
+                rv.append("dense")
+            elif prev == S and cur in {S, DC}:
+                rv.append("singleton")
+            elif prev in {C, DC} and cur == S and nxt in {S, C}:
+                # I'm not certain about `nxt == C` case here
+                rv.append("compressed-nonunique")
+            elif prev in {C, DC}:
+                rv.append("compressed")
+            else:
+                raise NotImplementedError()
+        return rv
 
     def _repr_svg_(self):
         try:
