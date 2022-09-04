@@ -1,6 +1,7 @@
+from itertools import zip_longest
+
 import numpy as np
 import pandas as pd
-from itertools import zip_longest
 
 from .sparsetype import DC, C, S, abbreviate, unabbreviate
 
@@ -273,7 +274,7 @@ class SPZ:
         # I'm not 100% certain of the use of "singleton" and "compressed-nonunique"
         rv = []
         L = [DC] + self._structure
-        for i, (prev, cur, nxt) in enumerate(zip_longest(L[:-1], L[1:], L[2:])):
+        for prev, cur, nxt in zip_longest(L[:-1], L[1:], L[2:]):
             if cur == C:
                 rv.append("dense")
             elif prev == S and cur in {S, DC}:
