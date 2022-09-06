@@ -1,9 +1,10 @@
-from itertools import zip_longest
-
 import numpy as np
 import pandas as pd
 
-from .sparsetype import DC, C, S, abbreviate, unabbreviate
+from .sparsetype import DC, C, S, abbreviate
+from .sparsetype import from_taco as _from_taco
+from .sparsetype import to_taco as _to_taco
+from .sparsetype import unabbreviate
 
 
 def repeatrange(repeat, *args):
@@ -16,6 +17,12 @@ def issorted(array):
 
 
 class SPZ:
+    @classmethod
+    def from_taco(cls, arrays, shape=None, structure=None):
+        if structure is not None:
+            structure = _from_taco(structure)
+        return cls(arrays, shape=shape, structure=structure)
+
     def __init__(self, arrays, shape=None, structure=None):
         if not isinstance(arrays, (list, tuple)):
             raise TypeError("arrays argument must be a list or tuple of numpy arrays")
@@ -220,7 +227,7 @@ class SPZ:
                 assert len(ptr) == len(set(ptr))
             else:  # pragma: no cover
                 raise AssertionError()
-        self.taco_structure
+        assert _from_taco(self.taco_structure) == structure
 
     def as_structure(self, structure):
         return SPZ(self.arrays, self.shape, structure)
@@ -271,22 +278,7 @@ class SPZ:
 
     @property
     def taco_structure(self):
-        # I'm not 100% certain of the use of "singleton" and "compressed-nonunique"
-        rv = []
-        L = [DC] + self._structure
-        for prev, cur, nxt in zip_longest(L[:-1], L[1:], L[2:]):
-            if cur == C:
-                rv.append("dense")
-            elif prev == S and cur in {S, DC}:
-                rv.append("singleton")
-            elif prev in {C, DC} and cur == S and nxt in {S, C}:
-                # I'm not certain about `nxt == C` case here
-                rv.append("compressed-nonunique")
-            elif prev in {C, DC}:
-                rv.append("compressed")
-            else:
-                raise NotImplementedError()
-        return rv
+        return _to_taco(self._structure)
 
     def _repr_svg_(self):
         try:
