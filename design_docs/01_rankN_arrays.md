@@ -94,7 +94,7 @@ CSR, CSC, DCSR, and DCSC are familiar and keep their original meanings.
 
 #### COO
 
-SSR and SSC in the previous table are new and are instances of COO with sorted indices and no duplicates (according to our simplifying assumptions).  SSR indices are lexicographically sorted by row then column, and a backronym could be "sorted sparse rows".  Conversely, SSC indices are lexicographically sorted by column then row, and a backronym could be "sorted sparse columns".
+SSR and SSC in the previous table are new and are instances of COO with sorted indices and no duplicates (according to our simplifying assumptions).  SSR indices are lexicographically sorted by row then column, and a backronym could be "sorted sparse rows" (or "simple" or "standard" instead of "sorted").  Conversely, SSC indices are lexicographically sorted by column then row, and a backronym could be "sorted sparse columns".
 
 We can consider also keeping COO as a type of compression.  COO does not need to be sorted, and metadata can indicate whether or not it may have duplicate indices.
 
@@ -202,11 +202,13 @@ The main difference from our proposal is the use of `pointer_i`.  In TACO and ML
 
 In TACO, DCSR is constructed using "compressed", "compressed" dimensions.  This results in _two_ `pointers` arrays, which is not standard DCSR.  Only one `pointers` array is necessary.  In MLIR, there are two ways to specify DCSR arrays.  Our proposal only has one way to specify DCSR, and it does not have an extra, unnecessary `pointers` array.
 
-It is straightforward to convert from our specification to MLIR sparse tensor specification:
+It is straightforward to convert from our specification to MLIR sparse tensor specification with only "compressed" and "dense" dimensions:
 1. Increment `pointers` arrays, so e.g. `pointers_0` becomes `mlir_pointers_1`
 2. If a dimension has both `mlir_pointers_i` and `indices_i`, then it is MLIR's "compressed"
 3. If a dimension has only `indices_i`, then it is MLIR's "singleton"
 4. If a dimension does not have `mlir_pointers_i` or `indices_i`, then it is MLIR's "dense"
+
+Converting to TACO-style with "singleton" and "compressed-nonunique" is signficantly more difficult.
 
 ### Extensions
 
