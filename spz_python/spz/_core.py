@@ -233,10 +233,43 @@ class SPZ:
         return SPZ(self.arrays, self.shape, structure)
 
     def get_index(self, dim):
-        return self._indices[dim]
+        # Let's demonstrate how to compute indices that don't need to be stored
+        dim = range(self.ndim)[dim]  # Make dim positive
+        if self._structure[dim] == C:
+            size = 1
+            for cur in reversed(range(dim)):
+                if self._structure[cur] == C:
+                    size *= self._shape[cur]
+                else:
+                    size *= len(self._indices[cur])
+                    if self._structure[cur] == S:
+                        size //= self._shape[cur + 1]
+                    break
+            return repeatrange(size, self._shape[dim])
+        else:
+            return self._indices[dim]
 
     def get_pointers(self, dim):
-        return self._pointers[dim]
+        # Let's demonstrate how to compute pointers that don't need to be stored
+        dim = range(self.ndim)[dim]  # Make dim positive
+        if self._structure[dim] == S:
+            return np.arange(len(self._indices[dim]) + 1)
+        elif self._structure[dim + 1] == C:
+            if self._structure[dim] == DC:
+                size = len(self._indices[dim])
+            else:
+                size = self._shape[dim]
+                for cur in reversed(range(dim)):
+                    if self._structure[cur] == C:
+                        size *= self._shape[cur]
+                    else:
+                        size *= len(self._indices[cur])
+                        if self._structure[cur] == S:
+                            size //= self._shape[cur + 1]
+                        break
+            return np.arange(size + 1) * self._shape[dim + 1]
+        else:
+            return self._pointers[dim]
 
     @property
     def indices(self):
