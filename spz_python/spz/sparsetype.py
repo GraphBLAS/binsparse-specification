@@ -1,3 +1,6 @@
+from itertools import zip_longest
+
+
 class StructureType:
     def __repr__(self):
         return self.name
@@ -73,4 +76,73 @@ def unabbreviate(abbr):
             rv.append(to_type(c))
         rv.append(DC)
     rv.pop()  # One extra DC
+    return rv
+
+
+def to_taco(structure):
+    if isinstance(structure, str):
+        structure = unabbreviate(structure)
+    else:
+        structure = unabbreviate(abbreviate(*structure))
+    rv = []
+    L = [DC] + structure
+    lookahead = S  # backwards-fill S values
+    for prev, cur, nxt in reversed(list(zip_longest(L[:-1], L[1:], L[2:]))):
+        # Uh, these rules totally make sense.  Right?  Right?!
+        if cur != S:
+            lookahead = cur
+        if cur == C:
+            rv.append("dense")
+        elif prev == S and cur in {S, DC}:
+            rv.append("singleton")
+        elif prev in {C, DC} and cur == S and lookahead in {S, C} and nxt is not None:
+            rv.append("compressed-nonunique")
+        elif prev in {C, DC}:
+            rv.append("compressed")
+        else:
+            # We should be able to always go to TACO
+            raise NotImplementedError(f"Unable to convert to TACO structure: {structure}")
+    rv.reverse()
+    return rv
+
+
+def from_taco(structure):
+    compressed = "compressed"
+    dense = "dense"
+    nonunique = "compressed-nonunique"
+    singleton = "singleton"
+    rv = []
+    prev_nonS = structure[0]
+    # fmt: off
+    for prev, cur, nxt in zip_longest([None] + list(structure[:-1]), structure, structure[1:]):
+        # These rules were developed via trial and error.  Fingers crossed!
+        # Let's try come up with a clearer way to convert from taco.
+        if cur == dense and nxt in {dense, nonunique, compressed}:
+            rv.append(C)
+        elif (
+            prev in {None, dense, singleton, compressed} and cur == compressed
+            and nxt in {dense, nonunique, compressed}
+            or cur == singleton and (
+                prev == compressed and nxt in {dense, nonunique, compressed}
+                or prev == singleton and nxt == compressed
+                or prev == singleton and nxt in {dense, nonunique} and prev_nonS == compressed
+            ) and not (prev == singleton and nxt == compressed and prev_nonS == nonunique)
+        ):
+            rv.append(DC)
+        elif (
+            cur == nonunique and nxt in {dense, singleton}
+            or cur == compressed and nxt in {None, singleton}
+            or cur == singleton and (
+                prev == nonunique and nxt in {None, dense, singleton}
+                or prev == compressed and nxt == singleton
+                or prev == singleton and nxt in {None, singleton}
+                or prev == singleton and nxt == dense and prev_nonS == nonunique
+            ) and not (nxt is None and prev_nonS == compressed)
+        ):
+            rv.append(S)
+        else:
+            raise ValueError(f"Unable to convert from TACO structure: {structure}")
+        if cur != "singleton":
+            prev_nonS = cur
+    # fmt: on
     return rv
