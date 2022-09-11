@@ -4,6 +4,13 @@ import numpy as np
 
 concat = itertools.chain.from_iterable
 
+TACO_ABBV = {
+    "compressed": "C",
+    "dense": "D",
+    "singleton": "S",
+    "compressed-nonunique": "CN",
+}
+
 
 def _to_level(indices, pointers, level=0, start=0, stop=None):
     index, *indices = indices
@@ -267,7 +274,7 @@ def draw_pointer(canvas, x, y, w, ptr, *, center_right=False, skip_if_nonempty=F
         canvas[y][x + i] = c
 
 
-def to_text(self, *, squared=False, compact=None):
+def to_text(self, *, squared=False, compact=None, as_taco=False):
     indices = self._indices
     pointers = self._pointers
     index_widths, pointers_widths, xoffsets, yoffsets = get_layout(
@@ -319,10 +326,32 @@ def to_text(self, *, squared=False, compact=None):
     # Draw header
     header = [[" "] * xmax for _ in range(4)]
     for i, (x, w, index) in enumerate(zip(xoffsets[::2], index_widths, self.indices)):
+        if as_taco:
+            if i == 0:
+                continue
+            i -= 1
         draw_box(header, x, 0, w + 1, f"i{i} ", square=squared, dashed=index is None)
     for i, (x, w) in enumerate(zip(xoffsets[1::2], pointers_widths)):
         draw_pointer(header, x + 1, 1, w - 2, f"p{i}", center_right=False)
     draw_line(header, 0, 3, len("".join(header[0]).rstrip()), double=True)
+
+    # Very top: group columns together and display dimension type
+    w = "".join(header[1]).rindex("|")
+    top = ["-"] * (w + 1)
+    top[w] = "|"
+    structure = self.taco_structure[1:] if as_taco else self._structure
+    for sparsity, x in zip(structure, xoffsets[1 if as_taco else 0 :: 2]):
+        if as_taco:
+            abbv = TACO_ABBV[sparsity]
+        else:
+            abbv = sparsity.abbreviation
+        top[x] = "|"
+        x += 1
+        for c in abbv:
+            top[x] = c
+            x += 1
+        top[x] = " "
+    top = ["".join(top)]
 
     # Strip extra white space
     hrows = ["".join(row).rstrip() for row in header]
@@ -331,11 +360,14 @@ def to_text(self, *, squared=False, compact=None):
     rows = ["".join(row).rstrip() for row in canvas]
     while rows and not rows[-1]:
         rows.pop()
-    return "\n".join(hrows + rows)
+    combined = top + hrows + rows
+    if as_taco:
+        combined = [row[xoffsets[1] :] for row in combined]
+    return "\n".join(combined)
 
 
-def to_svg(self, *, squared=False, compact=None):
+def to_svg(self, *, squared=False, compact=None, as_taco=False):
     from sphinxcontrib.svgbob._svgbob import to_svg as _to_svg
 
-    text = to_text(self, squared=squared, compact=compact)
+    text = to_text(self, squared=squared, compact=compact, as_taco=as_taco)
     return _to_svg(text)

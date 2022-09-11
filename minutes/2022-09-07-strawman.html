@@ -14631,6 +14631,16 @@ flowchart TB
 </code></pre>
 <p>These containers are higher level than e.g. ZIP, LMDB, and Tar files, and handle data types, multidimensional arrays, endianness, compression, etc.</p>
 <p>Our current design goal, then, is to determine the high level metadata and arrays for sparse arrays.</p>
+<p>We should also consider using <code>binsparse</code> as an <em>embedded</em> spec to be used as components in other storage formats.</p>
+<pre><code>mermaid
+flowchart LR
+  subgraph Container
+  a[embedded binsparse 'foo']
+  b[embedded binsparse 'bar']
+  c[dense array 'baz']
+  d[other stuff]
+  end
+</code></pre>
 
 </div>
 </div>
@@ -14647,9 +14657,10 @@ flowchart TB
 <li>Simple and opinionated with no options</li>
 <li>Easy to explain and understand</li>
 <li>Smooth transition to version 2.0</li>
+<li>Cover most of MatrixMarket format</li>
 </ul>
 </li>
-<li>Sparse formats: COO, CSR, CSC, DCSR, DCSC, sparse vector</li>
+<li>Sparse formats: COO, CSR, CSC, DCSR, DCSC, sparse vector (VEC)</li>
 <li>Indices must be lexicographically sorted by dim0, dim1</li>
 <li>No duplicate indices allowed<ul>
 <li>Applies to COO</li>
@@ -14666,7 +14677,7 @@ flowchart TB
 </pre></div>
 <table style="text-align:left; border:1px solid #ccc;">
     <tr></tr>
-    <tr><th> CSR </th><th> CSC </th><th> DCSR </th><th> DCSC </th><th> COO </th><th> Vector </th></tr>
+    <tr><th> CSR </th><th> CSC </th><th> DCSR </th><th> DCSC </th><th> COO </th><th> VEC </th></tr>
 <tr><td>
 <div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
 <span class="w">  </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CSR&quot;</span><span class="p">,</span><span class="w"></span>
@@ -14773,16 +14784,97 @@ flowchart TB
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<h3 id="Questions">Questions<a class="anchor-link" href="#Questions">&#182;</a></h3><ul>
+<h3 id="Questions">Questions<a class="anchor-link" href="#Questions">&#182;</a></h3><p>Inluding some reactions from the September 7 meeting:</p>
+<ul>
 <li>Should we save datatypes or defer to the storage container?<ul>
-<li>e.g., <code>{&quot;data_types&quot;: {&quot;indices_0&quot;: &quot;uint64&quot;, &quot;values&quot;: &quot;float64&quot;}</code></li>
-<li>If so, should we indicate endianness such as <code>&quot;&lt;i4&quot;</code>?</li>
+<li>e.g., <code>{&quot;data_types&quot;: {&quot;indices_0&quot;: &quot;uint64&quot;, &quot;values&quot;: &quot;float64&quot;}</code><ul>
+<li><em>Jim says yes</em></li>
+<li><em>Keep v1 simple</em></li>
+<li><em>Researching data types is an action item</em></li>
 </ul>
 </li>
-<li>Should we add <code>&quot;COOR&quot;</code> and <code>&quot;COOC&quot;</code> (or <code>&quot;COO-R&quot;</code> and <code>&quot;COO-C&quot;</code>) formats that are sorted by row then column and column then row?</li>
-<li>Should <code>&quot;COO&quot;</code> format be &quot;special&quot; and allowed to be unsorted and/or have duplicates?</li>
-<li>Should we always include <code>dim_types</code> (see below)?</li>
+<li>If so, should we indicate endianness such as <code>&quot;&lt;i4&quot;</code>?<ul>
+<li><em>Jim and Ben say no</em></li>
 </ul>
+</li>
+</ul>
+</li>
+<li>Should we add <code>&quot;COOR&quot;</code> and <code>&quot;COOC&quot;</code> (or <code>&quot;COO-R&quot;</code> and <code>&quot;COO-C&quot;</code>) formats that are sorted by row then column and column then row?<ul>
+<li><em>Jim, yes for COOR, COOC</em></li>
+</ul>
+</li>
+<li>Should <code>&quot;COO&quot;</code> format be &quot;special&quot; and allowed to be unsorted and/or have duplicates?<ul>
+<li><em>Ben: COO defaults to COOR</em></li>
+</ul>
+</li>
+<li>Should we always include <code>dim_types</code> (see below)?<ul>
+<li><em>Nah</em></li>
+</ul>
+</li>
+<li>Should we add a field for arbitrary user metadata such as comments?<ul>
+<li><em>Yes, a field such as <code>&quot;attrs&quot;</code> that can save key-value pairs</em></li>
+<li><em>Would be nice to store SuiteSparse collection w/o losing any info</em></li>
+<li><em>Erik: follow Zarr's example and don't allow arbitrary key-value pairs--have a specified place for user metadata</em></li>
+</ul>
+</li>
+<li>Should bitmap and full formats be in v1?<ul>
+<li><em>Jim, Ben, Erik: gut reactions--no</em></li>
+<li><em>Isaac would like to consider memory-friendliness</em></li>
+</ul>
+</li>
+</ul>
+<pre><code>Easy datatypes
+    int8 int16 int32 int64
+    uint8 uint16 uint32 uint64
+    float32 float64
+
+Harder datatypes
+    bool
+    complex64
+    int128
+    uint128
+    float16
+    fixed-width UDTs (void or composed?)
+    strings or variable-length
+    datetimes
+</code></pre>
+
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h4 id="Ideas-for-handling-data-types-and-values">Ideas for handling data types and values<a class="anchor-link" href="#Ideas-for-handling-data-types-and-values">&#182;</a></h4><p>Single values array:</p>
+<div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CSR&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;shape&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="err">m</span><span class="p">,</span><span class="w"> </span><span class="kc">n</span><span class="p">],</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;data_types&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;pointers_0&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;int32&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;indices_1&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;uint64&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;values&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;float64&quot;</span><span class="p">},</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+<p>Iso-value:</p>
+<div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CSR&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;shape&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="err">m</span><span class="p">,</span><span class="w"> </span><span class="kc">n</span><span class="p">],</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;data_types&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;pointers_0&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;int32&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;indices_1&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;uint64&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;values&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;float64&quot;</span><span class="p">},</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;isovalue&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span><span class="w"></span>
+
+<span class="w">  </span><span class="nt">&quot;data_types&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;pointers_0&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;int32&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;indices_1&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;uint64&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;values&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;iso[float64&quot;</span><span class="p">]:</span><span class="w"> </span><span class="mf">1.0</span><span class="p">}},</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+<p>No value, structure-only:</p>
+<div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;CSR&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;shape&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="err">m</span><span class="p">,</span><span class="w"> </span><span class="kc">n</span><span class="p">],</span><span class="w"></span>
+<span class="w">  </span><span class="nt">&quot;data_types&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;pointers_0&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;int32&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;indices_1&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;uint64&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;values&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">}</span><span class="w"></span>
+
+<span class="w">  </span><span class="nt">&quot;is_structure_only&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
 
 </div>
 </div>
