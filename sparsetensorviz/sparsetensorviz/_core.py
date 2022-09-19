@@ -16,7 +16,7 @@ def issorted(array):
     return np.all(array[:-1] <= array[1:])
 
 
-class SPZ:
+class SparseTensor:
     @classmethod
     def from_taco(cls, arrays, shape=None, structure=None):
         if structure is not None:
@@ -231,7 +231,7 @@ class SPZ:
         # self.taco_view
 
     def as_structure(self, structure):
-        return SPZ(self.arrays, self.shape, structure)
+        return SparseTensor(self.arrays, self.shape, structure)
 
     def get_index(self, dim):
         # Let's demonstrate how to compute indices that don't need to be stored
@@ -334,7 +334,7 @@ class SPZ:
 class TacoView:
     def __init__(self, parent):
         self._parent = parent
-        self._fake = object.__new__(SPZ)
+        self._fake = object.__new__(SparseTensor)
         self._fake._structure = [DC] + parent._structure
         self._fake._shape = (1,) + parent._shape
         self._fake._indices = [np.array([0])] + self._parent._indices

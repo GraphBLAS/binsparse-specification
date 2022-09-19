@@ -2,7 +2,7 @@ import itertools
 
 import pytest
 
-from spz.sparsetype import DC, C, S, abbreviate, from_taco, to_taco, unabbreviate
+from sparsetensorviz.sparsetype import DC, C, S, abbreviate, from_taco, to_taco, unabbreviate
 
 
 def test_abbreviate():

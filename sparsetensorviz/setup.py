@@ -13,7 +13,7 @@ with open("README.md") as f:
     long_description = f.read()
 
 setup(
-    name="spz",
+    name="sparsetensorviz",
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
     description="Explore multidimensional sparse data structures",

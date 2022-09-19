@@ -5,7 +5,11 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from spz import SPZ
+from sparsetensorviz import SparseTensor
+
+
+def slow(param):
+    return pytest.param(param, marks=pytest.mark.slow)
 
 
 @pytest.fixture
@@ -24,10 +28,10 @@ def test_indices1(indices1, shape):
     sparsities = ["S", "C", "DC"]
     for sparsity in itertools.product(sparsities, sparsities, sparsities):
         structure = "".join(sparsity) + "S"
-        spz = SPZ(indices1, shape, structure)
-        spz._validate()
-        # spz._repr_svg_()
-        df2 = pd.DataFrame(spz.arrays).T
+        st = SparseTensor(indices1, shape, structure)
+        st._validate()
+        # st._repr_svg_()
+        df2 = pd.DataFrame(st.arrays).T
         pd.testing.assert_frame_equal(df, df2)
 
 
@@ -36,10 +40,10 @@ def test_rank1():
         for num in range(1, size + 1):
             for array in itertools.combinations(range(size), num):
                 array = np.array(array)
-                spz = SPZ([array], (size,), "S")
-                spz._validate()
-                # spz._repr_svg_()
-                [index] = spz.arrays
+                st = SparseTensor([array], (size,), "S")
+                st._validate()
+                # st._repr_svg_()
+                [index] = st.arrays
                 assert np.array_equal(array, index)
 
 
@@ -54,10 +58,10 @@ def test_rank2():
                     x = array // ncols
                     y = array % ncols
                     for sparsity in ["S", "C", "DC"]:
-                        spz = SPZ([x, y], (nrows, ncols), sparsity + "S")
-                        spz._validate()
-                        # spz._repr_svg_()
-                        rows, cols = spz.arrays
+                        st = SparseTensor([x, y], (nrows, ncols), sparsity + "S")
+                        st._validate()
+                        # st._repr_svg_()
+                        rows, cols = st.arrays
                         assert np.array_equal(x, rows)
                         assert np.array_equal(y, cols)
 
@@ -79,17 +83,16 @@ def test_rank3():
                                 # Randomly skip two thirds of cases to speed up testing
                                 continue
                             structure = "".join(sparsity) + "S"
-                            spz = SPZ([x, y, z], (nx, ny, nz), structure)
-                            spz._validate()
-                            # spz._repr_svg_()
-                            x2, y2, z2 = spz.arrays
+                            st = SparseTensor([x, y, z], (nx, ny, nz), structure)
+                            st._validate()
+                            # st._repr_svg_()
+                            x2, y2, z2 = st.arrays
                             assert np.array_equal(x, x2)
                             assert np.array_equal(y, y2)
                             assert np.array_equal(z, z2)
 
 
-@pytest.mark.slow
-@pytest.mark.parametrize("N", range(1, 7))
+@pytest.mark.parametrize("N", [1, 2, 3, 4, slow(5), slow(6)])
 def test_rankN(N):
     sparsities = [["S", "C", "DC"]] * (N - 1)
     for sparsity in itertools.product(*sparsities):
@@ -112,7 +115,7 @@ def test_rankN(N):
             indices.append(array // np.multiply.reduce(shape[i + 1 :]) % shape[i])
         indices.append(array % shape[-1])
         try:
-            spz = SPZ(indices, shape, structure)
+            st = SparseTensor(indices, shape, structure)
         except Exception:  # pragma: no cover
             print("N:", N)
             print("array:", array)
@@ -121,15 +124,15 @@ def test_rankN(N):
             print("indices:", indices)
             raise
         try:
-            spz._validate()
+            st._validate()
         except Exception:  # pragma: no cover
-            print("structure:", spz.structure)
-            print("shape:", spz.shape)
-            print("indices:", spz._indices)
-            print("pointers:", spz._pointers)
-            print(spz)
+            print("structure:", st.structure)
+            print("shape:", st.shape)
+            print("indices:", st._indices)
+            print("pointers:", st._pointers)
+            print(st)
             raise
-        # spz._repr_svg_()
-        arrays = spz.arrays
+        # st._repr_svg_()
+        arrays = st.arrays
         for index, arr in zip(indices, arrays):
             assert np.array_equal(index, arr)
