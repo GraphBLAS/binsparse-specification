@@ -2,7 +2,7 @@ import itertools
 
 import pytest
 
-from spz.sparsetype import DC, C, S, abbreviate, from_taco, to_taco, unabbreviate
+from sparsetensorviz.sparsetype import DC, C, S, abbreviate, from_taco, to_taco, unabbreviate
 
 
 def test_abbreviate():
@@ -42,5 +42,26 @@ def test_from_taco(N):
                 f"{taco} and {results[structure]} -> {structure}"
             )
         results[structure] = taco
-        assert tuple(to_taco(structure)) == taco
+        assert tuple(to_taco(structure)) == taco, (taco, structure)
+    assert len(results) == 3 ** (N - 1)
+
+
+# It's not strictly necessary to have both `test_from_taco` and `test_to_taco`,
+# but if changes are made, then it's helpful to have both to help debug.
+@pytest.mark.parametrize("N", range(1, 9))
+def test_to_taco(N):
+    options = [DC, C, S]
+    results = {}
+    for structure in itertools.product(*([options] * (N - 1)), [S]):
+        taco = tuple(to_taco(structure))
+        if taco in results:  # pragma: no cover
+            print(taco)
+            print(" ", results[taco])
+            print(" ", structure)
+            raise AssertionError(
+                "Multiple TACO structures give the same structure: "
+                f"{taco} and {results[structure]} -> {structure}"
+            )
+        results[taco] = structure
+        assert tuple(from_taco(taco)) == structure, (structure, taco)
     assert len(results) == 3 ** (N - 1)

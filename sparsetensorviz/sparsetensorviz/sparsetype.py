@@ -88,25 +88,42 @@ def to_taco(structure):
     L = [DC] + structure
     lookahead = S  # backwards-fill S values
     for prev, cur, nxt in reversed(list(zip_longest(L[:-1], L[1:], L[2:]))):
-        # Uh, these rules totally make sense.  Right?  Right?!
-        if cur != S:
-            lookahead = cur
         if cur == C:
             rv.append("dense")
         elif prev == S and cur in {S, DC}:
             rv.append("singleton")
-        elif prev in {C, DC} and cur == S and lookahead in {S, C} and nxt is not None:
+        elif prev in {C, DC} and cur == S and nxt is not None and lookahead in {C, S}:
             rv.append("compressed-nonunique")
         elif prev in {C, DC}:
             rv.append("compressed")
         else:
             # We should be able to always go to TACO
             raise NotImplementedError(f"Unable to convert to TACO structure: {structure}")
+        if cur != S:
+            lookahead = cur
     rv.reverse()
+
+    # Make some assertions about how we interpret TACO structure
+    assert rv[0] != "singleton"
+    assert rv[-1] != "compressed-nonunique"
+    # "compressed-nonunique" may be followed by any number of "singleton" dimensions
+    # and then "dense" or end of structure.  E.g., "CN-D", "CN-S-D", and "CN-S-S".
+    is_nonunique = False
+    for item in rv:
+        if is_nonunique and item not in {"singleton", "dense"}:  # pragma: no cover
+            raise RuntimeError("Bad TACO format")
+        if item == "compressed-nonunique":
+            is_nonunique = True
+        elif item != "singleton":
+            is_nonunique = False
+
     return rv
 
 
 def from_taco(structure):
+    # We choose a 1-to-1 mapping to and from TACO formats.
+    # It's possible (even likely) that multiple TACO formats could technically
+    # map to the same format, but we choose 1-to-1 for clarity.
     compressed = "compressed"
     dense = "dense"
     nonunique = "compressed-nonunique"

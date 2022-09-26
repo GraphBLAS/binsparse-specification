@@ -16,7 +16,7 @@ def issorted(array):
     return np.all(array[:-1] <= array[1:])
 
 
-class SPZ:
+class SparseTensor:
     @classmethod
     def from_taco(cls, arrays, shape=None, structure=None):
         if structure is not None:
@@ -228,9 +228,10 @@ class SPZ:
             else:  # pragma: no cover
                 raise AssertionError()
         assert _from_taco(self.taco_structure) == structure
+        # self.taco_view
 
     def as_structure(self, structure):
-        return SPZ(self.arrays, self.shape, structure)
+        return SparseTensor(self.arrays, self.shape, structure)
 
     def get_index(self, dim):
         # Let's demonstrate how to compute indices that don't need to be stored
@@ -313,17 +314,81 @@ class SPZ:
     def taco_structure(self):
         return _to_taco(self._structure)
 
-    def _repr_svg_(self):
+    @property
+    def taco_view(self):
+        return TacoView(self)
+
+    def _repr_svg_(self, *, as_taco=False):
         try:
             from ._formatting import to_svg
         except ImportError:
             return
-        return to_svg(self)
+        return to_svg(self, as_taco=as_taco)
 
-    def __repr__(self):
+    def __repr__(self, *, as_taco=False):
         from ._formatting import to_text
 
-        return to_text(self)
+        return to_text(self, as_taco=as_taco)
+
+
+class TacoView:
+    def __init__(self, parent):
+        self._parent = parent
+        self._fake = object.__new__(SparseTensor)
+        self._fake._structure = [DC] + parent._structure
+        self._fake._shape = (1,) + parent._shape
+        self._fake._indices = [np.array([0])] + self._parent._indices
+        self._fake._pointers = [
+            np.array([0, self._parent._indices[0].size])
+        ] + self._parent._pointers
+        # assert self._parent.taco_structure == self._fake.taco_structure[1:]
+
+    def get_index(self, dim):
+        return self._parent.get_index(dim)
+
+    def get_pointers(self, dim):
+        dim = range(self.ndim)[dim]  # Make dim positive
+        return self._fake.get_pointers(dim)
+
+    @property
+    def indices(self):
+        return self._parent.indices
+
+    @property
+    def pointers(self):
+        return self._fake.pointers
+
+    @property
+    def ndim(self):
+        return self._parent.ndim
+
+    @property
+    def shape(self):
+        return self._parent.shape
+
+    @property
+    def structure(self):
+        return self._parent.taco_structure
+
+    @property
+    def abbreviation(self):
+        abbv = {
+            "compressed": "C",
+            "dense": "D",
+            "singleton": "S",
+            "compressed-nonunique": "CN",
+        }
+        return "-".join(abbv[x] for x in self.structure)
+
+    @property
+    def arrays(self):
+        return self._parent.arrays
+
+    def _repr_svg_(self):
+        return self._fake._repr_svg_(as_taco=True)
+
+    def __repr__(self):
+        return self._fake.__repr__(as_taco=True)
 
 
 def _to_coo(indices, pointers, start=0, stop=None):
