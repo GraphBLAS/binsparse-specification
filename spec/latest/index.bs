@@ -1,12 +1,15 @@
 <pre class='metadata'>
 Title: Your Spec Title
-Shortname: your-spec
+Shortname: binsparse
 Level: 1
-Status: w3c/UD
-Group: WGNAMEORWHATEVER
+Status: LS-COMMIT
+Status: UD
+Group: GraphBLAS
 URL: http://example.com/url-this-spec-will-live-at
+Repository: https://github.com/GraphBLAS/binsparse-specification
+Editor: Benjamin Brock, Intel
 Editor: Your Name, Your Company http://example.com/your-company, your-email@example.com, http://example.com/your-personal-website
-Abstract: A short description of your spec, one or two sentences.
+Abstract: A cross-platform binary storage format for sparse data, particularly sparse matrices.
 </pre>
 
 Introduction {#intro}
