@@ -1,0 +1,23 @@
+<pre class='metadata'>
+Title: Binary Sparse Format Specification
+Shortname: binsparse
+Level: 1
+Status: LS-COMMIT
+Status: w3c/UD
+Group: GraphBLAS
+URL: http://example.com/url-this-spec-will-live-at
+Repository: https://github.com/GraphBLAS/binsparse-specification
+Editor: Benjamin Brock, Intel
+Editor: Tim Davis, Texas A&M
+Editor: Jim Kitchen, Anaconda
+Editor: Erik Welch, NVIDIA
+Editor: Isaac Virshup, Helmholtz Munich
+Editor: Your Name, Your Company http://example.com/your-company, your-email@example.com, http://example.com/your-personal-website
+Abstract: A cross-platform binary storage format for sparse data, particularly sparse matrices.
+</pre>
+
+Introduction {#intro}
+=====================
+
+Introduction here.
+
