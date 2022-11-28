@@ -3,7 +3,7 @@ Title: Your Spec Title
 Shortname: binsparse
 Level: 1
 Status: LS-COMMIT
-Status: UD
+Status: w3c/UD
 Group: GraphBLAS
 URL: http://example.com/url-this-spec-will-live-at
 Repository: https://github.com/GraphBLAS/binsparse-specification

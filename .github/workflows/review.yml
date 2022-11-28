@@ -21,5 +21,5 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             #### Automated Review URLs
-            * [render latest/index.bs](http://api.csswg.org/bikeshed/?url=https://raw.githubusercontent.com/GraphBLAS/binsparse-specification/${{ github.event.pull_request.head.sha }}/latest/index.bs)
+            * [render latest/index.bs](http://api.csswg.org/bikeshed/?url=https://raw.githubusercontent.com/GraphBLAS/binsparse-specification/${{ github.event.pull_request.head.sha }}/spec/latest/index.bs)
           edit-mode: replace
