@@ -19,5 +19,5 @@ Abstract: A cross-platform binary storage format for sparse data, particularly s
 Introduction {#intro}
 =====================
 
-Introduction here.
-
+The Binsparse Specification (name tentative) provides a cross-platform format
+for efficiently storing data, particularly sparse matrix, in binary formats.
