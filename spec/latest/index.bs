@@ -20,4 +20,4 @@ Introduction {#intro}
 =====================
 
 The Binsparse Specification (name tentative) provides a cross-platform format
-for efficiently storing data, particularly sparse matrix, in binary formats.
+for efficiently storing data, particularly sparse matrix data, in binary formats.
