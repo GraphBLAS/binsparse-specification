@@ -318,6 +318,12 @@ class SparseTensor:
     def taco_view(self):
         return TacoView(self)
 
+    @property
+    def bundled_groups(self):
+        from ._bundle import to_bundled_groups
+
+        return to_bundled_groups(self)
+
     def _repr_svg_(self, *, as_taco=False):
         try:
             from ._formatting import to_svg
