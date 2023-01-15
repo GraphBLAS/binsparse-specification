@@ -18,12 +18,13 @@ def issorted(array):
 
 class SparseTensor:
     @classmethod
-    def from_taco(cls, arrays, shape=None, structure=None):
+    def from_taco(cls, arrays, shape=None, structure=None, *, group_indices=False):
         if structure is not None:
             structure = _from_taco(structure)
-        return cls(arrays, shape=shape, structure=structure)
+        return cls(arrays, shape=shape, structure=structure, group_indices=group_indices)
 
-    def __init__(self, arrays, shape=None, structure=None):
+    def __init__(self, arrays, shape=None, structure=None, *, group_indices=False):
+        self.group_indices = group_indices
         if not isinstance(arrays, (list, tuple)):
             raise TypeError("arrays argument must be a list or tuple of numpy arrays")
         if not arrays:
@@ -230,8 +231,10 @@ class SparseTensor:
         assert _from_taco(self.taco_structure) == structure
         # self.taco_view
 
-    def as_structure(self, structure):
-        return SparseTensor(self.arrays, self.shape, structure)
+    def as_structure(self, structure, *, group_indices=None):
+        if group_indices is None:
+            group_indices = self.group_indices
+        return SparseTensor(self.arrays, self.shape, structure, group_indices=group_indices)
 
     def get_index(self, dim):
         # Let's demonstrate how to compute indices that don't need to be stored
@@ -324,23 +327,28 @@ class SparseTensor:
 
         return to_bundled_groups(self)
 
-    def _repr_svg_(self, *, as_taco=False):
+    def _repr_svg_(self, *, as_taco=False, as_groups=None):
         try:
             from ._formatting import to_svg
         except ImportError:
             return
-        return to_svg(self, as_taco=as_taco)
+        if as_groups is None:
+            as_groups = self.group_indices
+        return to_svg(self, as_taco=as_taco, as_groups=as_groups)
 
-    def __repr__(self, *, as_taco=False):
+    def __repr__(self, *, as_taco=False, as_groups=None):
         from ._formatting import to_text
 
-        return to_text(self, as_taco=as_taco)
+        if as_groups is None:
+            as_groups = self.group_indices
+        return to_text(self, as_taco=as_taco, as_groups=as_groups)
 
 
 class TacoView:
     def __init__(self, parent):
         self._parent = parent
         self._fake = object.__new__(SparseTensor)
+        self._fake.group_indices = self._parent.group_indices
         self._fake._structure = [DC] + parent._structure
         self._fake._shape = (1,) + parent._shape
         self._fake._indices = [np.array([0])] + self._parent._indices
@@ -355,6 +363,10 @@ class TacoView:
     def get_pointers(self, dim):
         dim = range(self.ndim)[dim]  # Make dim positive
         return self._fake.get_pointers(dim)
+
+    @property
+    def group_indices(self):
+        return self._parent.group_indices
 
     @property
     def indices(self):

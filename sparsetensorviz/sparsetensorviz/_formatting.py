@@ -274,7 +274,7 @@ def draw_pointer(canvas, x, y, w, ptr, *, center_right=False, skip_if_nonempty=F
         canvas[y][x + i] = c
 
 
-def to_text(self, *, squared=False, compact=None, as_taco=False):
+def to_text(self, *, squared=False, compact=None, as_taco=False, as_groups=False):
     indices = self._indices
     pointers = self._pointers
     index_widths, pointers_widths, xoffsets, yoffsets = get_layout(
@@ -363,11 +363,34 @@ def to_text(self, *, squared=False, compact=None, as_taco=False):
     combined = top + hrows + rows
     if as_taco:
         combined = [row[xoffsets[1] :] for row in combined]
+    elif as_groups:
+        nums = [int(gp[:-1].split('(', 1)[1].split(',', 1)[0]) for gp in self.bundled_groups]
+        trim_ranges = []
+        i = 0
+        for num in nums:
+            for j in range(i, i + num - 1):
+                trim_ranges.append((xoffsets[2*j+1]-1, xoffsets[2*j+2]+1))
+            i += num
+
+        def trim(row, start, stop):
+            first = row[:start]
+            last = row[stop:]
+            if first[-1] == "-" == last[0]:
+                middle = "-"
+            elif first[-1] == "=" == last[0]:
+                middle = "="
+            else:
+                middle = " "
+            return first + middle + last
+
+        for start, stop in reversed(trim_ranges):
+            combined = [trim(row, start, stop) for row in combined]
+
     return "\n".join(combined)
 
 
-def to_svg(self, *, squared=False, compact=None, as_taco=False):
+def to_svg(self, *, squared=False, compact=None, as_taco=False, as_groups=False):
     from sphinxcontrib.svgbob._svgbob import to_svg as _to_svg
 
-    text = to_text(self, squared=squared, compact=compact, as_taco=as_taco)
+    text = to_text(self, squared=squared, compact=compact, as_taco=as_taco, as_groups=as_groups)
     return _to_svg(text)
