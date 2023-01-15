@@ -1,4 +1,3 @@
-import itertools
 import re
 
 from ._core import SparseTensor
@@ -24,7 +23,8 @@ class MatcherBase:
 
 
 class AllFull(MatcherBase):
-    """ F[-F] """
+    """F[-F]"""
+
     pattern = re.compile("^F(?P<F>(-F)*)$")
 
     def __new__(cls, ma, s):
@@ -33,7 +33,8 @@ class AllFull(MatcherBase):
 
 
 class AllCoord(MatcherBase):
-    """ S[-S] """
+    """S[-S]"""
+
     pattern = re.compile("^(?P<S>(S-)*)S$")
 
     def __new__(cls, ma, s):
@@ -42,7 +43,8 @@ class AllCoord(MatcherBase):
 
 
 class InitSparse(MatcherBase):
-    """ C-[C-] """
+    """C-[C-]"""
+
     pattern = re.compile("^(?P<C>(C-)+)")
 
     def __new__(cls, ma, s):
@@ -51,7 +53,8 @@ class InitSparse(MatcherBase):
 
 
 class CoordSparse(MatcherBase):
-    """ [S-]DC-C-[C-] """
+    """[S-]DC-C-[C-]"""
+
     pattern = re.compile("^(?P<S>(S-)*)DC-(?P<C>(C-)+)")
 
     def __new__(cls, ma, s):
@@ -61,7 +64,8 @@ class CoordSparse(MatcherBase):
 
 
 class CoordSparseExpanded(MatcherBase):
-    """ [S-]S-C-[C-] """
+    """[S-]S-C-[C-]"""
+
     pattern = re.compile("^(?P<S>(S-)+)(?P<C>(C-)+)")
 
     def __new__(cls, ma, s):
@@ -71,7 +75,8 @@ class CoordSparseExpanded(MatcherBase):
 
 
 class HyperSparse(MatcherBase):
-    """ [S-]DC- """
+    """[S-]DC-"""
+
     pattern = re.compile("^(?P<S>(S-)*)DC-")
 
     def __new__(cls, ma, s):
@@ -80,7 +85,8 @@ class HyperSparse(MatcherBase):
 
 
 class CoordFull(MatcherBase):
-    """ [S-]S-F[-F] """
+    """[S-]S-F[-F]"""
+
     pattern = re.compile("^(?P<S>(S-)+)F(?P<F>(-F)*)$")
 
     def __new__(cls, ma, s):
@@ -99,12 +105,12 @@ def to_bundled_groups(s):
     if "-" not in s:
         s = "-".join(s)
     orig_s = s
-    if (ma := AllFull.match(s)):  # All F
+    if ma := AllFull.match(s):  # All F
         return AllFull(ma, s)
-    if (ma := AllCoord.match(s)):  # All S
+    if ma := AllCoord.match(s):  # All S
         return AllCoord(ma, s)
     rv = []
-    if (ma := InitSparse.match(s)):  # Begins with C
+    if ma := InitSparse.match(s):  # Begins with C
         rv.extend(InitSparse(ma, s))
         s = trim(ma, s)
     matchers = [
@@ -116,7 +122,7 @@ def to_bundled_groups(s):
     ]
     while s:
         for matcher in matchers:
-            if (ma := matcher.match(s)):
+            if ma := matcher.match(s):
                 rv.extend(matcher(ma, s))
                 s = trim(ma, s)
                 break

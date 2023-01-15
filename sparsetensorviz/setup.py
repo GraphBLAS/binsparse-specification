@@ -2,7 +2,9 @@ from setuptools import find_packages, setup
 
 import versioneer
 
-install_requires = open("requirements.txt").read().strip().split("\n")
+with open("requirements.txt") as f:
+    install_requires = f.read().strip().split("\n")
+
 extras_require = {
     "test": ["pytest"],
     "viz": ["sphinxcontrib-svgbob"],

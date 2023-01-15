@@ -364,12 +364,12 @@ def to_text(self, *, squared=False, compact=None, as_taco=False, as_groups=False
     if as_taco:
         combined = [row[xoffsets[1] :] for row in combined]
     elif as_groups:
-        nums = [int(gp[:-1].split('(', 1)[1].split(',', 1)[0]) for gp in self.bundled_groups]
+        nums = [int(gp[:-1].split("(", 1)[1].split(",", 1)[0]) for gp in self.bundled_groups]
         trim_ranges = []
         i = 0
         for num in nums:
             for j in range(i, i + num - 1):
-                trim_ranges.append((xoffsets[2*j+1]-1, xoffsets[2*j+2]+1))
+                trim_ranges.append((xoffsets[2 * j + 1] - 1, xoffsets[2 * j + 2] + 1))
             i += num
 
         def trim(row, start, stop):
