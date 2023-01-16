@@ -71,7 +71,7 @@ class CoordSparseExpanded(MatcherBase):
     def __new__(cls, ma, s):
         numS = num(ma, "S")
         numC = num(ma, "C")
-        return [f"Coord({numS}, expanded=True)", f"Sparse({numC})"]
+        return [f"Coord({numS}, expanded=1)", f"Sparse({numC})"]
 
 
 class HyperSparse(MatcherBase):
