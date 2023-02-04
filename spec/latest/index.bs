@@ -20,4 +20,85 @@ Introduction {#intro}
 =====================
 
 The Binsparse Specification (name tentative) provides a cross-platform format
-for efficiently storing data, particularly sparse matrix data, in binary formats.
+for efficiently storing data, particularly sparse matrix data, in binary format.
+Binsparse is designed to be both a standalone and embeddable format.  It consists
+of two parts, a JSON *descriptor*, a collection of metadata that describe the
+structure of a particular binary storage format, and the one or more *binary
+arrays* that store matrix data, with each array stored under a predefined dataset
+name in a supported *binary container*.
+
+Definitions {#defs}
+===================
+
+Binsparse is intended to support multidimensional *sparse* arrays, meaning arrays
+in which not every location has a value.  We refer to each location in the matrix
+with a value as a *stored value*.  Stored values have associated with them a
+*scalar value*, which is the value stored in that location in the array, and one
+or more *indices*, which describe the location where the stored value is located
+in the matrix.  Some or all of these indices may be stored explicitly, or they may
+be implicitly derived, depending on the storage format.
+
+
+Binsparse JSON Descriptors {#descriptor}
+========================================
+
+Binsparse descriptors are JSON blobs that describe the binary format of sparse
+data.  The JSON blob includes a number of keys that describe the structure of
+the binary storage.
+
+## `shape`
+
+The `shape` key shall define the shape of the matrix.  It shall contain a JSON
+array of integers, with index `i` containing size of the `i`'th dimension.  For
+matrices, index `0` shall contain the number of rows, and index `1` shall contain
+the number of columns.
+
+#### Example
+
+This example defines a CSR matrix with `shape` defined as `[10, 12]`, meaning
+the matrix has 10 rows and 12 columns.
+
+```json
+{
+  "format": "CSR",
+  "shape": [10, 12]
+}
+```
+
+## `format`
+
+The `format` key shall describe the binary storage format used to store data.
+Formats include pre-defined traditional formats such as compressed sparse row (CSR),
+dense row-major, or coordinate (COO), as well as custom formats.  The format
+defined by the `format` key determines which binary arrays shall exist in the
+binary storage container.
+
+### Pre-defined Formats
+For the following pre-defined formats, we define the arrays that shall be present
+in the binary container along with a description of their contents.
+
+#### `CSR`
+The key `CSR` indicates the compressed sparse row (CSR) format.  Files using the
+`CSR` format shall contain three binary arrays.
+
+```
+ - pointers_0
+ - indices_1
+ - values
+```
+
+The `pointers_0` array stores the indices in the `values` and `indices_1`
+arrays where data for each row is located.  The column indices of the stored
+values located in row `i` are located in the range `[pointers_0[i], pointers_0[i+1])`
+in the `indices_1` array.  The scalar values for each of those stored values
+is stored in the corresponding index in the `values` array.
+
+Binary Containers {#binary_container}
+=====================================
+Binary containers must store binary arrays in a standardized, cross-platform
+manner, using the corresponding dataset names previously defined.
+
+## Supported Binary Containers
+
+Currently supported binary containers include HDF5 and NetCDF (but should include more).
+
