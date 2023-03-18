@@ -300,15 +300,17 @@ If the level is an sparse level, the `subformat` key must be present.  The
 The sparse level represents zero or more `r`-dimensional sparse arrays whose
 non-implicit elements are themselves arrays specified by `subformat`. For
 example, A sparse level of rank 1 represents an array created by stacking
-vectors of subarrays in the level specified by `subformat`. 
+vectors of subarrays in the level specified by `subformat`.
 
-It implies that the following binary arrays are present in the tensor:
+Assume that this level represents `n`-dimensional subarrays and the root array
+is `N`-dimensional.  The sparse level implies the following binary arrays are
+present:
 
-: pointers_(N - 1)
+: pointers_(N - n - 1)
 :: Array of size `number_of_positions + 1` whose 1st element is equal to `0` and whose `p + 1`th element is equal to the sum of `pointers_N[p]` and the number of explicitly represented slices in the `p`th position.
 
-: indices_(N - 1), ..., indices(N - r)
-:: There are `r` such arrays. When `A[i_0, ..., i_(r - 1), :, ..., :]` is explicitly represented by the subarray in position `q`, `indices_(N-1-s)[q] = i_s`. The arrays must be ordered such that the tuples `(indices_(N-1)[q], ..., indices_(N-r)[q])` are unique and appear in lexicographic order for all `q` in each range `pos[p] <= q < pos[p + 1]`. This array must contain no other elements.
+: indices_(N - n), ..., indices(N - n + r - 1)
+:: There are `r` such arrays. When `A[i_0, ..., i_(r - 1), :, ..., :]` is explicitly represented by the subarray in position `q`, `indices_(N-n+s)[q] = i_s`. The arrays must be ordered such that the tuples `(indices_(N-n)[q], ..., indices_(N-n+r-1)[q])` are unique and appear in lexicographic order for all `q` in each range `pos[p] <= q < pos[p + 1]`. This array must contain no other elements.
 
 Special note: If the sparse level is the root level, the `pointers` array should
 be ommitted, as its first value will be `0` and its last value will be the
