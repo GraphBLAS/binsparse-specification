@@ -60,10 +60,12 @@ attributes.
 ```json
 {
   "format": "CSC",
-  "position_type": "uint64",
-  "value_type": "uint64",
-  "index_types": ["uint64","uint64"]
   "shape": [10, 12],
+  "data_types": {
+    "pointers_0": "uint64",
+    "indices_1": "uint64",
+    "values": "float32"
+  },
   "attrs": {
     "original_source": "https://url/of/original/file.mtx",
     "author": "John Doe"
@@ -320,8 +322,12 @@ duplicating the same number unnecessarily. Iso levels represents zero or more
 scalars of all the same value. It implies that the following binary arrays are
 present in the tensor:
 
-: value
+: values
 :: Array of size `1` whose element holds the value of all explicit entries in the sparse tensor.
+
+Note: Structure-only matrices (allowed in matrix market format) can be stored
+      using this level with a value of 1. This adds only a small amount of
+      overhead while describing essentially the same matrix.
 
 ### Equivalent Formats ### {#equivalent_formats}
 
@@ -455,23 +461,17 @@ Column-wise Coordinate format
 Data Types {#key_data_types}
 ----------------------------
 
-The `index_types`, `position_type`, and `value_types` keys must be present and
-shall define the data types of all required arrays based on the [[#key_format]].
-The types declare the type of the in-memory arrays. While these are often
-identical to the types used when storing the arrays on disk in the container,
-the container may choose to store the arrays in another format. For example,
-`uint64` type may be stored as `int8` if all the numbers in the array are small
-enough to fit, but `position_type` would still list the array as having type
-`uint64`.
+The `data_types` key must be present and shall define the data types of all required
+arrays based on the [[#key_format]]. The data type declares the type of the
+in-memory arrays. While these are often identical to the types used when storing
+the arrays on disk in the container, the container may choose to store the arrays
+in another format. For example, `uint64` type may be stored as `int8` if all the
+numbers in the array are small enough to fit, but `data_types` would still list the
+array as having type `uint64`.
 
-The `index_types` shall define the types of in-memory arrays that hold indices.
-It shall be an array `[i_type_0, ..., i_type_(N-1)]` where `i_type_r` is the
-type of r^th index to the array (regardless of whether the array is row-major or
-column major).
+For a given [[#key_format]], all named binary arrays for that format shall have a
+corresponding name in `data_types`.
 
-The `position_type` shall define the type of in-memory arrays that hold positions.
-
-The `value_type` shall define the type of in-memory arrays that hold the array elements themselves.
 
 <div class=example>
 
@@ -541,14 +541,16 @@ Example of a CSR Matrix whose values are all 1.
       "level": "sparse",
       "rank": "1",
       "subformat": {
-        "level": "element",
+        "level": "iso",
       }
     }
   },
   "shape": [5, 5],
-  "index_types": ["uint64", "uint64"]
-  "position_type": "uint64"
-  "value_type": "int8"
+  "data_types": {
+    "pointers_0": "uint64",
+    "indices_1": "uint64",
+    "values": "int8"
+  }
 }
 ```
 
@@ -557,10 +559,6 @@ Example of a CSR Matrix whose values are all 1.
 - `values` = [1]
 
 </div>
-
-Note: Structure-only matrices (allowed in matrix market format) can be stored
-      using this technique with a value of 1. This adds only a small amount of
-      overhead while describing essentially the same matrix.
 
 
 Binary Containers {#binary_container}
