@@ -280,7 +280,7 @@ key must be present, and set to an integer `r` greater than or equal to 1.  The
 dense level represents zero or more r-dimensional dense arrays whose elements
 are themselves arrays specified by `subformat`. For example, a dense level
 of
-rank 2 represents a collection of matrices of subarrays. 
+rank 2 represents a collection of dense matrices of subarrays. 
 
 Assuming that the level describes arrays of shape `I_0, ..., I_(N - 1)`, the
 array at position `p` in a dense level of rank `r` is an array whose slice
@@ -296,11 +296,11 @@ of the sublevel.
 #### Sparse #### {#sparse_level}
 
 If the level is an sparse level, the `subformat` key must be present.  The
-`rank` key must be present, and set to an integer `r` greater than or equal to 1.
-The sparse level represents zero or more `r`-dimensional sparse arrays whose
+`rank` key must be present, and set to an integer `r` greater than or equal to
+1.  The sparse level represents zero or more `r`-dimensional sparse arrays whose
 non-implicit elements are themselves arrays specified by `subformat`. For
-example, A sparse level of rank 1 represents an array created by stacking
-vectors of subarrays in the level specified by `subformat`.
+example, a sparse level of rank 1 represents a collection of sparse vectors of
+subarrays.
 
 Assume that this level represents `n`-dimensional subarrays and the root array
 is `N`-dimensional.  The sparse level implies the following binary arrays are
