@@ -297,8 +297,8 @@ of the sublevel.
 
 If the level is an sparse level, the `subformat` key must be present.  The
 `rank` key must be present, and set to an integer `r` greater than or equal to
-1.  The sparse level represents zero or more `r`-dimensional sparse arrays whose
-non-implicit elements are themselves arrays specified by `subformat`. For
+`1`.  The sparse level represents zero or more `r`-dimensional sparse arrays
+whose non-implicit elements are themselves arrays specified by `subformat`. For
 example, a sparse level of rank 1 represents a collection of sparse vectors of
 subarrays.
 
