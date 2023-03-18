@@ -220,24 +220,32 @@ Coordinate format is an alias for [[#coor_format]] format.
 
 ### Custom Formats ### {#custom_formats}
 
-Binsparse supports custom multidimensional formats by constructing array descriptors
-recursively out of level descriptors. Levels are datastructures which represent
-collections of zero or more arrays which all have the same format.  We represent
-the tensor format by first constructing a hierarching of level formats, and the
-top level contains only one root tensor.
+Binsparse describes custom multidimensional formats hierarchically.  We can
+understand these formats as arrays of arrays, where the parent array and
+child arrays might use different formats. For example, we could have a dense
+outer array which contains sparse inner arrays, so the first index would be
+dense and the second index would be sparse. To achieve efficient storage, all
+arrays in the same level are stored contiguously in a specialized datastructure
+called a level.
 
-The simplest level format is the element format, which represents scalars. We
-can stack scalars into vectors with the dense level format. The dense level
-format represents dense vectors by grouping contiguous scalars in an element
-level (analogously to the numpy.stack operator). The sparse level format
-represents sparse vectors by listing the locations of nonzeros, and storing
-nonzero scalars using an element level.
+A level is a collection of zero or more arrays which all have the same format.
+The elements of arrays in a level may be subarrays in a sublevel. The global
+array we wish to store is represented by a level that holds a single root array.
+
+For example, the simplest level is the element format, which represents a
+collection of scalars.  We can represent a collection of dense vectors with a
+dense level format. Each vector in the collection would be composed from
+contiguous scalars in an element level (analogously to the numpy.stack
+operator). We can represent a collection of sparse vectors using a sparse level.
+The sparse level format represents sparse vectors by listing the locations of
+nonzeros, and storing only the nonzero scalars inside an element level.
+
 
 In addition to storing scalars, dense and sparse levels may themselves store
 multidimensional arrays. This leads to multiple ways to store sparse matrices
-and tensors. For example, we may stack several sparse vectors together with the
-dense level to produce a CSR matrix format, or we may stack sparse vectors with
-a sparse level to produce the hypersparse DCSR matrix format.
+and tensors. For example, a dense vector of sparse vectors is equivalent to the
+CSR matrix format, and a sparse vector of sparse vectors is equivalent to the
+hypersparse DCSR matrix format.
 
 When defining a custom format, the `format` key is defined as the root level
 descriptor (a level which will only hold one array). If a level holds many
@@ -247,7 +255,8 @@ Levels are row-major by default (adding an outer level adds a row dimension).
 The format descriptor may optionally define a `swizzle` key, equal to a list of
 the described dimensions in the order they should appear. If the tensor we wish
 to represent is `A` and the tensor described by the format descriptor is `B`,
-then `A[i_1, ..., i_n] = B[i_(swizzle[1]), ..., i_(swizzle[n])]`.
+then `A[i_1, ..., i_n] = B[i_(swizzle[1]), ..., i_(swizzle[n])]`. `swizzle` must
+be a permutation.
 
 If the format key is a dictionary, the `level` key must be present and shall
 describe the storage format of the level used to represent the sparse array.
@@ -264,16 +273,15 @@ that the following binary arrays are present in the tensor:
 
 #### Dense #### {#dense_level}
 
-If the level is a dense level, the `format` key must be present. The dense
-level represents zero or more arrays whose slices are represented in the format
-specified by `format`. The `rank` key must be present, and set to an integer
-greater than or equal to 1. A dense level of rank 1 represents an array created
-by stacking vectors of subarrays in the level specified by `subformat`. A dense
-level of rank 2 represents an array created by stacking matrices of the
-subarrays. 
+If the level is a dense level, the `subformat` key must be present.  The `rank`
+key must be present, and set to an integer `r` greater than or equal to 1.  The
+dense level represents zero or more r-dimensional dense arrays whose elements
+are themselves arrays specified by `subformat`. For example, a dense level
+of
+rank 2 represents a collection of matrices of subarrays. 
 
-Assuming that the array is of shape `I_0, ..., I_(N - 1)`, the array at position `p`
-in a dense level of rank `r` is an array whose slice
+Assuming that the level describes arrays of shape `I_0, ..., I_(N - 1)`, the
+array at position `p` in a dense level of rank `r` is an array whose slice
 
 `A[i_0, ..., i_(r - 1), :, ..., :]`
 
@@ -281,18 +289,18 @@ is described by the row-major position
 
 `q = (((((p * I_0) + i_0) * I_1) + i_1) * I_2 + i_2) * ... + i_(r - 1)`
 
+of the sublevel.
+
 #### Sparse #### {#sparse_level}
 
-If the level is an sparse level, the `subformat` key must be present. The sparse
-level represents zero or more `N`-dimensional arrays whose non-implicit slices
-are represented in the format specified by `subformat`. The `rank` key must be
-present, and set to an integer greater than or equal to 1. A sparse level of rank
-1 represents an array created by stacking vectors of subarrays in the level
-specified by `subformat`. A sparse level of rank 2 represents an array created by
-stacking matrices of the subarrays. 
+If the level is an sparse level, the `subformat` key must be present.  The
+`rank` key must be present, and set to an integer `r` greater than or equal to 1.
+The sparse level represents zero or more `r`-dimensional sparse arrays whose
+non-implicit elements are themselves arrays specified by `subformat`. For
+example, A sparse level of rank 1 represents an array created by stacking
+vectors of subarrays in the level specified by `subformat`. 
 
-It implies that the
-following binary arrays are present in the tensor:
+It implies that the following binary arrays are present in the tensor:
 
 : pointers_(N - 1)
 :: Array of size `number_of_positions + 1` whose 1st element is equal to `0` and whose `p + 1`th element is equal to the sum of `pointers_N[p]` and the number of explicitly represented slices in the `p`th position.
@@ -301,14 +309,10 @@ following binary arrays are present in the tensor:
 :: There are `r` such arrays. When `A[i_0, ..., i_(r - 1), :, ..., :]` is explicitly represented by the subarray in position `q`, `indices_(N-1-s)[q] = i_s`. The arrays must be ordered such that the tuples `(indices_(N-1)[q], ..., indices_(N-r)[q])` are unique and appear in lexicographic order for all `q` in each range `pos[p] <= q < pos[p + 1]`. This array must contain no other elements.
 
 Special note: If the sparse level is the root level, the `pointers` array should
-be ommitted, as its first value is `0` and its last value is the length of any
-of the `indices` arrays in this level.
-
-: pointers_(N - 1)
-:: Array of size `number_of_positions + 1` whose 1st element is equal to `0` and whose `p + 1`th element is equal to the sum of `pointers_N[p]` and the number of explicitly represented slices in the `p`th position.
+be ommitted, as its first value will be `0` and its last value will be the
+length of any of the `indices` arrays in this level.
 
 #### ISO #### {#iso_level}
-
 
 When all values of a sparse array are the same identical value, a special level
 is provided to compress the value array to a single value rather than
@@ -332,7 +336,7 @@ Vector format is equivalent to
   "format": {
     "level": "dense",
     "rank": "1",
-    "format": {
+    "subformat": {
       "level": "element",
     }
   },
@@ -350,10 +354,10 @@ Vector format is equivalent to
   "format": {
     "level": "dense",
     "rank": "1",
-    "format": {
+    "subformat": {
       "level": "sparse",
       "rank": "1",
-      "format": {
+      "subformat": {
         "level": "element",
       }
     }
@@ -369,10 +373,10 @@ Vector format is equivalent to
   "format": {
     "level": "dense",
     "rank": "1",
-    "format": {
+    "subformat": {
       "level": "sparse",
       "rank": "1",
-      "format": {
+      "subformat": {
         "level": "element",
       }
     }
@@ -387,10 +391,10 @@ Vector format is equivalent to
   "format": {
     "level": "sparse",
     "rank": "1",
-    "format": {
+    "subformat": {
       "level": "sparse",
       "rank": "1",
-      "format": {
+      "subformat": {
         "level": "element",
       }
     }
@@ -406,10 +410,10 @@ Vector format is equivalent to
     "swizzle": [1, 0],
     "level": "sparse",
     "rank": "1",
-    "format": {
+    "subformat": {
       "level": "sparse",
       "rank": "1",
-      "format": {
+      "subformat": {
         "level": "element",
       }
     }
@@ -424,7 +428,7 @@ Vector format is equivalent to
   "format": {
     "level": "sparse",
     "rank": "2",
-    "format": {
+    "subformat": {
       "level": "element",
     }
   },
@@ -441,7 +445,7 @@ Column-wise Coordinate format
   "format": {
     "level": "sparse",
     "rank": "2",
-    "format": {
+    "subformat": {
       "level": "element",
     }
   },
@@ -460,12 +464,14 @@ the container may choose to store the arrays in another format. For example,
 enough to fit, but `position_type` would still list the array as having type
 `uint64`.
 
-The `index_types` key must be present and shall define the index types of
-in-memory arrays that hold indices.
+The `index_types` shall define the types of in-memory arrays that hold indices.
+It shall be an array `[i_type_0, ..., i_type_(N-1)]` where `i_type_r` is the
+type of r^th index to the array (regardless of whether the array is row-major or
+column major).
 
-The `position_types` key must be present and shall define the index types of
-in-memory arrays that hold positions.
+The `position_type` shall define the type of in-memory arrays that hold positions.
 
+The `value_type` shall define the type of in-memory arrays that hold the array elements themselves.
 
 <div class=example>
 
@@ -528,13 +534,21 @@ Example of a CSR Matrix whose values are all 1.
 
 ```json
 {
-  "format": "CSR",
+  "format": {
+    "level": "dense",
+    "rank": "1",
+    "subformat": {
+      "level": "sparse",
+      "rank": "1",
+      "subformat": {
+        "level": "element",
+      }
+    }
+  },
   "shape": [5, 5],
-  "data_types": {
-    "pointers_0": "uint64",
-    "indices_1": "uint64",
-    "values": "1x[int8]"
-  }
+  "index_types": ["uint64", "uint64"]
+  "position_type": "uint64"
+  "value_type": "int8"
 }
 ```
 
