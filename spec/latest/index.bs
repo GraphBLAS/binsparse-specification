@@ -233,6 +233,30 @@ array as having type `uint64`.
 For a given [[#key_format]], all named binary arrays for that format shall have a
 corresponding name in `data_types`.
 
+The following strings shall be used to describe data types:
+: "uint8"
+:: unsigned 8-bit integer
+: "uint16"
+:: unsigned 16-bit integer
+: "uint32"
+:: unsigned 32-bit integer
+: "uint64"
+:: unsigned 64-bit integer
+: "int8"
+:: signed 8-bit integer
+: "int16"
+:: signed 16-bit integer
+: "int32"
+:: signed 32-bit integer
+: "int64"
+:: signed 64-bit integer
+: "float32" or "float"
+:: IEEE binary32 floating point number
+: "float64" or "double"
+:: IEEE binary64 floating point number
+: "bool"
+:: Boolean number (however that is represented in the host language)
+
 ### Sparse Array with All Values the Same ### {#iso_arrays}
 
 When all values of a sparse array are the same identical value, a special syntax is
