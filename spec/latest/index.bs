@@ -255,9 +255,9 @@ The following strings shall be used to describe data types:
 :: signed 32-bit integer
 : "int64"
 :: signed 64-bit integer
-: "float32" or "float"
+: "float32"
 :: IEEE binary32 floating point number
-: "float64" or "double"
+: "float64"
 :: IEEE binary64 floating point number
 : "bool"
 :: Boolean number (however that is represented in the host language)
