@@ -40,16 +40,18 @@ with a value as a *stored value*.  Stored values have associated with them a
 *scalar value*, which is the value stored in that location in the array, and one
 or more *indices*, which describe the location where the stored value is located
 in the array. Some or all of these indices may be stored explicitly, or they may
-be implicitly derived, depending on the storage format.  When stored explicitly,
+be implicitly derived, depending on storage format.  When stored explicitly,
 indices are 0-based positive integers. 
 
 
 Binsparse JSON Descriptors {#descriptor}
 ========================================
 
-Binsparse descriptors are JSON blobs that describe the binary format of sparse
-data.  The JSON blob includes several required keys that describe the structure of
-the binary storage. Optional attributes may be defined to hold additional metadata.
+Binsparse descriptors are key-value metadata that describe the binary format of sparse
+data.  The key-value data is namespaced as "binsparse" to avoid any conflict with other
+metadata in the container. The required entries in the "binsparse" entry are listed
+below. Optional attributes may be defined to hold additional metadata and must be stored
+outside of the "binsparse" namespace.
 
 <div class=example>
 
@@ -59,17 +61,17 @@ attributes.
 
 ```json
 {
-  "format": "CSC",
-  "shape": [10, 12],
-  "data_types": {
-    "pointers_0": "uint64",
-    "indices_1": "uint64",
-    "values": "float32"
+  "binsparse": {
+    "format": "CSC",
+    "shape": [10, 12],
+    "data_types": {
+      "pointers_0": "uint64",
+      "indices_1": "uint64",
+      "values": "float32"
+    }
   },
-  "attrs": {
-    "original_source": "https://url/of/original/file.mtx",
-    "author": "John Doe"
-  }
+  "original_source": "https://url/of/original/file.mtx",
+  "author": "John Doe"
 }
 ```
 
@@ -82,7 +84,7 @@ The `shape` key must be present and shall define the shape of the sparse tensor.
 It shall contain a JSON array of integers, with index `i` containing the size of
 the `i`'th dimension. For matrices, index `0` shall contain the number of rows,
 and index `1` shall contain the number of columns. For vectors, index `0` shall
-contain the number of indices of the vector if it were dense.
+contain the vector's dimension.
 
 Note: a matrix has shape [`number_of_rows`, `number_of_columns`] regardless of whether
 the format orientation is row-wise or column-wise.
@@ -99,7 +101,9 @@ in the binary storage container.
 ### Pre-defined Formats ### {#predefined_formats}
 
 The following is a list of all pre-defined formats and the arrays that shall
-be present in the binary container.
+be present in the binary container.  `number_of_elements` refers to the number
+of stored values, `number_of_rows` refers to the number of rows, and `number_of_columns`
+refers to the number of columns.
 
 #### VEC #### {#vec_format}
 
@@ -110,7 +114,8 @@ Vector format
 : values
 :: Array of size `number_of_elements` containing stored values.
 
-Indices shall be sorted and must not be duplicated.
+The element of the vector located at index `indices_0[i]` has scalar value
+`values[i]`.  Elements shall be sorted by index and must not be duplicated.
 
 #### CSR #### {#csr_format}
 
@@ -127,7 +132,7 @@ The column indices of the stored values located in row `i` are located in the ra
 `[pointers_0[i], pointers_0[i+1])` in the `indices_1` array. The scalar values for
 each of those stored values is stored in the corresponding index in the `values` array.
 
-Within a row, column indices shall be sorted and must not be duplicated.
+Within a row, elements shall be sorted by column index and must not be duplicated.
 
 #### CSC #### {#csc_format}
 
@@ -144,7 +149,7 @@ The rows indices of the stored values located in column `j` are located in the r
 `[pointers_0[j], pointers_0[j+1])` in the `indices_1` array. The scalar values for
 each of those stored values is stored in the corresponding index in the `values` array.
 
-Within a column, row indices shall be sorted and must not be duplicated.
+Within a column, elements shall be sorted by row index and must not be duplicated.
 
 #### DCSR #### {#dcsr_format}
 
@@ -164,8 +169,8 @@ DCSR is similar to CSR, except that rows which are entirely empty are not stored
 contains no repeated values. Because the position within `pointers_0` no longer dictates the
 corresponding row index, `indices_0` provides the row index.
 
-Within a row, column indices shall be sorted and must not be duplicated. Row indices shall be
-sorted and must not be duplicated.
+Rows shall be sorted and must not be duplicated.
+Within each row, elements shall be sorted by column index and must not be duplicated.
 
 #### DCSC #### {#dcsc_format}
 
@@ -185,8 +190,8 @@ DCSC is similar to CSC, except that columns which are entirely empty are not sto
 contains no repeated values. Because the position within `pointers_0` no longer dictates the
 corresponding column index, `indices_0` provides the column index.
 
-Within a column, row indices shall be sorted and must not be duplicated. Column indices shall be
-sorted and must not be duplicated.
+Columns shall be sorted and not duplicated.
+Within each column, elements shall be sorted by row index and must not be duplicated.
 
 #### COOR #### {#coor_format}
 
@@ -464,12 +469,12 @@ Data Types {#key_data_types}
 ----------------------------
 
 The `data_types` key must be present and shall define the data types of all required
-arrays based on the [[#key_format]]. The data type declares the type of the
-in-memory arrays. While these are often identical to the types used when storing
-the arrays on disk in the container, the container may choose to store the arrays
-in another format. For example, `uint64` type may be stored as `int8` if all the
-numbers in the array are small enough to fit, but `data_types` would still list the
-array as having type `uint64`.
+arrays based on the [[#key_format]]. The data type declares the type of both the
+on-disk array as well as the in-memory array. When these are identical, a simple string
+defines the type. When the on-disk and in-memory types differ due to limitations in the
+storage container (ex. HDF5 lacks a BOOL type), the type is shown as "on_disk->in_memory".
+For the example of storing BOOL type as INT8, this would be "int8->bool" to indicate that
+after reading the values array into memory, it should be interpreted as boolean data.
 
 For a given [[#key_format]], all named binary arrays for that format shall have a
 corresponding name in `data_types`.
@@ -496,16 +501,16 @@ Example of a CSR Matrix whose values are all 1.
     <td>.</td>
     <td>.</td>
     <td>.</td>
-    <td>1</td>
+    <td>7</td>
     <td>.</td>
   </tr>
   <tr>
     <th>1</th>
     <td>.</td>
-    <td>1</td>
+    <td>7</td>
     <td>.</td>
     <td>.</td>
-    <td>1</td>
+    <td>7</td>
   </tr>
   <tr>
     <th>2</th>
@@ -518,8 +523,8 @@ Example of a CSR Matrix whose values are all 1.
   <tr>
     <th>3</th>
     <td>.</td>
-    <td>1</td>
-    <td>1</td>
+    <td>7</td>
+    <td>7</td>
     <td>.</td>
     <td>.</td>
   </tr>
@@ -528,7 +533,7 @@ Example of a CSR Matrix whose values are all 1.
     <td>.</td>
     <td>.</td>
     <td>.</td>
-    <td>1</td>
+    <td>7</td>
     <td>.</td>
   </tr>
   </tbody>
@@ -558,7 +563,7 @@ Example of a CSR Matrix whose values are all 1.
 
 - `pointers_0` = [0, 1, 3, 3, 5, 6]
 - `indices_1` = [3, 1, 4, 1, 2, 3]
-- `values` = [1]
+- `values` = [7]
 
 </div>
 
