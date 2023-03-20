@@ -40,7 +40,7 @@ with a value as a *stored value*.  Stored values have associated with them a
 *scalar value*, which is the value stored in that location in the array, and one
 or more *indices*, which describe the location where the stored value is located
 in the array. Some or all of these indices may be stored explicitly, or they may
-be implicitly derived, depending on the storage format.  When stored explicitly,
+be implicitly derived, depending on storage format.  When stored explicitly,
 indices are 0-based positive integers. 
 
 
@@ -83,7 +83,7 @@ The `shape` key must be present and shall define the shape of the sparse tensor.
 It shall contain a JSON array of integers, with index `i` containing the size of
 the `i`'th dimension. For matrices, index `0` shall contain the number of rows,
 and index `1` shall contain the number of columns. For vectors, index `0` shall
-contain the number of indices of the vector if it were dense.
+contain the vector's dimension.
 
 Note: a matrix has shape [`number_of_rows`, `number_of_columns`] regardless of whether
 the format orientation is row-wise or column-wise.
@@ -100,7 +100,9 @@ in the binary storage container.
 ### Pre-defined Formats ### {#predefined_formats}
 
 The following is a list of all pre-defined formats and the arrays that shall
-be present in the binary container.
+be present in the binary container.  `number_of_elements` refers to the number
+of stored values, `number_of_rows` refers to the number of rows, and `number_of_columns`
+refers to the number of columns.
 
 #### VEC #### {#vec_format}
 
@@ -111,7 +113,8 @@ Vector format
 : values
 :: Array of size `number_of_elements` containing stored values.
 
-Indices shall be sorted and must not be duplicated.
+The element of the vector located at index `indices_0[i]` has scalar value
+`values[i]`.  Elements shall be sorted by index and must not be duplicated.
 
 #### CSR #### {#csr_format}
 
@@ -128,7 +131,7 @@ The column indices of the stored values located in row `i` are located in the ra
 `[pointers_0[i], pointers_0[i+1])` in the `indices_1` array. The scalar values for
 each of those stored values is stored in the corresponding index in the `values` array.
 
-Within a row, column indices shall be sorted and must not be duplicated.
+Within a row, elements shall be sorted by column index and must not be duplicated.
 
 #### CSC #### {#csc_format}
 
@@ -145,7 +148,7 @@ The rows indices of the stored values located in column `j` are located in the r
 `[pointers_0[j], pointers_0[j+1])` in the `indices_1` array. The scalar values for
 each of those stored values is stored in the corresponding index in the `values` array.
 
-Within a column, row indices shall be sorted and must not be duplicated.
+Within a column, elements shall be sorted by row index and must not be duplicated.
 
 #### DCSR #### {#dcsr_format}
 
@@ -165,8 +168,8 @@ DCSR is similar to CSR, except that rows which are entirely empty are not stored
 contains no repeated values. Because the position within `pointers_0` no longer dictates the
 corresponding row index, `indices_0` provides the row index.
 
-Within a row, column indices shall be sorted and must not be duplicated. Row indices shall be
-sorted and must not be duplicated.
+Rows shall be sorted and must not be duplicated.
+Within each row, elements shall be sorted by column index and must not be duplicated.
 
 #### DCSC #### {#dcsc_format}
 
@@ -186,8 +189,8 @@ DCSC is similar to CSC, except that columns which are entirely empty are not sto
 contains no repeated values. Because the position within `pointers_0` no longer dictates the
 corresponding column index, `indices_0` provides the column index.
 
-Within a column, row indices shall be sorted and must not be duplicated. Column indices shall be
-sorted and must not be duplicated.
+Columns shall be sorted and not duplicated.
+Within each column, elements shall be sorted by row index and must not be duplicated.
 
 #### COOR #### {#coor_format}
 
