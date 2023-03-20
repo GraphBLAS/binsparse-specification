@@ -272,7 +272,8 @@ The level descriptors are dictionaries defined as follows:
 
 #### Element #### {#element_level}
 
-If the level is an element level, it represents zero or more scalars. It implies
+If the level is an element level, it represents zero or more scalars.
+If `values_type` is not `iso`, it implies
 that the following binary arrays are present in the tensor:
 
 : values
@@ -348,7 +349,7 @@ Vector format is equivalent to
 {
   "format": {
     "level": "dense",
-    "rank": "1",
+    "rank": 1,
     "subformat": {
       "level": "element",
     }
@@ -366,10 +367,10 @@ Vector format is equivalent to
 {
   "format": {
     "level": "dense",
-    "rank": "1",
+    "rank": 1,
     "subformat": {
       "level": "sparse",
-      "rank": "1",
+      "rank": 1,
       "subformat": {
         "level": "element",
       }
@@ -385,10 +386,10 @@ Vector format is equivalent to
   "swizzle": [1, 0],
   "format": {
     "level": "dense",
-    "rank": "1",
+    "rank": 1,
     "subformat": {
       "level": "sparse",
-      "rank": "1",
+      "rank": 1,
       "subformat": {
         "level": "element",
       }
@@ -403,10 +404,10 @@ Vector format is equivalent to
 {
   "format": {
     "level": "sparse",
-    "rank": "1",
+    "rank": 1,
     "subformat": {
       "level": "sparse",
-      "rank": "1",
+      "rank": 1,
       "subformat": {
         "level": "element",
       }
@@ -422,10 +423,10 @@ Vector format is equivalent to
   "format": {
     "swizzle": [1, 0],
     "level": "sparse",
-    "rank": "1",
+    "rank": 1,
     "subformat": {
       "level": "sparse",
-      "rank": "1",
+      "rank": 1,
       "subformat": {
         "level": "element",
       }
@@ -440,7 +441,7 @@ Vector format is equivalent to
 {
   "format": {
     "level": "sparse",
-    "rank": "2",
+    "rank": 2,
     "subformat": {
       "level": "element",
     }
@@ -457,7 +458,7 @@ Column-wise Coordinate format
   "swizzle": [1, 0],
   "format": {
     "level": "sparse",
-    "rank": "2",
+    "rank": 2,
     "subformat": {
       "level": "element",
     }
@@ -479,6 +480,12 @@ after reading the values array into memory, it should be interpreted as boolean 
 For a given [[#key_format]], all named binary arrays for that format shall have a
 corresponding name in `data_types`.
 
+### Sparse Array with All Values the Same ### {#iso_arrays}
+
+When all values of a sparse array are the same identical value, a special syntax is
+provided to compress the value array to a single value rather than duplicating the same
+number unnecessarily. The type is written as `iso[<type>]` to indicate that the array
+will store only a single element which is common to all stored indices.
 
 <div class=example>
 
@@ -543,10 +550,10 @@ Example of a CSR Matrix whose values are all 1.
 {
   "format": {
     "level": "dense",
-    "rank": "1",
+    "rank": 1,
     "subformat": {
       "level": "sparse",
-      "rank": "1",
+      "rank": 1,
       "subformat": {
         "level": "iso",
       }
