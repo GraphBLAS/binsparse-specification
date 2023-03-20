@@ -13,6 +13,6 @@ The spec is written in [bikeshed](https://github.com/tabatkins/bikeshed) – a v
 To render the spec locally:
 
 * Install bikeshed (ideally in an isolated environment): `pipx install bikeshed`
-* Call `bikeshed spec spec/latest/index.md`
+* Call `bikeshed spec spec/latest/index.bs`
 
 Rendered versions will generated for pull requests.
