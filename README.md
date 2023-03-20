@@ -1,7 +1,7 @@
 # Binary Sparse Format Specification
 This is part of a new effort to create a binary storage format for storing sparse matrices and other sparse data to disk.
 
-[Minutes from our meetings](minutes) are available.
+Minutes from our meetings are available [here](https://hackmd.io/0qzK4fJlQp-78t067yiYsA?view) (see also: [previous minutes](minutes)).
 
 ## Specification
 
