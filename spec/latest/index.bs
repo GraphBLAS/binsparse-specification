@@ -326,6 +326,55 @@ Note: Structure-only matrices (allowed in matrix market format) can be stored
       using this technique with a value of 1. This adds only a small amount of
       overhead while describing essentially the same matrix.
 
+Structure {#key_structure}
+--------------------------
+The `structure` key, if present, denotes a special matrix structure in which
+only one triangle of the matrix is stored and the structure and values in the
+other triangle are inferred.
+
+#### symmetric_lower #### {#symmetric_lower_structure}
+
+The `symmetric_lower` value indicates that the matrix has a symmetric structure
+with only the lower triangle stored.  For all matrix entries with row and column
+indices `i,j` and value `v`, `i >= j`.  If `i != j`, the entry implies the
+presence of an entry at row and column index `j,i` with value `v`.
+
+#### symmetric_upper #### {#symmetric_upper_structure}
+
+The `symmetric_upper` value indicates that the matrix has a symmetric structure
+with only the upper triangle stored.  For all matrix entries with row and column
+indices `i,j` and value `v`, `i <= j`.  If `i != j`, the entry implies the
+presence of an entry at row and column index `j,i` with value `v`.
+
+#### hermitian_lower #### {#hermitian_lower_structure}
+
+The `hermitian_lower` value indicates that the matrix has a Hermitian structure
+with only the lower triangle stored.  For all matrix entries with row and column
+indices `i,j` and value `v`, `i >= j`.  If `i != j`, the entry implies the
+presence of an entry at row and column index `j,i` with a value equal to the
+complex conjugate of `v`.  The matrix's value type must be complex.
+
+#### hermitian_upper #### {#hermitian_upper_structure}
+
+The `hermitian_upper` value indicates that the matrix has a Hermitian structure
+with only the upper triangle stored.  For all matrix entries with row and column
+indices `i,j` and value `v`, `i <= j`.  If `i != j`, the entry implies the
+presence of an entry at row and column index `j,i` with a value equal to the
+complex conjugate of `v`.  The matrix's value type must be complex.
+
+#### skew_symmetric_lower #### {#skew_symmetric_lower_structure}
+
+The `skew_symmetric_lower` value indicates that the matrix has a skew-symmetric structure
+with only the lower triangle stored.  For all matrix entries with row and column
+indices `i,j` and value `v`, `i >= j`.  If `i != j`, the entry implies the
+presence of an entry at row and column index `j,i` with value `-v`.
+
+#### skew_symmetric_upper #### {#skew_symmetric_upper_structure}
+
+The `symmetric_upper` value indicates that the matrix has a skew-symmetric structure
+with only the upper triangle stored.  For all matrix entries with row and column
+indices `i,j` and value `v`, `i <= j`.  If `i != j`, the entry implies the
+presence of an entry at row and column index `j,i` with value `-v`.
 
 Binary Containers {#binary_container}
 =====================================
