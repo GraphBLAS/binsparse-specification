@@ -242,7 +242,7 @@ corresponding name in `data_types`.
 
 When all values of a sparse array are the same identical value, a special syntax is
 provided to compress the value array to a single value rather than duplicating the same
-number unnecessarily. The format of the array is written as `iso[<format>]` to indicate
+number unnecessarily. The type is written as `iso[<format>]` to indicate
 that the array will store only a single element which is common to all stored indices.
 
 <div class=example>
@@ -306,12 +306,12 @@ Example of a CSR Matrix whose values are all 7.
 
 ```json
 {
-  "format": "iso[CSR]",
+  "format": "CSR",
   "shape": [5, 5],
   "data_types": {
     "pointers_0": "uint64",
     "indices_1": "uint64",
-    "values": "int8"
+    "values": "iso[int8]"
   }
 }
 ```
