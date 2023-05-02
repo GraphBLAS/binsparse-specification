@@ -306,7 +306,7 @@ Example of a CSR Matrix whose values are all 7.
 
 ```json
 {
-  "format": "iso[CSR]",
+  "format": "iso\[CSR]",
   "shape": [5, 5],
   "data_types": {
     "pointers_0": "uint64",
@@ -331,6 +331,11 @@ Structure {#key_structure}
 The `structure` key, if present, denotes a special matrix structure in which
 only one triangle of the matrix is stored and the structure and values in the
 other triangle are inferred.
+
+### Pre-Defined Structures ### {#predefined_structure}
+
+The follow pre-defined values can be supplied for the `structure` key to indicate
+the structure of the matrix.
 
 #### symmetric_lower #### {#symmetric_lower_structure}
 
