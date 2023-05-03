@@ -274,18 +274,18 @@ example, a value array containing complex float64 would have a datatype of
 `complex[float64]` The real component of the $i$th element in the modified array
 shall be stored at position $2i$ in the original array, and the imaginary
 component of the $ith$ element in the modified array shall be at position $2i +
-1$ in the original array.
+1$ in the underlying array.
 
 ### Sparse Array with All Values the Same ### {#iso_arrays}
 
 When all values of a sparse array are the same identical value, the type is
 written as `iso[<type>]`. This indicates that the array will store only a single
 element which is common to all stored indices. All elements in the modified
-array shall be stored at position $0$ of the original array.
+array shall be stored at position $0$ of the underlying array.
 
 <div class=example>
 
-Example of a CSR Matrix whose values are all 1.
+Example of a CSR Matrix whose values are all 7.
 
 <table>
   <thead>
