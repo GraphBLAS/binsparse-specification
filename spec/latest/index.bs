@@ -88,6 +88,13 @@ contain the vector's dimension.
 Note: a matrix has shape [`number_of_rows`, `number_of_columns`] regardless of whether
 the format orientation is row-wise or column-wise.
 
+Fill {#key_fill}
+--------------------
+The `fill` key may be present. If the `fill` key is present, it shall have a
+boolean value. If the value is true, it signifies the presence of a `fill_value`
+array, whose single element defines the fill (zero) value of the sparse tensor,
+or the value of the array at indices not otherwise specified by the sparse
+tensor structure. 
 
 Format {#key_format}
 --------------------
@@ -306,7 +313,7 @@ Example of a CSR Matrix whose values are all 7.
 
 ```json
 {
-  "format": "iso[CSR]",
+  "format": "iso\[CSR]",
   "shape": [5, 5],
   "data_types": {
     "pointers_0": "uint64",
