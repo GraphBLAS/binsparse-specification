@@ -268,13 +268,12 @@ provided to indicate modifications to the underlying value array.
 
 ### Sparse Array with Complex Values ### {#complex_arrays}
 
-To indicate that a value array is composed of alternating real and imaginary
-components of complex numbers, we wrap the type in the `complex[]` modifier. For
-example, a value array containing complex float64 would have a datatype of
-`complex[float64]` The real component of the `i`th element in the modified array
-shall be stored at position `2i` in the original array, and the imaginary
-component of the `i`th element in the modified array shall be at position `2i +
-1` in the underlying array.
+When a value array is composed of alternating real and imaginary components of
+complex numbers, the type is written as `complex[<type>]`. For example, a value
+array of complex `float64` would have a datatype of `complex[float64]` The real
+component of the `i`th element in the modified array shall be stored at position
+`2i` in the original array, and the imaginary component of the `i`th element in
+the modified array shall be at position `2i + 1` in the underlying array.
 
 ### Sparse Array with All Values the Same ### {#iso_arrays}
 
