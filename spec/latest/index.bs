@@ -272,16 +272,14 @@ The level descriptors are dictionaries defined as follows:
 
 #### Element #### {#element_level}
 
-If the level is an element level, it represents zero or more scalars.
-If `values_type` is not `iso`, it implies
-that the following binary arrays are present in the tensor:
+If the level key is "element", the level represents zero or more scalars.
 
 : values
 :: Array of size `number_of_positions` whose `p`th element holds the value of the scalar at position `p`.
 
 #### Dense #### {#dense_level}
 
-If the level is a dense level, the `subformat` key must be present.  The `rank`
+If the level key is "dense", the `subformat` key must be present.  The `rank`
 key must be present, and set to an integer `r` greater than or equal to 1.  The
 dense level represents zero or more r-dimensional dense arrays whose elements
 are themselves arrays specified by `subformat`. For example, a dense level
@@ -301,7 +299,7 @@ of the sublevel.
 
 #### Sparse #### {#sparse_level}
 
-If the level is an sparse level, the `subformat` key must be present.  The
+If the level key is "sparse", the `subformat` key must be present.  The
 `rank` key must be present, and set to an integer `r` greater than or equal to
 `1`.  The sparse level represents zero or more `r`-dimensional sparse arrays
 whose non-implicit elements are themselves arrays specified by `subformat`. For
@@ -322,28 +320,12 @@ Special note: If the sparse level is the root level, the `pointers` array should
 be ommitted, as its first value will be `0` and its last value will be the
 length of any of the `indices` arrays in this level.
 
-#### ISO #### {#iso_level}
-
-When all values of a sparse array are the same identical value, a special level
-is provided to compress the value array to a single value rather than
-duplicating the same number unnecessarily. Iso levels represents zero or more
-scalars of all the same value. It implies that the following binary arrays are
-present in the tensor:
-
-: values
-:: Array of size `1` whose element holds the value of all explicit entries in the sparse tensor.
-
-Note: Structure-only matrices (allowed in matrix market format) can be stored
-      using this level with a value of 1. This adds only a small amount of
-      overhead while describing essentially the same matrix.
 
 ### Equivalent Formats ### {#equivalent_formats}
 
 The following formats are equivalent
 
 #### VEC #### {#vec_format_equiv}
-
-Vector format is equivalent to
 
 ```json
 {
@@ -358,10 +340,6 @@ Vector format is equivalent to
 ```
 
 #### CSR #### {#csr_format_equiv}
-
-Compressed-Sparse Row format is equivalent to
-
-Vector format is equivalent to
 
 ```json
 {
@@ -506,23 +484,36 @@ The following strings shall be used to describe data types:
 ## Value Modifiers ## {#value_modifiers}
 
 When the value array is meant to be reinterpreted before reading, a special bracket syntax is
-provided to indicate modifications to the underlying value array.
+provided to indicate modifications to the underlying element level. These modifiers can be specified
+either in the values_type field or as wrapper levels around the element level.
 
-### Sparse Array with Complex Values ### {#complex_arrays}
+### Complex Values (complex) ### {#complex_level}
 
-When a value array is composed of alternating real and imaginary components of
-complex numbers, the type is written as `complex[<type>]`. For example, a value
-array of complex `float64` would have a datatype of `complex[float64]` The real
-component of the `i`th element in the modified array shall be stored at position
-`2i` in the original array, and the imaginary component of the `i`th element in
-the modified array shall be at position `2i + 1` in the underlying array.
+When the values are composed of alternating real and imaginary components of
+complex numbers, we use a complex level to signal this modification to the
+underlying array.
 
-### Sparse Array with All Values the Same ### {#iso_arrays}
+If the level key is "complex", the `subformat` key must be present. The
+complex level represents zero or more complex-valued arrays specified by
+`subformat`.  The real and imaginary components of the `p`th array are the subarrays at
+positions `2p` and `2p+1`.
 
-When all values of a sparse array are the same identical value, the type is
-written as `iso[<type>]`. This indicates that the array will store only a single
-element which is common to all stored indices. All elements in the modified
-array shall be stored at position 0 of the underlying array.
+One can also specify that a type is complex by writing the type as
+`complex[<type>]`. For example, a value array of complex `float64` would have a
+datatype of `complex[float64]`.
+
+### All Values the Same (ISO) ### {#iso_level}
+
+When all values of a sparse array are the same identical value, a special level
+is provided to compress the value array to a single value rather than
+duplicating the same number unnecessarily.
+
+If the level key is "iso", the `subformat` key must be present. All arrays
+represented by the iso level map to the same subarray at position 0. The subarray
+is usually a scalar element which is common to all stored indices.
+
+One can specify that the value array should be wrapped in an iso level by
+writing the value type as `iso[<type>]`. 
 
 <div class=example>
 
@@ -592,7 +583,7 @@ Example of a CSR Matrix whose values are all 7.
       "level": "sparse",
       "rank": 1,
       "subformat": {
-        "level": "iso",
+        "level": "element",
       }
     }
   },
@@ -600,7 +591,7 @@ Example of a CSR Matrix whose values are all 7.
   "data_types": {
     "pointers_0": "uint64",
     "indices_1": "uint64",
-    "values": "int8"
+    "values": "iso[int8]"
   }
 }
 ```
@@ -611,6 +602,9 @@ Example of a CSR Matrix whose values are all 7.
 
 </div>
 
+Note: Structure-only matrices (allowed in matrix market format) can be stored
+      using this technique with a value of 1. This adds only a small amount of
+      overhead while describing essentially the same matrix.
 
 Binary Containers {#binary_container}
 =====================================
