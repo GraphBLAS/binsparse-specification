@@ -257,11 +257,11 @@ The following strings shall be used to describe data types:
 :: IEEE binary64 floating point number
 : "bint8"
 :: An unsigned 8-bit integer, to be reinterpreted as a Boolean number, however
-that is represented in the host language. The value 0 shall map to false and the
-value 1 shall map to true. When parsing, implementations may choose to interpret
-values other than 0 or 1 as true, or throw an error.
+    that is represented in the host language. The value 0 shall map to false and the
+    value 1 shall map to true. When parsing, implementations may choose to interpret
+    values other than 0 or 1 as true, or throw an error.
 
-## Value Modifiers
+## Value Modifiers ## {#value_modifiers}
 
 When the value array is meant to be reinterpreted before reading, a special bracket syntax is
 provided to indicate modifications to the underlying value array.
@@ -271,17 +271,17 @@ provided to indicate modifications to the underlying value array.
 To indicate that a value array is composed of alternating real and imaginary
 components of complex numbers, we wrap the type in the `complex[]` modifier. For
 example, a value array containing complex float64 would have a datatype of
-`complex[float64]` The real component of the $i$th element in the modified array
-shall be stored at position $2i$ in the original array, and the imaginary
-component of the $ith$ element in the modified array shall be at position $2i +
-1$ in the underlying array.
+`complex[float64]` The real component of the `i`th element in the modified array
+shall be stored at position `2i` in the original array, and the imaginary
+component of the `i`th element in the modified array shall be at position `2i +
+1` in the underlying array.
 
 ### Sparse Array with All Values the Same ### {#iso_arrays}
 
 When all values of a sparse array are the same identical value, the type is
 written as `iso[<type>]`. This indicates that the array will store only a single
 element which is common to all stored indices. All elements in the modified
-array shall be stored at position $0$ of the underlying array.
+array shall be stored at position 0 of the underlying array.
 
 <div class=example>
 
