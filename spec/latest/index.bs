@@ -92,9 +92,8 @@ Fill {#key_fill}
 --------------------
 The `fill` key may be present. If the `fill` key is present, it shall have a
 boolean value. If the value is true, it signifies the presence of a `fill_value`
-array, whose single element defines the fill (zero) value of the sparse tensor,
-or the value of the array at indices not otherwise specified by the sparse
-tensor structure. 
+array, whose single element defines the value at indices not specified
+by the sparse tensor structure.
 
 Format {#key_format}
 --------------------
