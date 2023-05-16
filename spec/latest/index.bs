@@ -229,21 +229,58 @@ Data Types {#key_data_types}
 
 The `data_types` key must be present and shall define the data types of all required
 arrays based on the [[#key_format]]. The data type declares the type of both the
-on-disk array as well as the in-memory array. When these are identical, a simple string
-defines the type. When the on-disk and in-memory types differ due to limitations in the
-storage container (ex. HDF5 lacks a BOOL type), the type is shown as "on_disk->in_memory".
-For the example of storing BOOL type as INT8, this would be "int8->bool" to indicate that
-after reading the values array into memory, it should be interpreted as boolean data.
+on-disk array as well as the in-memory array.
 
 For a given [[#key_format]], all named binary arrays for that format shall have a
 corresponding name in `data_types`.
 
+The following strings shall be used to describe data types:
+: "uint8"
+:: unsigned 8-bit integer
+: "uint16"
+:: unsigned 16-bit integer
+: "uint32"
+:: unsigned 32-bit integer
+: "uint64"
+:: unsigned 64-bit integer
+: "int8"
+:: signed 8-bit integer
+: "int16"
+:: signed 16-bit integer
+: "int32"
+:: signed 32-bit integer
+: "int64"
+:: signed 64-bit integer
+: "float32"
+:: IEEE binary32 floating point number
+: "float64"
+:: IEEE binary64 floating point number
+: "bint8"
+:: An unsigned 8-bit integer, to be reinterpreted as a Boolean number, however
+    that is represented in the host language. The value 0 shall map to false and the
+    value 1 shall map to true. When parsing, implementations may choose to interpret
+    values other than 0 or 1 as true, or throw an error.
+
+## Value Modifiers ## {#value_modifiers}
+
+When the value array is meant to be reinterpreted before reading, a special bracket syntax is
+provided to indicate modifications to the underlying value array.
+
+### Sparse Array with Complex Values ### {#complex_arrays}
+
+When a value array is composed of alternating real and imaginary components of
+complex numbers, the type is written as `complex[<type>]`. For example, a value
+array of complex `float64` would have a datatype of `complex[float64]` The real
+component of the `i`th element in the modified array shall be stored at position
+`2i` in the original array, and the imaginary component of the `i`th element in
+the modified array shall be at position `2i + 1` in the underlying array.
+
 ### Sparse Array with All Values the Same ### {#iso_arrays}
 
-When all values of a sparse array are the same identical value, a special syntax is
-provided to compress the value array to a single value rather than duplicating the same
-number unnecessarily. The format of the array is written as `iso[<format>]` to indicate
-that the array will store only a single element which is common to all stored indices.
+When all values of a sparse array are the same identical value, the type is
+written as `iso[<type>]`. This indicates that the array will store only a single
+element which is common to all stored indices. All elements in the modified
+array shall be stored at position 0 of the underlying array.
 
 <div class=example>
 
@@ -306,12 +343,12 @@ Example of a CSR Matrix whose values are all 7.
 
 ```json
 {
-  "format": "iso[CSR]",
+  "format": "CSR",
   "shape": [5, 5],
   "data_types": {
     "pointers_0": "uint64",
     "indices_1": "uint64",
-    "values": "int8"
+    "values": "iso[int8]"
   }
 }
 ```
