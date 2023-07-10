@@ -64,7 +64,7 @@ and 12 columns, containing float32 values, along with user-defined attributes.
     "format": "CSC",
     "shape": [10, 12],
     "data_types": {
-      "pointers_0": "uint64",
+      "pointers_to_1": "uint64",
       "indices_1": "uint64",
       "values": "float32"
     }
@@ -126,7 +126,7 @@ The element of the vector located at index `indices_0[i]` has scalar value
 
 Compressed-Sparse Row format
 
-: pointers_0
+: pointers_to_1
 :: Array of size `number_of_rows + 1` containing start and end positions by row.
 : indices_1
 :: Array of size `number_of_elements` containing 0-based column indices.
@@ -134,7 +134,7 @@ Compressed-Sparse Row format
 :: Array of size `number_of_elements` containing stored values.
 
 The column indices of the stored values located in row `i` are located in the range
-`[pointers_0[i], pointers_0[i+1])` in the `indices_1` array. The scalar values for
+`[pointers_to_1[i], pointers_to_1[i+1])` in the `indices_1` array. The scalar values for
 each of those stored values is stored in the corresponding index in the `values` array.
 
 Within a row, elements shall be sorted by column index and must not be duplicated.
@@ -143,7 +143,7 @@ Within a row, elements shall be sorted by column index and must not be duplicate
 
 Compressed-Sparse Column format
 
-: pointers_0
+: pointers_to_1
 :: Array of size `number_of_columns + 1` containing start and end positions by column.
 : indices_1
 :: Array of size `number_of_elements` containing 0-based row indices.
@@ -151,7 +151,7 @@ Compressed-Sparse Column format
 :: Array of size `number_of_elements` containing stored values.
 
 The rows indices of the stored values located in column `j` are located in the range
-`[pointers_0[j], pointers_0[j+1])` in the `indices_1` array. The scalar values for
+`[pointers_to_1[j], pointers_to_1[j+1])` in the `indices_1` array. The scalar values for
 each of those stored values is stored in the corresponding index in the `values` array.
 
 Within a column, elements shall be sorted by row index and must not be duplicated.
@@ -162,16 +162,16 @@ Doubly Compressed-Sparse Row format
 
 : indices_0
 :: Array of size `number_of_nonempty_rows` containing 0-based row indices corresponding
-      to positions within `pointers_0`.
-: pointers_0
+      to positions within `pointers_to_1`.
+: pointers_to_1
 :: Array of size `number_of_nonempty_rows + 1` containing start and end positions.
 : indices_1
 :: Array of size `number_of_elements` containing 0-based column indices.
 : values
 :: Array of size `number_of_elements` containing stored values.
 
-DCSR is similar to CSR, except that rows which are entirely empty are not stored. `pointers_0`
-contains no repeated values. Because the position within `pointers_0` no longer dictates the
+DCSR is similar to CSR, except that rows which are entirely empty are not stored. `pointers_to_1`
+contains no repeated values. Because the position within `pointers_to_1` no longer dictates the
 corresponding row index, `indices_0` provides the row index.
 
 Rows shall be sorted and must not be duplicated.
@@ -183,16 +183,16 @@ Doubly Compressed-Sparse Column format
 
 : indices_0
 :: Array of size `number_of_nonempty_columns` containing 0-based column indices
-      corresponding to positions within `pointers_0`.
-: pointers_0
+      corresponding to positions within `pointers_to_1`.
+: pointers_to_1
 :: Array of size `number_of_nonempty_columns + 1` containing start and end positions.
 : indices_1
 :: Array of size `number_of_elements` containing 0-based row indices.
 : values
 :: Array of size `number_of_elements` containing stored values.
 
-DCSC is similar to CSC, except that columns which are entirely empty are not stored. `pointers_0`
-contains no repeated values. Because the position within `pointers_0` no longer dictates the
+DCSC is similar to CSC, except that columns which are entirely empty are not stored. `pointers_to_1`
+contains no repeated values. Because the position within `pointers_to_1` no longer dictates the
 corresponding column index, `indices_0` provides the column index.
 
 Columns shall be sorted and not duplicated.
@@ -352,14 +352,14 @@ Example of a CSR Matrix whose values are all 7.
   "format": "CSR",
   "shape": [5, 5],
   "data_types": {
-    "pointers_0": "uint64",
+    "pointers_to_1": "uint64",
     "indices_1": "uint64",
     "values": "iso[int8]"
   }
 }
 ```
 
-- `pointers_0` = [0, 1, 3, 3, 5, 6]
+- `pointers_to_1` = [0, 1, 3, 3, 5, 6]
 - `indices_1` = [3, 1, 4, 1, 2, 3]
 - `values` = [7]
 
@@ -489,14 +489,14 @@ Example of a symmetric CSR matrix.
   "shape": [5, 5],
   "structure": "symmetric_lower",
   "data_types": {
-    "pointers_0": "uint64",
+    "pointers_to_1": "uint64",
     "indices_1": "uint64",
     "values": "int8"
   }
 }
 ```
 
-- `pointers_0` = [0, 1, 3, 5, 7, 9]
+- `pointers_to_1` = [0, 1, 3, 5, 7, 9]
 - `indices_1` = [0, 0, 1, 0, 2, 1, 3, 2, 4]
 - `values` = [1, 2, 9, 7, 2, 2, 3, 3, 7]
 
