@@ -65,7 +65,7 @@ attributes.
     "format": "CSC",
     "shape": [10, 12],
     "data_types": {
-      "pointers_0": "uint64",
+      "pointers_to_1": "uint64",
       "indices_1": "uint64",
       "values": "float32"
     }
@@ -93,9 +93,8 @@ Fill {#key_fill}
 --------------------
 The `fill` key may be present. If the `fill` key is present, it shall have a
 boolean value. If the value is true, it signifies the presence of a `fill_value`
-array, whose single element defines the fill (zero) value of the sparse tensor,
-or the value of the array at indices not otherwise specified by the sparse
-tensor structure. 
+array, whose single element defines the value at indices not specified
+by the sparse tensor structure.
 
 Format {#key_format}
 --------------------
@@ -128,7 +127,7 @@ The element of the vector located at index `indices_0[i]` has scalar value
 
 Compressed-Sparse Row format
 
-: pointers_0
+: pointers_to_1
 :: Array of size `number_of_rows + 1` containing start and end positions by row.
 : indices_1
 :: Array of size `number_of_elements` containing 0-based column indices.
@@ -136,7 +135,7 @@ Compressed-Sparse Row format
 :: Array of size `number_of_elements` containing stored values.
 
 The column indices of the stored values located in row `i` are located in the range
-`[pointers_0[i], pointers_0[i+1])` in the `indices_1` array. The scalar values for
+`[pointers_to_1[i], pointers_to_1[i+1])` in the `indices_1` array. The scalar values for
 each of those stored values is stored in the corresponding index in the `values` array.
 
 Within a row, elements shall be sorted by column index and must not be duplicated.
@@ -145,7 +144,7 @@ Within a row, elements shall be sorted by column index and must not be duplicate
 
 Compressed-Sparse Column format
 
-: pointers_0
+: pointers_to_1
 :: Array of size `number_of_columns + 1` containing start and end positions by column.
 : indices_1
 :: Array of size `number_of_elements` containing 0-based row indices.
@@ -153,7 +152,7 @@ Compressed-Sparse Column format
 :: Array of size `number_of_elements` containing stored values.
 
 The rows indices of the stored values located in column `j` are located in the range
-`[pointers_0[j], pointers_0[j+1])` in the `indices_1` array. The scalar values for
+`[pointers_to_1[j], pointers_to_1[j+1])` in the `indices_1` array. The scalar values for
 each of those stored values is stored in the corresponding index in the `values` array.
 
 Within a column, elements shall be sorted by row index and must not be duplicated.
@@ -164,16 +163,16 @@ Doubly Compressed-Sparse Row format
 
 : indices_0
 :: Array of size `number_of_nonempty_rows` containing 0-based row indices corresponding
-      to positions within `pointers_0`.
-: pointers_0
+      to positions within `pointers_to_1`.
+: pointers_to_1
 :: Array of size `number_of_nonempty_rows + 1` containing start and end positions.
 : indices_1
 :: Array of size `number_of_elements` containing 0-based column indices.
 : values
 :: Array of size `number_of_elements` containing stored values.
 
-DCSR is similar to CSR, except that rows which are entirely empty are not stored. `pointers_0`
-contains no repeated values. Because the position within `pointers_0` no longer dictates the
+DCSR is similar to CSR, except that rows which are entirely empty are not stored. `pointers_to_1`
+contains no repeated values. Because the position within `pointers_to_1` no longer dictates the
 corresponding row index, `indices_0` provides the row index.
 
 Rows shall be sorted and must not be duplicated.
@@ -185,16 +184,16 @@ Doubly Compressed-Sparse Column format
 
 : indices_0
 :: Array of size `number_of_nonempty_columns` containing 0-based column indices
-      corresponding to positions within `pointers_0`.
-: pointers_0
+      corresponding to positions within `pointers_to_1`.
+: pointers_to_1
 :: Array of size `number_of_nonempty_columns + 1` containing start and end positions.
 : indices_1
 :: Array of size `number_of_elements` containing 0-based row indices.
 : values
 :: Array of size `number_of_elements` containing stored values.
 
-DCSC is similar to CSC, except that columns which are entirely empty are not stored. `pointers_0`
-contains no repeated values. Because the position within `pointers_0` no longer dictates the
+DCSC is similar to CSC, except that columns which are entirely empty are not stored. `pointers_to_1`
+contains no repeated values. Because the position within `pointers_to_1` no longer dictates the
 corresponding column index, `indices_0` provides the column index.
 
 Columns shall be sorted and not duplicated.
@@ -317,11 +316,11 @@ Assume that this level represents `n`-dimensional subarrays and the root array
 is `N`-dimensional.  The sparse level implies the following binary arrays are
 present:
 
-: pointers_(N - n - 1)
-:: Array of size `number_of_positions + 1` whose 1st element is equal to `0` and whose `p + 1`th element is equal to the sum of `pointers_N[p]` and the number of explicitly represented slices in the `p`th position.
+: pointers_to_(N - n)
+:: Array of size `number_of_positions + 1` whose 1st element is equal to `0` and whose `p + 1`th element is equal to the sum of `pointers_to_(N - n)[p]` and the number of explicitly represented slices in the `p`th position.
 
 : indices_(N - n), ..., indices(N - n + r - 1)
-:: There are `r` such arrays. When `A[i_0, ..., i_(r - 1), :, ..., :]` is explicitly represented by the subarray in position `q`, `indices_(N-n+s)[q] = i_s`. The arrays must be ordered such that the tuples `(indices_(N-n)[q], ..., indices_(N-n+r-1)[q])` are unique and appear in lexicographic order for all `q` in each range `pos[p] <= q < pos[p + 1]`. This array must contain no other elements.
+:: There are `r` such arrays. When `A[i_0, ..., i_(r - 1), :, ..., :]` is explicitly represented by the subarray in position `q`, `indices_(N-n+s)[q] = i_s`. The arrays must be ordered such that the tuples `(indices_(N-n)[q], ..., indices_(N-n+r-1)[q])` are unique and appear in lexicographic order for all `q` in each range `pointers_to_(N-n)[p] <= q < pointers_to_(N-n)[p + 1]`. This array must contain no other elements.
 
 Special note: If the sparse level is the root level, the `pointers` array should
 be ommitted, as its first value will be `0` and its last value will be the
@@ -596,14 +595,14 @@ Example of a CSR Matrix whose values are all 7.
   },
   "shape": [5, 5],
   "data_types": {
-    "pointers_0": "uint64",
+    "pointers_to_1": "uint64",
     "indices_1": "uint64",
     "values": "iso[int8]"
   }
 }
 ```
 
-- `pointers_0` = [0, 1, 3, 3, 5, 6]
+- `pointers_to_1` = [0, 1, 3, 3, 5, 6]
 - `indices_1` = [3, 1, 4, 1, 2, 3]
 - `values` = [7]
 
@@ -612,6 +611,139 @@ Example of a CSR Matrix whose values are all 7.
 Note: Structure-only matrices (allowed in matrix market format) can be stored
       using this technique with a value of 1. This adds only a small amount of
       overhead while describing essentially the same matrix.
+
+Structure {#key_structure}
+--------------------------
+The `structure` key, if present, denotes a special matrix structure in which
+only one triangle of the matrix is stored and the structure and values in the
+other triangle are inferred.
+
+### Pre-Defined Structures ### {#predefined_structure}
+
+The follow pre-defined values can be supplied for the `structure` key to indicate
+the structure of the matrix.
+
+#### symmetric_lower #### {#symmetric_lower_structure}
+
+The `symmetric_lower` value indicates that the matrix has a symmetric structure
+with only the lower triangle stored.  For all matrix entries with row and column
+indices `i,j` and value `v`, `i >= j`.  If `i != j`, the entry implies the
+presence of an entry at row and column index `j,i` with value `v`.
+
+#### symmetric_upper #### {#symmetric_upper_structure}
+
+The `symmetric_upper` value indicates that the matrix has a symmetric structure
+with only the upper triangle stored.  For all matrix entries with row and column
+indices `i,j` and value `v`, `i <= j`.  If `i != j`, the entry implies the
+presence of an entry at row and column index `j,i` with value `v`.
+
+#### hermitian_lower #### {#hermitian_lower_structure}
+
+The `hermitian_lower` value indicates that the matrix has a Hermitian structure
+with only the lower triangle stored.  For all matrix entries with row and column
+indices `i,j` and value `v`, `i >= j`.  If `i != j`, the entry implies the
+presence of an entry at row and column index `j,i` with a value equal to the
+complex conjugate of `v`.  The matrix's value type must be complex.
+
+#### hermitian_upper #### {#hermitian_upper_structure}
+
+The `hermitian_upper` value indicates that the matrix has a Hermitian structure
+with only the upper triangle stored.  For all matrix entries with row and column
+indices `i,j` and value `v`, `i <= j`.  If `i != j`, the entry implies the
+presence of an entry at row and column index `j,i` with a value equal to the
+complex conjugate of `v`.  The matrix's value type must be complex.
+
+#### skew_symmetric_lower #### {#skew_symmetric_lower_structure}
+
+The `skew_symmetric_lower` value indicates that the matrix has a skew-symmetric structure
+with only the lower triangle stored.  For all matrix entries with row and column
+indices `i,j` and value `v`, `i >= j`.  If `i != j`, the entry implies the
+presence of an entry at row and column index `j,i` with value `-v`.
+
+#### skew_symmetric_upper #### {#skew_symmetric_upper_structure}
+
+The `symmetric_upper` value indicates that the matrix has a skew-symmetric structure
+with only the upper triangle stored.  For all matrix entries with row and column
+indices `i,j` and value `v`, `i <= j`.  If `i != j`, the entry implies the
+presence of an entry at row and column index `j,i` with value `-v`.
+
+<div class=example>
+
+Example of a symmetric CSR matrix.
+
+<table>
+  <thead>
+  <tr>
+    <th> </th>
+    <th>0</th>
+    <th>1</th>
+    <th>2</th>
+    <th>3</th>
+    <th>4</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <th>0</th>
+    <td>1</td>
+    <td>.</td>
+    <td>.</td>
+    <td>.</td>
+    <td>.</td>
+  </tr>
+  <tr>
+    <th>1</th>
+    <td>2</td>
+    <td>9</td>
+    <td>.</td>
+    <td>.</td>
+    <td>.</td>
+  </tr>
+  <tr>
+    <th>2</th>
+    <td>7</td>
+    <td>.</td>
+    <td>2</td>
+    <td>.</td>
+    <td>.</td>
+  </tr>
+  <tr>
+    <th>3</th>
+    <td>.</td>
+    <td>2</td>
+    <td>.</td>
+    <td>3</td>
+    <td>.</td>
+  </tr>
+  <tr>
+    <th>4</th>
+    <td>.</td>
+    <td>.</td>
+    <td>3</td>
+    <td>.</td>
+    <td>7</td>
+  </tr>
+  </tbody>
+</table>
+
+```json
+{
+  "format": "CSR",
+  "shape": [5, 5],
+  "structure": "symmetric_lower",
+  "data_types": {
+    "pointers_to_1": "uint64",
+    "indices_1": "uint64",
+    "values": "int8"
+  }
+}
+```
+
+- `pointers_to_1` = [0, 1, 3, 5, 7, 9]
+- `indices_1` = [0, 0, 1, 0, 2, 1, 3, 2, 4]
+- `values` = [1, 2, 9, 7, 2, 2, 3, 3, 7]
+
+</div>
 
 Binary Containers {#binary_container}
 =====================================
