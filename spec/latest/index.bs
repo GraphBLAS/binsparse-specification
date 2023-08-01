@@ -61,6 +61,7 @@ and 12 columns, containing float32 values, along with user-defined attributes.
 ```json
 {
   "binsparse": {
+    "version": "1.0",
     "format": "CSC",
     "shape": [10, 12],
     "data_types": {
@@ -75,6 +76,14 @@ and 12 columns, containing float32 values, along with user-defined attributes.
 ```
 
 </div>
+
+Version {#key_version}
+----------------------
+
+Version indicates the version of the Binsparse specification used here.
+This is a two digit specifier of the form `major.minor`.
+Any minor updates should be backwards compatible with the previous version, e.g. must be a superset of the previous versions within the major release series.
+Major versions may break backwards compatibility.
 
 Shape {#key_shape}
 ------------------
@@ -349,6 +358,7 @@ Example of a CSR Matrix whose values are all 7.
 
 ```json
 {
+  "version": "1.0",
   "format": "CSR",
   "shape": [5, 5],
   "data_types": {
@@ -485,6 +495,7 @@ Example of a symmetric CSR matrix.
 
 ```json
 {
+  "version": "1.0",
   "format": "CSR",
   "shape": [5, 5],
   "structure": "symmetric_lower",
