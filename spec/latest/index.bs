@@ -1,5 +1,5 @@
 <pre class='metadata'>
-Title: Binary Sparse Format Specification
+Title: Binary Sparse Format Specification Version 0.5
 Shortname: binsparse
 Level: 1
 Status: LS-COMMIT
@@ -61,7 +61,7 @@ and 12 columns, containing float32 values, along with user-defined attributes.
 ```json
 {
   "binsparse": {
-    "version": "1.0",
+    "version": "0.5",
     "format": "CSC",
     "shape": [10, 12],
     "data_types": {
@@ -358,7 +358,7 @@ Example of a CSR Matrix whose values are all 7.
 
 ```json
 {
-  "version": "1.0",
+  "version": "0.5",
   "format": "CSR",
   "shape": [5, 5],
   "data_types": {
@@ -495,7 +495,7 @@ Example of a symmetric CSR matrix.
 
 ```json
 {
-  "version": "1.0",
+  "version": "0.5",
   "format": "CSR",
   "shape": [5, 5],
   "structure": "symmetric_lower",
