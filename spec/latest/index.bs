@@ -280,6 +280,8 @@ array of complex `float64` would have a datatype of `complex[float64]` The real
 component of the `i`th element in the modified array shall be stored at position
 `2i` in the original array, and the imaginary component of the `i`th element in
 the modified array shall be at position `2i + 1` in the underlying array.
+The `complex` value modifier may only be used with the types `float32` and
+`float64`.
 
 ### Sparse Array with All Values the Same ### {#iso_arrays}
 
