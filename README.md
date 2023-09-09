@@ -7,6 +7,18 @@ Minutes from our meetings are available [here](https://hackmd.io/0qzK4fJlQp-78t0
 
 The working version of the specification can be found under `spec/latest/index.bs`.
 
+## Parsers
+
+Here is a table listing the current tensor frameworks that support the format:
+
+| Language | Framework | Status | Notes |
+| -------- | ------ | ------ | ----- |
+| C++ | [binsparse-reference-impl](https://github.com/GraphBLAS/binsparse-reference-impl) | under development | converts between binsparse V1.0 and custom in-memory sparse matrices | 
+| Julia | [Finch.jl](https://willowahrens.io/Finch.jl/dev/fileio/) | under development | converts between binsparse V1.0 and V2.0 and Finch matrices and tensors |
+| Python | [binsparse-python](https://github.com/ivirshup/binsparse-python) | under development | converts between binsparse V1.0 and scipy.sparse matrices |
+
+The working version of the specification can be found under `spec/latest/index.bs`.
+
 ### Editing
 
 The spec is written in [bikeshed](https://github.com/tabatkins/bikeshed) – a variant of markdown.
