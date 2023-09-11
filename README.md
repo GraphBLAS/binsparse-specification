@@ -5,7 +5,7 @@ Minutes from our meetings are available [here](https://hackmd.io/0qzK4fJlQp-78t0
 
 ## Specification
 
-The working version of the specification can be found under `spec/latest/index.bs`.
+The working version of the specification can be found under [`spec/latest/index.bs`](https://api.csswg.org/bikeshed/?url=https://raw.githubusercontent.com/GraphBLAS/binsparse-specification/main/spec/latest/index.bs). 
 
 ### Editing
 
