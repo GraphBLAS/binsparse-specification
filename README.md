@@ -15,4 +15,12 @@ To render the spec locally:
 * Install bikeshed (ideally in an isolated environment): `pipx install bikeshed`
 * Call `bikeshed spec spec/latest/index.bs`
 
+To render the spec online, see [api.csswg.org](https://api.csswg.org/bikeshed/),
+or use the following commands:
+
+```
+cd binsparse-specification/spec/latest
+curl https://api.csswg.org/bikeshed/ -F file=@index.bs > index.html
+```
+
 Rendered versions will generated for pull requests.
