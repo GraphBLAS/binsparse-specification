@@ -365,12 +365,63 @@ length of any of the `indices` arrays in this level.
 
 The following formats are equivalent
 
-#### VEC #### {#vec_format_equiv}
+#### DVEC #### {#dvec_format_equiv}
 
 ```json
 {
   "format": {
     "level": "dense",
+    "rank": 1,
+    "subformat": {
+      "level": "element",
+    }
+  },
+}
+```
+
+#### DMATR #### {#dmatr_format_equiv}
+
+```json
+{
+  "format": {
+    "level": "dense",
+    "rank": 1,
+    "subformat": {
+      "level": "dense",
+      "rank": 1,
+      "subformat": {
+        "level": "element",
+      }
+    },
+  },
+}
+```
+
+#### DMATC #### {#dmatr_format_equiv}
+
+```json
+{
+  "swizzle": [1, 0]
+  "format": {
+    "level": "dense",
+    "rank": 1,
+    "subformat": {
+      "level": "dense",
+      "rank": 1,
+      "subformat": {
+        "level": "element",
+      }
+    },
+  },
+}
+```
+
+#### CVEC #### {#cvec_format_equiv}
+
+```json
+{
+  "format": {
+    "level": "sparse",
     "rank": 1,
     "subformat": {
       "level": "element",
