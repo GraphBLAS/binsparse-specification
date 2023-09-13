@@ -110,9 +110,43 @@ be present in the binary container.  `number_of_elements` refers to the number
 of stored values, `number_of_rows` refers to the number of rows, and `number_of_columns`
 refers to the number of columns.
 
-#### VEC #### {#vec_format}
+#### DVEC #### {#dvec_format}
 
-Vector format
+Dense Vector format
+
+: values
+:: Array of size `number_of_elements` containing stored values.
+
+The element of the vector located at index `i` has scalar value
+`values[i]`.
+
+#### DMATR #### {#dmatr_format}
+
+Row-Major Dense Matrix format
+
+: values
+:: Array of size `number_of_elements` containing stored values.
+
+The element of the vector located at index `i, j` has scalar value
+`values[i * number_of_columns + j]`.
+
+#### DMATC #### {#dmatc_format}
+
+Column-Major Dense Matrix format
+
+: values
+:: Array of size `number_of_elements` containing stored values.
+
+The element of the vector located at index `i, j` has scalar value
+`values[i + j * number_of_rows]`.
+
+#### DMAT #### {#DMAT_format}
+
+DMAT format is an alias for [[#dmatr_format]] format.
+
+#### CVEC #### {#cvec_format}
+
+Compressed Sparse Vector format
 
 : indices_0
 :: Array of size `number_of_elements` containing indices.
