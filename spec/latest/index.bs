@@ -138,7 +138,7 @@ Column-Major Dense Matrix format
 :: Array of size `number_of_elements` containing stored values.
 
 The element of the vector located at index `i, j` has scalar value
-`values[j * number_of_rows + i]`.
+`values[i + j * number_of_rows]`.
 
 #### DMAT #### {#DMAT_format}
 
