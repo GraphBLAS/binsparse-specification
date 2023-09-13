@@ -5,7 +5,7 @@ Minutes from our meetings are available [here](https://hackmd.io/0qzK4fJlQp-78t0
 
 ## Specification
 
-The working version of the specification can be found under `spec/latest/index.bs`.
+[View Latest Spec](https://api.csswg.org/bikeshed/?url=https://raw.githubusercontent.com/GraphBLAS/binsparse-specification/main/spec/latest/index.bs)
 
 ## Parsers
 
@@ -19,10 +19,20 @@ Here is a table listing the current tensor frameworks that support the format:
 
 ### Editing
 
+The working version of the specification can be found under `spec/latest/index.bs`.
+
 The spec is written in [bikeshed](https://github.com/tabatkins/bikeshed) – a variant of markdown.
 To render the spec locally:
 
 * Install bikeshed (ideally in an isolated environment): `pipx install bikeshed`
 * Call `bikeshed spec spec/latest/index.bs`
+
+To render the spec online, see [api.csswg.org](https://api.csswg.org/bikeshed/),
+or use the following commands:
+
+```
+cd binsparse-specification/spec/latest
+curl https://api.csswg.org/bikeshed/ -F file=@index.bs > index.html
+```
 
 Rendered versions will generated for pull requests.
