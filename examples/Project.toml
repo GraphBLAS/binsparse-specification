@@ -1,0 +1,6 @@
+[deps]
+Finch = "9177782c-1635-4eb9-9bfb-d9dfa25e6bce"
+HDF5 = "f67ccb44-e63f-5c2f-98bd-6dc0ccc4ba2f"
+JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
+MatrixMarket = "4d4711f2-db25-561a-b6b3-d35e7d4047d3"
+TensorMarket = "8b7d4fe7-0b45-4d0d-9dd8-5cc9b23b4b77"
