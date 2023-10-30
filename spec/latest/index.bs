@@ -274,7 +274,7 @@ Pairs must not be duplicated.
 
 Coordinate format is an alias for [[#coor_format]] format.
 
-### Custom Formats ### {#custom_formats}
+### EXPERIMENTAL: Custom Formats ### {#custom_formats}
 
 Binsparse describes custom multidimensional formats hierarchically.  We can
 understand these formats as arrays of arrays, where the parent array and
@@ -583,8 +583,7 @@ The following strings shall be used to describe data types:
 ## Value Modifiers ## {#value_modifiers}
 
 When the value array is meant to be reinterpreted before reading, a special bracket syntax is
-provided to indicate modifications to the underlying element level. These modifiers can be specified
-either in the values_type field or as wrapper levels around the element level.
+provided to indicate modifications to the underlying element level.
 
 ### Complex Values (complex) ### {#complex_level}
 
