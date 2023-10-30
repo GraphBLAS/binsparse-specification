@@ -274,7 +274,10 @@ Pairs must not be duplicated.
 
 Coordinate format is an alias for [[#coor_format]] format.
 
-### EXPERIMENTAL: Custom Formats ### {#custom_formats}
+### Version 2.0 only: Custom Formats ### {#custom_formats}
+
+The contents of this section will be finalized with the release of Binsparse
+V2.0, and are subject to change until then.
 
 Binsparse describes custom multidimensional formats hierarchically.  We can
 understand these formats as arrays of arrays, where the parent array and
@@ -665,17 +668,7 @@ Example of a CSR Matrix whose values are all 7.
 ```json
 {
   "version": "0.1",
-  "format": {
-    "level": "dense",
-    "rank": 1,
-    "subformat": {
-      "level": "sparse",
-      "rank": 1,
-      "subformat": {
-        "level": "element",
-      }
-    }
-  },
+  "format": "CSR",
   "shape": [5, 5],
   "data_types": {
     "pointers_to_1": "uint64",
