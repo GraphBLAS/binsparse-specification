@@ -1,5 +1,5 @@
 <pre class='metadata'>
-Title: Binary Sparse Format Specification
+Title: Binary Sparse Format Specification Version 0.1
 Shortname: binsparse
 Level: 1
 Status: LS-COMMIT
@@ -62,6 +62,7 @@ attributes.
 ```json
 {
   "binsparse": {
+    "version": "0.1",
     "format": "CSC",
     "shape": [10, 12],
     "data_types": {
@@ -76,6 +77,14 @@ attributes.
 ```
 
 </div>
+
+Version {#key_version}
+----------------------
+
+Version indicates the version of the Binsparse specification used here.
+This is a two digit specifier of the form `major.minor`.
+Any minor updates should be backwards compatible with the previous version, e.g. must be a superset of the previous versions within the major release series.
+Major versions may break backwards compatibility.
 
 Shape {#key_shape}
 ------------------
@@ -139,7 +148,7 @@ Column-Major Dense Matrix format
 :: Array of size `number_of_elements` containing stored values.
 
 The element of the vector located at index `i, j` has scalar value
-`values[j * number_of_rows + i]`.
+`values[i + j * number_of_rows]`.
 
 #### DMAT #### {#DMAT_format}
 
@@ -672,6 +681,7 @@ Example of a CSR Matrix whose values are all 7.
 
 ```json
 {
+  "version": "0.1",
   "format": {
     "level": "dense",
     "rank": 1,
@@ -818,6 +828,7 @@ Example of a symmetric CSR matrix.
 
 ```json
 {
+  "version": "0.1",
   "format": "CSR",
   "shape": [5, 5],
   "structure": "symmetric_lower",
