@@ -21,7 +21,7 @@ for (vec_key, x) in [
         "VEC" => Fiber!(SparseList(Element(zero(eltype(x))))),
         "DVEC" => Fiber!(Dense(Element(zero(eltype(x))))),
     ]
-        dropdefaults!(fmt, x)
+        fmt = dropdefaults!(fmt, x)
         example_dir = joinpath(@__DIR__, "reference", "$(vec_key)_$(fmt_key)")
         mkpath(example_dir)
         fwrite(joinpath(example_dir, "$(vec_key).mtx"), x)
@@ -44,7 +44,7 @@ for (mtx_key, A) in [
         "COO" => swizzle(Fiber!(SparseCOO{2}(Element(zero(eltype(A))))), 2, 1),
         "COOC" => Fiber!(SparseCOO{2}(Element(zero(eltype(A))))),
     ]
-        copyto!(fmt, A)
+        fmt = copyto!(fmt, A)
         example_dir = joinpath(@__DIR__, "reference", "$(mtx_key)_$(fmt_key)")
         mkpath(example_dir)
         fwrite(joinpath(example_dir, "$(mtx_key).mtx"), A)
