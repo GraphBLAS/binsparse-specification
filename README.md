@@ -7,7 +7,7 @@ Minutes from our meetings are available [here](https://hackmd.io/0qzK4fJlQp-78t0
 
 ## Specification
 
-[View Latest Spec](https://api.csswg.org/bikeshed/?url=https://raw.githubusercontent.com/GraphBLAS/binsparse-specification/main/spec/latest/index.bs)
+[View Latest Spec](https://graphblas.org/binsparse-specification/)
 
 ## Parsers
 
