@@ -3,6 +3,8 @@ This is part of a new effort to create a binary storage format for storing spars
 
 Minutes from our meetings are available [here](https://hackmd.io/0qzK4fJlQp-78t067yiYsA?view) (see also: [previous minutes](minutes)).
 
+
+
 ## Specification
 
 [View Latest Spec](https://api.csswg.org/bikeshed/?url=https://raw.githubusercontent.com/GraphBLAS/binsparse-specification/main/spec/latest/index.bs)
