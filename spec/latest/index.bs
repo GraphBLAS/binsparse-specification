@@ -5,7 +5,7 @@ Level: 1
 Status: LS-COMMIT
 Status: w3c/UD
 Group: GraphBLAS
-URL: http://example.com/url-this-spec-will-live-at
+URL: https://github.com/GraphBLAS/binsparse-specification
 Repository: https://github.com/GraphBLAS/binsparse-specification
 Editor: Benjamin Brock, Intel
 Editor: Tim Davis, Texas A&M
