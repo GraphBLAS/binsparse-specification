@@ -1,0 +1,834 @@
+<pre class='metadata'>
+Title: Binary Sparse Format Specification Version 0.1
+Shortname: binsparse
+Level: 1
+Status: LS-COMMIT
+Status: w3c/UD
+Group: GraphBLAS
+URL: http://example.com/url-this-spec-will-live-at
+Repository: https://github.com/GraphBLAS/binsparse-specification
+Editor: Benjamin Brock, Intel
+Editor: Tim Davis, Texas A&M
+Editor: Jim Kitchen, Anaconda
+Editor: Erik Welch, NVIDIA
+Editor: Isaac Virshup, Helmholtz Munich
+Editor: Willow Ahrens, MIT
+Abstract: A cross-platform binary storage format for sparse data, particularly sparse matrices.
+Markup Shorthands: css no, markdown yes
+</pre>
+
+Introduction {#intro}
+=====================
+
+The Binsparse Specification (name tentative) provides a cross-platform format
+for efficiently storing data, particularly sparse multidimensional arrays, in
+binary format. Binsparse is designed to be both a standalone and embeddable
+format.  It consists of two parts:
+
+- a JSON *descriptor* detailing the structure of the chosen binary storage format
+- one or more *binary arrays*, each stored under a predefined dataset name based
+    on the format
+
+Both the descriptor and binary arrays are stored in a supported *binary container*.
+
+Definitions {#defs}
+===================
+
+Binsparse is intended to support multidimensional *sparse arrays*, meaning arrays
+in which not every location has a value.  We refer to each location in the array
+with a value as a *stored value*.  Stored values have associated with them a
+*scalar value*, which is the value stored in that location in the array, and one
+or more *indices*, which describe the location where the stored value is located
+in the array. Some or all of these indices may be stored explicitly, or they may
+be implicitly derived, depending on storage format.  When stored explicitly,
+indices are 0-based positive integers. 
+
+
+Binsparse JSON Descriptors {#descriptor}
+========================================
+
+Binsparse descriptors are key-value metadata that describe the binary format of sparse
+data.  The key-value data is namespaced as "binsparse" to avoid any conflict with other
+metadata in the container. The required entries in the "binsparse" entry are listed
+below. Optional attributes may be defined to hold additional metadata and must be stored
+outside of the "binsparse" namespace.
+
+<div class=example>
+
+Example of a JSON descriptor for a compressed-sparse column (CSC) matrix with 10
+rows and 12 columns, containing float32 values, along with user-defined
+attributes.
+
+```json
+{
+  "binsparse": {
+    "version": "0.1",
+    "format": "CSC",
+    "shape": [10, 12],
+    "data_types": {
+      "pointers_to_1": "uint64",
+      "indices_1": "uint64",
+      "values": "float32"
+    }
+  },
+  "original_source": "https://url/of/original/file.mtx",
+  "author": "John Doe"
+}
+```
+
+</div>
+
+Version {#key_version}
+----------------------
+
+Version indicates the version of the Binsparse specification used here.
+This is a two digit specifier of the form `major.minor`.
+Any minor updates should be backwards compatible with the previous version, e.g. must be a superset of the previous versions within the major release series.
+Major versions may break backwards compatibility.
+
+Shape {#key_shape}
+------------------
+
+The `shape` key must be present and shall define the shape of the sparse tensor.
+It shall contain a JSON array of integers, with index `i` containing the size of
+the `i`'th dimension. For matrices, index `0` shall contain the number of rows,
+and index `1` shall contain the number of columns. For vectors, index `0` shall
+contain the vector's dimension.
+
+Note: a matrix has shape [`number_of_rows`, `number_of_columns`] regardless of whether
+the format orientation is row-wise or column-wise.
+
+Fill {#key_fill}
+--------------------
+The `fill` key may be present. If the `fill` key is present, it shall have a
+boolean value. If the value is true, it signifies the presence of a `fill_value`
+array, whose single element defines the value at indices not specified
+by the sparse tensor structure.
+
+Format {#key_format}
+--------------------
+
+The `format` key must be present and shall describe the binary storage format
+of dense arrays used to represent the sparse array. The format
+defined by the `format` key determines the named binary arrays that shall exist
+in the binary storage container.
+
+### Pre-defined Formats ### {#predefined_formats}
+
+The following is a list of all pre-defined formats and the arrays that shall
+be present in the binary container.  `number_of_elements` refers to the number
+of stored values, `number_of_rows` refers to the number of rows, and `number_of_columns`
+refers to the number of columns.
+
+#### DVEC #### {#dvec_format}
+
+Dense Vector format
+
+: values
+:: Array of size `number_of_elements` containing stored values.
+
+The element of the vector located at index `i` has scalar value
+`values[i]`.
+
+#### DMATR #### {#dmatr_format}
+
+Row-Major Dense Matrix format
+
+: values
+:: Array of size `number_of_elements` containing stored values.
+
+The element of the vector located at index `i, j` has scalar value
+`values[i * number_of_columns + j]`.
+
+#### DMATC #### {#dmatc_format}
+
+Column-Major Dense Matrix format
+
+: values
+:: Array of size `number_of_elements` containing stored values.
+
+The element of the vector located at index `i, j` has scalar value
+`values[i + j * number_of_rows]`.
+
+#### DMAT #### {#DMAT_format}
+
+DMAT format is an alias for [[#dmatr_format]] format.
+
+#### CVEC #### {#cvec_format}
+
+Compressed Sparse Vector format
+
+: indices_0
+:: Array of size `number_of_elements` containing indices.
+: values
+:: Array of size `number_of_elements` containing stored values.
+
+The element of the vector located at index `indices_0[i]` has scalar value
+`values[i]`.  Elements shall be sorted by index and must not be duplicated.
+
+#### CSR #### {#csr_format}
+
+Compressed-Sparse Row format
+
+: pointers_to_1
+:: Array of size `number_of_rows + 1` containing start and end positions by row.
+: indices_1
+:: Array of size `number_of_elements` containing 0-based column indices.
+: values
+:: Array of size `number_of_elements` containing stored values.
+
+The column indices of the stored values located in row `i` are located in the range
+`[pointers_to_1[i], pointers_to_1[i+1])` in the `indices_1` array. The scalar values for
+each of those stored values is stored in the corresponding index in the `values` array.
+
+Within a row, elements shall be sorted by column index and must not be duplicated.
+
+#### CSC #### {#csc_format}
+
+Compressed-Sparse Column format
+
+: pointers_to_1
+:: Array of size `number_of_columns + 1` containing start and end positions by column.
+: indices_1
+:: Array of size `number_of_elements` containing 0-based row indices.
+: values
+:: Array of size `number_of_elements` containing stored values.
+
+The rows indices of the stored values located in column `j` are located in the range
+`[pointers_to_1[j], pointers_to_1[j+1])` in the `indices_1` array. The scalar values for
+each of those stored values is stored in the corresponding index in the `values` array.
+
+Within a column, elements shall be sorted by row index and must not be duplicated.
+
+#### DCSR #### {#dcsr_format}
+
+Doubly Compressed-Sparse Row format
+
+: indices_0
+:: Array of size `number_of_nonempty_rows` containing 0-based row indices corresponding
+      to positions within `pointers_to_1`.
+: pointers_to_1
+:: Array of size `number_of_nonempty_rows + 1` containing start and end positions.
+: indices_1
+:: Array of size `number_of_elements` containing 0-based column indices.
+: values
+:: Array of size `number_of_elements` containing stored values.
+
+DCSR is similar to CSR, except that rows which are entirely empty are not stored. `pointers_to_1`
+contains no repeated values. Because the position within `pointers_to_1` no longer dictates the
+corresponding row index, `indices_0` provides the row index.
+
+Rows shall be sorted and must not be duplicated.
+Within each row, elements shall be sorted by column index and must not be duplicated.
+
+#### DCSC #### {#dcsc_format}
+
+Doubly Compressed-Sparse Column format
+
+: indices_0
+:: Array of size `number_of_nonempty_columns` containing 0-based column indices
+      corresponding to positions within `pointers_to_1`.
+: pointers_to_1
+:: Array of size `number_of_nonempty_columns + 1` containing start and end positions.
+: indices_1
+:: Array of size `number_of_elements` containing 0-based row indices.
+: values
+:: Array of size `number_of_elements` containing stored values.
+
+DCSC is similar to CSC, except that columns which are entirely empty are not stored. `pointers_to_1`
+contains no repeated values. Because the position within `pointers_to_1` no longer dictates the
+corresponding column index, `indices_0` provides the column index.
+
+Columns shall be sorted and not duplicated.
+Within each column, elements shall be sorted by row index and must not be duplicated.
+
+#### COOR #### {#coor_format}
+
+Row-wise Coordinate format
+
+: indices_0
+:: Array of size `number_of_elements` containing 0-based row indices.
+: indices_1
+:: Array of size `number_of_elements` containing 0-based column indices.
+: values
+:: Array of size `number_of_elements` containing stored values.
+
+Pairs of (row index, column index) shall be sorted first by row and then by column.
+Pairs must not be duplicated.
+
+#### COOC #### {#cooc_format}
+
+Column-wise Coordinate format
+
+: indices_0
+:: Array of size `number_of_elements` containing 0-based column indices.
+: indices_1
+:: Array of size `number_of_elements` containing 0-based row indices.
+: values
+:: Array of size `number_of_elements` containing stored values.
+
+Pairs of (column index, row index) shall be sorted first by column and then by row.
+Pairs must not be duplicated.
+
+#### COO #### {#coo_format}
+
+Coordinate format is an alias for [[#coor_format]] format.
+
+### Version 2.0 only: Custom Formats ### {#custom_formats}
+
+The contents of this section will be finalized with the release of Binsparse
+V2.0, and are subject to change until then.
+
+Binsparse describes custom multidimensional formats hierarchically.  We can
+understand these formats as arrays of arrays, where the parent array and
+child arrays might use different formats. For example, we could have a dense
+outer array which contains sparse inner arrays, so the first index would be
+dense and the second index would be sparse. To achieve efficient storage, all
+arrays in the same level are stored contiguously in a specialized datastructure
+called a level.
+
+A level is a collection of zero or more arrays which all have the same format.
+The elements of arrays in a level may be subarrays in a sublevel. The global
+array we wish to store is represented by a level that holds a single root array.
+
+For example, the simplest level is the element format, which represents a
+collection of scalars.  We can represent a collection of dense vectors with a
+dense level format. Each vector in the collection would be composed from
+contiguous scalars in an element level (analogously to the numpy.stack
+operator). We can represent a collection of sparse vectors using a sparse level.
+The sparse level format represents sparse vectors by listing the locations of
+nonzeros, and storing only the nonzero scalars inside an element level.
+
+In addition to storing scalars, dense and sparse levels may themselves store
+multidimensional arrays. This leads to multiple ways to store sparse matrices
+and tensors. For example, a dense vector of sparse vectors is equivalent to the
+CSR matrix format, and a sparse vector of sparse vectors is equivalent to the
+hypersparse DCSR matrix format.
+
+When defining a custom format, the outermost `subformat` key is defined as the
+root level descriptor (a level which will only hold one array). If a level holds
+many different arrays, we refer to the `p`th array as the array in position `p`.
+
+Levels are row-major by default (adding an outer level adds a row dimension).
+The format descriptor may optionally define a `transpose` key, equal to a list of
+the described dimensions in the order they should appear. If the tensor we wish
+to represent is `A` and the tensor described by the format descriptor is `B`,
+then `A[i_1, ..., i_n] = B[i_(transpose[1]), ..., i_(transpose[n])]`. `transpose` must
+be a permutation.
+
+If the format key is a dictionary, the `level` key must be present and shall
+describe the storage format of the level used to represent the sparse array.
+
+The level descriptors are dictionaries defined as follows:
+
+#### Element #### {#element_level}
+
+If the level key is "element", the level represents zero or more scalars.
+
+: values
+:: Array of size `number_of_positions` whose `p`th element holds the value of the scalar at position `p`.
+
+#### Dense #### {#dense_level}
+
+If the level key is "dense", the `subformat` key must be present.  The `rank`
+key must be present, and set to an integer `r` greater than or equal to 1.  The
+dense level represents zero or more r-dimensional dense arrays whose elements
+are themselves arrays specified by `subformat`. For example, a dense level
+of
+rank 2 represents a collection of dense matrices of subarrays. 
+
+Assuming that the level describes arrays of shape `I_0, ..., I_(N - 1)`, the
+array at position `p` in a dense level of rank `r` is an array whose slice
+
+`A[i_0, ..., i_(r - 1), :, ..., :]`
+
+is described by the row-major position
+
+`q = (((((p * I_0) + i_0) * I_1) + i_1) * I_2 + i_2) * ... + i_(r - 1)`
+
+of the sublevel.
+
+#### Sparse #### {#sparse_level}
+
+If the level key is "sparse", the `subformat` key must be present.  The
+`rank` key must be present, and set to an integer `r` greater than or equal to
+`1`.  The sparse level represents zero or more `r`-dimensional sparse arrays
+whose non-implicit elements are themselves arrays specified by `subformat`. For
+example, a sparse level of rank 1 represents a collection of sparse vectors of
+subarrays.
+
+Assume that this level represents `n`-dimensional subarrays and the root array
+is `N`-dimensional.  The sparse level implies the following binary arrays are
+present:
+
+: pointers_to_(N - n)
+:: Array of size `number_of_positions + 1` whose 1st element is equal to `0` and whose `p + 1`th element is equal to the sum of `pointers_to_(N - n)[p]` and the number of explicitly represented slices in the `p`th position.
+
+: indices_(N - n), ..., indices(N - n + r - 1)
+:: There are `r` such arrays. When `A[i_0, ..., i_(r - 1), :, ..., :]` is explicitly represented by the subarray in position `q`, `indices_(N-n+s)[q] = i_s`. The arrays must be ordered such that the tuples `(indices_(N-n)[q], ..., indices_(N-n+r-1)[q])` are unique and appear in lexicographic order for all `q` in each range `pointers_to_(N-n)[p] <= q < pointers_to_(N-n)[p + 1]`. This array must contain no other elements.
+
+Special note: If the sparse level is the root level, the `pointers` array should
+be ommitted, as its first value will be `0` and its last value will be the
+length of any of the `indices` arrays in this level.
+
+
+### Equivalent Formats ### {#equivalent_formats}
+
+The following formats are equivalent
+
+#### DVEC #### {#dvec_format_equiv}
+
+```json
+"format": {
+  "subformat": {
+    "level": "dense",
+    "rank": 1,
+    "subformat": {
+      "level": "element",
+    }
+  }
+}
+```
+
+#### DMATR #### {#dmatr_format_equiv}
+
+```json
+"format": {
+  "subformat": {
+    "level": "dense",
+    "rank": 1,
+    "subformat": {
+      "level": "dense",
+      "rank": 1,
+      "subformat": {
+        "level": "element",
+      }
+    }
+  }
+}
+```
+
+#### DMATC #### {#dmatr_format_equiv}
+
+```json
+"format": {
+  "transpose": [1, 0],
+  "subformat": {
+    "level": "dense",
+    "rank": 1,
+    "subformat": {
+      "level": "dense",
+      "rank": 1,
+      "subformat": {
+        "level": "element",
+      }
+    }
+  }
+}
+```
+
+#### CVEC #### {#cvec_format_equiv}
+
+```json
+"format": {
+  "subformat": {
+    "level": "sparse",
+    "rank": 1,
+    "subformat": {
+      "level": "element",
+    }
+  }
+}
+```
+
+#### CSR #### {#csr_format_equiv}
+
+```json
+"format": {
+  "subformat": {
+    "level": "dense",
+    "rank": 1,
+    "subformat": {
+      "level": "sparse",
+      "rank": 1,
+      "subformat": {
+        "level": "element",
+      }
+    }
+  }
+}
+```
+
+#### CSC #### {#csc_format_equiv}
+
+```json
+"format": {
+  "transpose": [1, 0],
+  "subformat": {
+    "level": "dense",
+    "rank": 1,
+    "subformat": {
+      "level": "sparse",
+      "rank": 1,
+      "subformat": {
+        "level": "element",
+      }
+    }
+  }
+}
+```
+
+#### DCSR #### {#dcsr_format_equiv}
+
+```json
+"format": {
+  "subformat": {
+    "level": "sparse",
+    "rank": 1,
+    "subformat": {
+      "level": "sparse",
+      "rank": 1,
+      "subformat": {
+        "level": "element",
+      }
+    }
+  }
+}
+```
+
+#### DCSC #### {#dcsc_format_equiv}
+
+```json
+"format": {
+  "transpose": [1, 0],
+  "subformat": {
+    "level": "sparse",
+    "rank": 1,
+    "subformat": {
+      "level": "sparse",
+      "rank": 1,
+      "subformat": {
+        "level": "element",
+      }
+    }
+  }
+}
+```
+
+#### COOR #### {#coor_format_equiv}
+
+```json
+"format": {
+  "subformat": {
+    "level": "sparse",
+    "rank": 2,
+    "subformat": {
+      "level": "element",
+    }
+  }
+}
+```
+
+#### COOC #### {#cooc_format_equiv}
+
+Column-wise Coordinate format
+
+```json
+"format": {
+  "transpose": [1, 0],
+  "subformat": {
+    "level": "sparse",
+    "rank": 2,
+    "subformat": {
+      "level": "element",
+    }
+  }
+}
+```
+
+Data Types {#key_data_types}
+----------------------------
+
+The `data_types` key must be present and shall define the data types of all required
+arrays based on the [[#key_format]]. The data type declares the type of both the
+on-disk array as well as the in-memory array.
+
+For a given [[#key_format]], all named binary arrays for that format shall have a
+corresponding name in `data_types`.
+
+The following strings shall be used to describe data types:
+: "uint8"
+:: unsigned 8-bit integer
+: "uint16"
+:: unsigned 16-bit integer
+: "uint32"
+:: unsigned 32-bit integer
+: "uint64"
+:: unsigned 64-bit integer
+: "int8"
+:: signed 8-bit integer
+: "int16"
+:: signed 16-bit integer
+: "int32"
+:: signed 32-bit integer
+: "int64"
+:: signed 64-bit integer
+: "float32"
+:: IEEE binary32 floating point number
+: "float64"
+:: IEEE binary64 floating point number
+: "bint8"
+:: An unsigned 8-bit integer, to be reinterpreted as a Boolean number, however
+    that is represented in the host language. The value 0 shall map to false and the
+    value 1 shall map to true. When parsing, implementations may choose to interpret
+    values other than 0 or 1 as true, or throw an error.
+
+## Value Modifiers ## {#value_modifiers}
+
+When the value array is meant to be reinterpreted before reading, a special bracket syntax is
+provided to indicate modifications to the underlying element level.
+
+### Complex Values (complex) ### {#complex_level}
+
+When a value array is composed of alternating real and imaginary components of
+complex numbers, the type is written as `complex[<type>]`. For example, a value
+array of complex `float64` would have a datatype of `complex[float64]` The real
+component of the `i`th element in the modified array shall be stored at position
+`2i` in the original array, and the imaginary component of the `i`th element in
+the modified array shall be at position `2i + 1` in the underlying array.
+The `complex` value modifier may only be used with the types `float32` and
+`float64`.
+
+### All Values the Same (ISO) ### {#iso_level}
+
+When all values of a sparse array are the same identical value, the type is
+written as `iso[<type>]`. This indicates that the array will store only a single
+element which is common to all stored indices. All elements in the modified
+array shall be stored at position 0 of the underlying array.
+
+<div class=example>
+
+Example of a CSR Matrix whose values are all 7.
+
+<table>
+  <thead>
+  <tr>
+    <th> </th>
+    <th>0</th>
+    <th>1</th>
+    <th>2</th>
+    <th>3</th>
+    <th>4</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <th>0</th>
+    <td>.</td>
+    <td>.</td>
+    <td>.</td>
+    <td>7</td>
+    <td>.</td>
+  </tr>
+  <tr>
+    <th>1</th>
+    <td>.</td>
+    <td>7</td>
+    <td>.</td>
+    <td>.</td>
+    <td>7</td>
+  </tr>
+  <tr>
+    <th>2</th>
+    <td>.</td>
+    <td>.</td>
+    <td>.</td>
+    <td>.</td>
+    <td>.</td>
+  </tr>
+  <tr>
+    <th>3</th>
+    <td>.</td>
+    <td>7</td>
+    <td>7</td>
+    <td>.</td>
+    <td>.</td>
+  </tr>
+  <tr>
+    <th>4</th>
+    <td>.</td>
+    <td>.</td>
+    <td>.</td>
+    <td>7</td>
+    <td>.</td>
+  </tr>
+  </tbody>
+</table>
+
+```json
+{
+  "version": "0.1",
+  "format": "CSR",
+  "shape": [5, 5],
+  "data_types": {
+    "pointers_to_1": "uint64",
+    "indices_1": "uint64",
+    "values": "iso[int8]"
+  }
+}
+```
+
+- `pointers_to_1` = [0, 1, 3, 3, 5, 6]
+- `indices_1` = [3, 1, 4, 1, 2, 3]
+- `values` = [7]
+
+</div>
+
+Note: Structure-only matrices (allowed in matrix market format) can be stored
+      using this technique with a value of 1. This adds only a small amount of
+      overhead while describing essentially the same matrix.
+
+Structure {#key_structure}
+--------------------------
+The `structure` key, if present, denotes a special matrix structure in which
+only one triangle of the matrix is stored and the structure and values in the
+other triangle are inferred.
+
+### Pre-Defined Structures ### {#predefined_structure}
+
+The follow pre-defined values can be supplied for the `structure` key to indicate
+the structure of the matrix.
+
+#### symmetric_lower #### {#symmetric_lower_structure}
+
+The `symmetric_lower` value indicates that the matrix has a symmetric structure
+with only the lower triangle stored.  For all matrix entries with row and column
+indices `i,j` and value `v`, `i >= j`.  If `i != j`, the entry implies the
+presence of an entry at row and column index `j,i` with value `v`.
+
+#### symmetric_upper #### {#symmetric_upper_structure}
+
+The `symmetric_upper` value indicates that the matrix has a symmetric structure
+with only the upper triangle stored.  For all matrix entries with row and column
+indices `i,j` and value `v`, `i <= j`.  If `i != j`, the entry implies the
+presence of an entry at row and column index `j,i` with value `v`.
+
+#### hermitian_lower #### {#hermitian_lower_structure}
+
+The `hermitian_lower` value indicates that the matrix has a Hermitian structure
+with only the lower triangle stored.  For all matrix entries with row and column
+indices `i,j` and value `v`, `i >= j`.  If `i != j`, the entry implies the
+presence of an entry at row and column index `j,i` with a value equal to the
+complex conjugate of `v`.  The matrix's value type must be complex.
+
+#### hermitian_upper #### {#hermitian_upper_structure}
+
+The `hermitian_upper` value indicates that the matrix has a Hermitian structure
+with only the upper triangle stored.  For all matrix entries with row and column
+indices `i,j` and value `v`, `i <= j`.  If `i != j`, the entry implies the
+presence of an entry at row and column index `j,i` with a value equal to the
+complex conjugate of `v`.  The matrix's value type must be complex.
+
+#### skew_symmetric_lower #### {#skew_symmetric_lower_structure}
+
+The `skew_symmetric_lower` value indicates that the matrix has a skew-symmetric structure
+with only the lower triangle stored.  For all matrix entries with row and column
+indices `i,j` and value `v`, `i >= j`.  If `i != j`, the entry implies the
+presence of an entry at row and column index `j,i` with value `-v`.
+
+#### skew_symmetric_upper #### {#skew_symmetric_upper_structure}
+
+The `symmetric_upper` value indicates that the matrix has a skew-symmetric structure
+with only the upper triangle stored.  For all matrix entries with row and column
+indices `i,j` and value `v`, `i <= j`.  If `i != j`, the entry implies the
+presence of an entry at row and column index `j,i` with value `-v`.
+
+<div class=example>
+
+Example of a symmetric CSR matrix.
+
+<table>
+  <thead>
+  <tr>
+    <th> </th>
+    <th>0</th>
+    <th>1</th>
+    <th>2</th>
+    <th>3</th>
+    <th>4</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <th>0</th>
+    <td>1</td>
+    <td>.</td>
+    <td>.</td>
+    <td>.</td>
+    <td>.</td>
+  </tr>
+  <tr>
+    <th>1</th>
+    <td>2</td>
+    <td>9</td>
+    <td>.</td>
+    <td>.</td>
+    <td>.</td>
+  </tr>
+  <tr>
+    <th>2</th>
+    <td>7</td>
+    <td>.</td>
+    <td>2</td>
+    <td>.</td>
+    <td>.</td>
+  </tr>
+  <tr>
+    <th>3</th>
+    <td>.</td>
+    <td>2</td>
+    <td>.</td>
+    <td>3</td>
+    <td>.</td>
+  </tr>
+  <tr>
+    <th>4</th>
+    <td>.</td>
+    <td>.</td>
+    <td>3</td>
+    <td>.</td>
+    <td>7</td>
+  </tr>
+  </tbody>
+</table>
+
+```json
+{
+  "version": "0.1",
+  "format": "CSR",
+  "shape": [5, 5],
+  "structure": "symmetric_lower",
+  "data_types": {
+    "pointers_to_1": "uint64",
+    "indices_1": "uint64",
+    "values": "int8"
+  }
+}
+```
+
+- `pointers_to_1` = [0, 1, 3, 5, 7, 9]
+- `indices_1` = [0, 0, 1, 0, 2, 1, 3, 2, 4]
+- `values` = [1, 2, 9, 7, 2, 2, 3, 3, 7]
+
+</div>
+
+Binary Containers {#binary_container}
+=====================================
+Binary containers must store binary arrays in a standardized, cross-platform
+manner, using the corresponding dataset names previously defined.
+
+Supported Binary Containers {#supported_containers}
+---------------------------------------------------
+
+Currently supported binary containers include HDF5 and NetCDF (but should include more).
+

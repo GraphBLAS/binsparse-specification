@@ -1,0 +1,1390 @@
+<!doctype html><html lang="en">
+ <head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+  <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
+  <title>Binary Sparse Format Specification Version 0.1</title>
+  <meta content="w3c/UD" name="w3c-status">
+  <link href="https://www.w3.org/StyleSheets/TR/2021/W3C-UD" rel="stylesheet">
+  <link href="https://www.w3.org/2008/site/images/favicon.ico" rel="icon">
+  <meta content="Bikeshed version 63e66730b, updated Tue Oct 25 12:35:05 2022 -0700" name="generator">
+  <link href="http://example.com/url-this-spec-will-live-at" rel="canonical">
+<style>/* style-autolinks */
+
+.css.css, .property.property, .descriptor.descriptor {
+    color: var(--a-normal-text);
+    font-size: inherit;
+    font-family: inherit;
+}
+.css::before, .property::before, .descriptor::before {
+    content: "‘";
+}
+.css::after, .property::after, .descriptor::after {
+    content: "’";
+}
+.property, .descriptor {
+    /* Don't wrap property and descriptor names */
+    white-space: nowrap;
+}
+.type { /* CSS value <type> */
+    font-style: italic;
+}
+pre .property::before, pre .property::after {
+    content: "";
+}
+[data-link-type="property"]::before,
+[data-link-type="propdesc"]::before,
+[data-link-type="descriptor"]::before,
+[data-link-type="value"]::before,
+[data-link-type="function"]::before,
+[data-link-type="at-rule"]::before,
+[data-link-type="selector"]::before,
+[data-link-type="maybe"]::before {
+    content: "‘";
+}
+[data-link-type="property"]::after,
+[data-link-type="propdesc"]::after,
+[data-link-type="descriptor"]::after,
+[data-link-type="value"]::after,
+[data-link-type="function"]::after,
+[data-link-type="at-rule"]::after,
+[data-link-type="selector"]::after,
+[data-link-type="maybe"]::after {
+    content: "’";
+}
+
+[data-link-type].production::before,
+[data-link-type].production::after,
+.prod [data-link-type]::before,
+.prod [data-link-type]::after {
+    content: "";
+}
+
+[data-link-type=element],
+[data-link-type=element-attr] {
+    font-family: Menlo, Consolas, "DejaVu Sans Mono", monospace;
+    font-size: .9em;
+}
+[data-link-type=element]::before { content: "<" }
+[data-link-type=element]::after  { content: ">" }
+
+[data-link-type=biblio] {
+    white-space: pre;
+}</style>
+<style>/* style-colors */
+
+/* Any --*-text not paired with a --*-bg is assumed to have a transparent bg */
+:root {
+    color-scheme: light dark;
+
+    --text: black;
+    --bg: white;
+
+    --unofficial-watermark: url(https://www.w3.org/StyleSheets/TR/2016/logos/UD-watermark);
+
+    --logo-bg: #1a5e9a;
+    --logo-active-bg: #c00;
+    --logo-text: white;
+
+    --tocnav-normal-text: #707070;
+    --tocnav-normal-bg: var(--bg);
+    --tocnav-hover-text: var(--tocnav-normal-text);
+    --tocnav-hover-bg: #f8f8f8;
+    --tocnav-active-text: #c00;
+    --tocnav-active-bg: var(--tocnav-normal-bg);
+
+    --tocsidebar-text: var(--text);
+    --tocsidebar-bg: #f7f8f9;
+    --tocsidebar-shadow: rgba(0,0,0,.1);
+    --tocsidebar-heading-text: hsla(203,20%,40%,.7);
+
+    --toclink-text: var(--text);
+    --toclink-underline: #3980b5;
+    --toclink-visited-text: var(--toclink-text);
+    --toclink-visited-underline: #054572;
+
+    --heading-text: #005a9c;
+
+    --hr-text: var(--text);
+
+    --algo-border: #def;
+
+    --del-text: red;
+    --del-bg: transparent;
+    --ins-text: #080;
+    --ins-bg: transparent;
+
+    --a-normal-text: #034575;
+    --a-normal-underline: #bbb;
+    --a-visited-text: var(--a-normal-text);
+    --a-visited-underline: #707070;
+    --a-hover-bg: rgba(75%, 75%, 75%, .25);
+    --a-active-text: #c00;
+    --a-active-underline: #c00;
+
+    --blockquote-border: silver;
+    --blockquote-bg: transparent;
+    --blockquote-text: currentcolor;
+
+    --issue-border: #e05252;
+    --issue-bg: #fbe9e9;
+    --issue-text: var(--text);
+    --issueheading-text: #831616;
+
+    --example-border: #e0cb52;
+    --example-bg: #fcfaee;
+    --example-text: var(--text);
+    --exampleheading-text: #574b0f;
+
+    --note-border: #52e052;
+    --note-bg: #e9fbe9;
+    --note-text: var(--text);
+    --noteheading-text: hsl(120, 70%, 30%);
+    --notesummary-underline: silver;
+
+    --assertion-border: #aaa;
+    --assertion-bg: #eee;
+    --assertion-text: black;
+
+    --advisement-border: orange;
+    --advisement-bg: #fec;
+    --advisement-text: var(--text);
+    --advisementheading-text: #b35f00;
+
+    --warning-border: red;
+    --warning-bg: hsla(40,100%,50%,0.95);
+    --warning-text: var(--text);
+
+    --amendment-border: #330099;
+    --amendment-bg: #F5F0FF;
+    --amendment-text: var(--text);
+    --amendmentheading-text: #220066;
+
+    --def-border: #8ccbf2;
+    --def-bg: #def;
+    --def-text: var(--text);
+    --defrow-border: #bbd7e9;
+
+    --datacell-border: silver;
+
+    --indexinfo-text: #707070;
+
+    --indextable-hover-text: black;
+    --indextable-hover-bg: #f7f8f9;
+
+    --outdatedspec-bg: rgba(0, 0, 0, .5);
+    --outdatedspec-text: black;
+    --outdated-bg: maroon;
+    --outdated-text: white;
+    --outdated-shadow: red;
+
+    --editedrec-bg: darkorange;
+}</style>
+<style>/* style-counters */
+
+body {
+    counter-reset: example figure issue;
+}
+.issue {
+    counter-increment: issue;
+}
+.issue:not(.no-marker)::before {
+    content: "Issue " counter(issue);
+}
+
+.example {
+    counter-increment: example;
+}
+.example:not(.no-marker)::before {
+    content: "Example " counter(example);
+}
+.invalid.example:not(.no-marker)::before,
+.illegal.example:not(.no-marker)::before {
+    content: "Invalid Example" counter(example);
+}
+
+figcaption {
+    counter-increment: figure;
+}
+figcaption:not(.no-marker)::before {
+    content: "Figure " counter(figure) " ";
+}</style>
+<style>/* style-issues */
+
+a[href].issue-return {
+    float: right;
+    float: inline-end;
+    color: var(--issueheading-text);
+    font-weight: bold;
+    text-decoration: none;
+}
+</style>
+<style>/* style-md-lists */
+
+/* This is a weird hack for me not yet following the commonmark spec
+   regarding paragraph and lists. */
+[data-md] > :first-child {
+    margin-top: 0;
+}
+[data-md] > :last-child {
+    margin-bottom: 0;
+}</style>
+<style>/* style-selflinks */
+
+:root {
+    --selflink-text: white;
+    --selflink-bg: gray;
+    --selflink-hover-text: black;
+}
+.heading, .issue, .note, .example, li, dt {
+    position: relative;
+}
+a.self-link {
+    position: absolute;
+    top: 0;
+    left: calc(-1 * (3.5rem - 26px));
+    width: calc(3.5rem - 26px);
+    height: 2em;
+    text-align: center;
+    border: none;
+    transition: opacity .2s;
+    opacity: .5;
+}
+a.self-link:hover {
+    opacity: 1;
+}
+.heading > a.self-link {
+    font-size: 83%;
+}
+.example > a.self-link,
+.note > a.self-link,
+.issue > a.self-link {
+    /* These blocks are overflow:auto, so positioning outside
+       doesn't work. */
+    left: auto;
+    right: 0;
+}
+li > a.self-link {
+    left: calc(-1 * (3.5rem - 26px) - 2em);
+}
+dfn > a.self-link {
+    top: auto;
+    left: auto;
+    opacity: 0;
+    width: 1.5em;
+    height: 1.5em;
+    background: var(--selflink-bg);
+    color: var(--selflink-text);
+    font-style: normal;
+    transition: opacity .2s, background-color .2s, color .2s;
+}
+dfn:hover > a.self-link {
+    opacity: 1;
+}
+dfn > a.self-link:hover {
+    color: var(--selflink-hover-text);
+}
+
+a.self-link::before            { content: "¶"; }
+.heading > a.self-link::before { content: "§"; }
+dfn > a.self-link::before      { content: "#"; }
+</style>
+<style>/* style-syntax-highlighting */
+
+code.highlight { padding: .1em; border-radius: .3em; }
+pre.highlight, pre > code.highlight { display: block; padding: 1em; margin: .5em 0; overflow: auto; border-radius: 0; }
+
+.highlight:not(.idl) { background: rgba(0, 0, 0, .03); }
+c-[a] { color: #990055 } /* Keyword.Declaration */
+c-[b] { color: #990055 } /* Keyword.Type */
+c-[c] { color: #708090 } /* Comment */
+c-[d] { color: #708090 } /* Comment.Multiline */
+c-[e] { color: #0077aa } /* Name.Attribute */
+c-[f] { color: #669900 } /* Name.Tag */
+c-[g] { color: #222222 } /* Name.Variable */
+c-[k] { color: #990055 } /* Keyword */
+c-[l] { color: #000000 } /* Literal */
+c-[m] { color: #000000 } /* Literal.Number */
+c-[n] { color: #0077aa } /* Name */
+c-[o] { color: #999999 } /* Operator */
+c-[p] { color: #999999 } /* Punctuation */
+c-[s] { color: #a67f59 } /* Literal.String */
+c-[t] { color: #a67f59 } /* Literal.String.Single */
+c-[u] { color: #a67f59 } /* Literal.String.Double */
+c-[cp] { color: #708090 } /* Comment.Preproc */
+c-[c1] { color: #708090 } /* Comment.Single */
+c-[cs] { color: #708090 } /* Comment.Special */
+c-[kc] { color: #990055 } /* Keyword.Constant */
+c-[kn] { color: #990055 } /* Keyword.Namespace */
+c-[kp] { color: #990055 } /* Keyword.Pseudo */
+c-[kr] { color: #990055 } /* Keyword.Reserved */
+c-[ld] { color: #000000 } /* Literal.Date */
+c-[nc] { color: #0077aa } /* Name.Class */
+c-[no] { color: #0077aa } /* Name.Constant */
+c-[nd] { color: #0077aa } /* Name.Decorator */
+c-[ni] { color: #0077aa } /* Name.Entity */
+c-[ne] { color: #0077aa } /* Name.Exception */
+c-[nf] { color: #0077aa } /* Name.Function */
+c-[nl] { color: #0077aa } /* Name.Label */
+c-[nn] { color: #0077aa } /* Name.Namespace */
+c-[py] { color: #0077aa } /* Name.Property */
+c-[ow] { color: #999999 } /* Operator.Word */
+c-[mb] { color: #000000 } /* Literal.Number.Bin */
+c-[mf] { color: #000000 } /* Literal.Number.Float */
+c-[mh] { color: #000000 } /* Literal.Number.Hex */
+c-[mi] { color: #000000 } /* Literal.Number.Integer */
+c-[mo] { color: #000000 } /* Literal.Number.Oct */
+c-[sb] { color: #a67f59 } /* Literal.String.Backtick */
+c-[sc] { color: #a67f59 } /* Literal.String.Char */
+c-[sd] { color: #a67f59 } /* Literal.String.Doc */
+c-[se] { color: #a67f59 } /* Literal.String.Escape */
+c-[sh] { color: #a67f59 } /* Literal.String.Heredoc */
+c-[si] { color: #a67f59 } /* Literal.String.Interpol */
+c-[sx] { color: #a67f59 } /* Literal.String.Other */
+c-[sr] { color: #a67f59 } /* Literal.String.Regex */
+c-[ss] { color: #a67f59 } /* Literal.String.Symbol */
+c-[vc] { color: #0077aa } /* Name.Variable.Class */
+c-[vg] { color: #0077aa } /* Name.Variable.Global */
+c-[vi] { color: #0077aa } /* Name.Variable.Instance */
+c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
+</style>
+<style>/* style-darkmode */
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --text: #ddd;
+        --bg: black;
+
+        --unofficial-watermark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cg fill='%23100808' transform='translate(200 200) rotate(-45) translate(-200 -200)' stroke='%23100808' stroke-width='3'%3E%3Ctext x='50%25' y='220' style='font: bold 70px sans-serif; text-anchor: middle; letter-spacing: 6px;'%3EUNOFFICIAL%3C/text%3E%3Ctext x='50%25' y='305' style='font: bold 70px sans-serif; text-anchor: middle; letter-spacing: 6px;'%3EDRAFT%3C/text%3E%3C/g%3E%3C/svg%3E");
+
+        --logo-bg: #1a5e9a;
+        --logo-active-bg: #c00;
+        --logo-text: white;
+
+        --tocnav-normal-text: #999;
+        --tocnav-normal-bg: var(--bg);
+        --tocnav-hover-text: var(--tocnav-normal-text);
+        --tocnav-hover-bg: #080808;
+        --tocnav-active-text: #f44;
+        --tocnav-active-bg: var(--tocnav-normal-bg);
+
+        --tocsidebar-text: var(--text);
+        --tocsidebar-bg: #080808;
+        --tocsidebar-shadow: rgba(255,255,255,.1);
+        --tocsidebar-heading-text: hsla(203,20%,40%,.7);
+
+        --toclink-text: var(--text);
+        --toclink-underline: #6af;
+        --toclink-visited-text: var(--toclink-text);
+        --toclink-visited-underline: #054572;
+
+        --heading-text: #8af;
+
+        --hr-text: var(--text);
+
+        --algo-border: #456;
+
+        --del-text: #f44;
+        --del-bg: transparent;
+        --ins-text: #4a4;
+        --ins-bg: transparent;
+
+        --a-normal-text: #6af;
+        --a-normal-underline: #555;
+        --a-visited-text: var(--a-normal-text);
+        --a-visited-underline: var(--a-normal-underline);
+        --a-hover-bg: rgba(25%, 25%, 25%, .2);
+        --a-active-text: #f44;
+        --a-active-underline: var(--a-active-text);
+
+        --borderedblock-bg: rgba(255, 255, 255, .05);
+
+        --blockquote-border: silver;
+        --blockquote-bg: var(--borderedblock-bg);
+        --blockquote-text: currentcolor;
+
+        --issue-border: #e05252;
+        --issue-bg: var(--borderedblock-bg);
+        --issue-text: var(--text);
+        --issueheading-text: hsl(0deg, 70%, 70%);
+
+        --example-border: hsl(50deg, 90%, 60%);
+        --example-bg: var(--borderedblock-bg);
+        --example-text: var(--text);
+        --exampleheading-text: hsl(50deg, 70%, 70%);
+
+        --note-border: hsl(120deg, 100%, 35%);
+        --note-bg: var(--borderedblock-bg);
+        --note-text: var(--text);
+        --noteheading-text: hsl(120, 70%, 70%);
+        --notesummary-underline: silver;
+
+        --assertion-border: #444;
+        --assertion-bg: var(--borderedblock-bg);
+        --assertion-text: var(--text);
+
+        --advisement-border: orange;
+        --advisement-bg: #222218;
+        --advisement-text: var(--text);
+        --advisementheading-text: #f84;
+
+        --warning-border: red;
+        --warning-bg: hsla(40,100%,20%,0.95);
+        --warning-text: var(--text);
+
+        --amendment-border: #330099;
+        --amendment-bg: #080010;
+        --amendment-text: var(--text);
+        --amendmentheading-text: #cc00ff;
+
+        --def-border: #8ccbf2;
+        --def-bg: #080818;
+        --def-text: var(--text);
+        --defrow-border: #136;
+
+        --datacell-border: silver;
+
+        --indexinfo-text: #aaa;
+
+        --indextable-hover-text: var(--text);
+        --indextable-hover-bg: #181818;
+
+        --outdatedspec-bg: rgba(255, 255, 255, .5);
+        --outdatedspec-text: black;
+        --outdated-bg: maroon;
+        --outdated-text: white;
+        --outdated-shadow: red;
+
+        --editedrec-bg: darkorange;
+    }
+    /* In case a transparent-bg image doesn't expect to be on a dark bg,
+       which is quite common in practice... */
+    img { background: white; }
+}
+@media (prefers-color-scheme: dark) {
+    :root {
+        --selflink-text: black;
+        --selflink-bg: silver;
+        --selflink-hover-text: white;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    .highlight:not(.idl) { background: rgba(255, 255, 255, .05); }
+
+    c-[a] { color: #d33682 } /* Keyword.Declaration */
+    c-[b] { color: #d33682 } /* Keyword.Type */
+    c-[c] { color: #2aa198 } /* Comment */
+    c-[d] { color: #2aa198 } /* Comment.Multiline */
+    c-[e] { color: #268bd2 } /* Name.Attribute */
+    c-[f] { color: #b58900 } /* Name.Tag */
+    c-[g] { color: #cb4b16 } /* Name.Variable */
+    c-[k] { color: #d33682 } /* Keyword */
+    c-[l] { color: #657b83 } /* Literal */
+    c-[m] { color: #657b83 } /* Literal.Number */
+    c-[n] { color: #268bd2 } /* Name */
+    c-[o] { color: #657b83 } /* Operator */
+    c-[p] { color: #657b83 } /* Punctuation */
+    c-[s] { color: #6c71c4 } /* Literal.String */
+    c-[t] { color: #6c71c4 } /* Literal.String.Single */
+    c-[u] { color: #6c71c4 } /* Literal.String.Double */
+    c-[ch] { color: #2aa198 } /* Comment.Hashbang */
+    c-[cp] { color: #2aa198 } /* Comment.Preproc */
+    c-[cpf] { color: #2aa198 } /* Comment.PreprocFile */
+    c-[c1] { color: #2aa198 } /* Comment.Single */
+    c-[cs] { color: #2aa198 } /* Comment.Special */
+    c-[kc] { color: #d33682 } /* Keyword.Constant */
+    c-[kn] { color: #d33682 } /* Keyword.Namespace */
+    c-[kp] { color: #d33682 } /* Keyword.Pseudo */
+    c-[kr] { color: #d33682 } /* Keyword.Reserved */
+    c-[ld] { color: #657b83 } /* Literal.Date */
+    c-[nc] { color: #268bd2 } /* Name.Class */
+    c-[no] { color: #268bd2 } /* Name.Constant */
+    c-[nd] { color: #268bd2 } /* Name.Decorator */
+    c-[ni] { color: #268bd2 } /* Name.Entity */
+    c-[ne] { color: #268bd2 } /* Name.Exception */
+    c-[nf] { color: #268bd2 } /* Name.Function */
+    c-[nl] { color: #268bd2 } /* Name.Label */
+    c-[nn] { color: #268bd2 } /* Name.Namespace */
+    c-[py] { color: #268bd2 } /* Name.Property */
+    c-[ow] { color: #657b83 } /* Operator.Word */
+    c-[mb] { color: #657b83 } /* Literal.Number.Bin */
+    c-[mf] { color: #657b83 } /* Literal.Number.Float */
+    c-[mh] { color: #657b83 } /* Literal.Number.Hex */
+    c-[mi] { color: #657b83 } /* Literal.Number.Integer */
+    c-[mo] { color: #657b83 } /* Literal.Number.Oct */
+    c-[sa] { color: #6c71c4 } /* Literal.String.Affix */
+    c-[sb] { color: #6c71c4 } /* Literal.String.Backtick */
+    c-[sc] { color: #6c71c4 } /* Literal.String.Char */
+    c-[dl] { color: #6c71c4 } /* Literal.String.Delimiter */
+    c-[sd] { color: #6c71c4 } /* Literal.String.Doc */
+    c-[se] { color: #6c71c4 } /* Literal.String.Escape */
+    c-[sh] { color: #6c71c4 } /* Literal.String.Heredoc */
+    c-[si] { color: #6c71c4 } /* Literal.String.Interpol */
+    c-[sx] { color: #6c71c4 } /* Literal.String.Other */
+    c-[sr] { color: #6c71c4 } /* Literal.String.Regex */
+    c-[ss] { color: #6c71c4 } /* Literal.String.Symbol */
+    c-[fm] { color: #268bd2 } /* Name.Function.Magic */
+    c-[vc] { color: #cb4b16 } /* Name.Variable.Class */
+    c-[vg] { color: #cb4b16 } /* Name.Variable.Global */
+    c-[vi] { color: #cb4b16 } /* Name.Variable.Instance */
+    c-[vm] { color: #cb4b16 } /* Name.Variable.Magic */
+    c-[il] { color: #657b83 } /* Literal.Number.Integer.Long */
+}
+</style>
+ <body class="h-entry">
+  <div class="head">
+   <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
+   <h1 class="p-name no-ref" id="title">Binary Sparse Format Specification Version 0.1</h1>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#UD">Unofficial Proposal Draft</a>, <time class="dt-updated" datetime="2024-02-14">14 February 2024</time></p>
+   <details open>
+    <summary>More details about this document</summary>
+    <div data-fill-with="spec-metadata">
+     <dl>
+      <dt>This version:
+      <dd><a class="u-url" href="http://example.com/url-this-spec-will-live-at">http://example.com/url-this-spec-will-live-at</a>
+      <dt>Issue Tracking:
+      <dd><a href="https://github.com/GraphBLAS/binsparse-specification/issues/">GitHub</a>
+      <dt class="editor">Editors:
+      <dd class="editor p-author h-card vcard"><span class="p-name fn">Benjamin Brock</span> (<span class="p-org org">Intel</span>)
+      <dd class="editor p-author h-card vcard"><span class="p-name fn">Tim Davis</span> (<span class="p-org org">Texas A&amp;M</span>)
+      <dd class="editor p-author h-card vcard"><span class="p-name fn">Jim Kitchen</span> (<span class="p-org org">Anaconda</span>)
+      <dd class="editor p-author h-card vcard"><span class="p-name fn">Erik Welch</span> (<span class="p-org org">NVIDIA</span>)
+      <dd class="editor p-author h-card vcard"><span class="p-name fn">Isaac Virshup</span> (<span class="p-org org">Helmholtz Munich</span>)
+      <dd class="editor p-author h-card vcard"><span class="p-name fn">Willow Ahrens</span> (<span class="p-org org">MIT</span>)
+     </dl>
+    </div>
+   </details>
+   <div data-fill-with="warning"></div>
+   <p class="copyright" data-fill-with="copyright"><a href="https://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2024 <a href="https://www.w3.org/"><abbr title="World Wide Web Consortium">W3C</abbr></a><sup>®</sup> (<a href="https://www.csail.mit.edu/"><abbr title="Massachusetts Institute of Technology">MIT</abbr></a>, <a href="https://www.ercim.eu/"><abbr title="European Research Consortium for Informatics and Mathematics">ERCIM</abbr></a>, <a href="https://www.keio.ac.jp/">Keio</a>, <a href="https://ev.buaa.edu.cn/">Beihang</a>). W3C <a href="https://www.w3.org/Consortium/Legal/ipr-notice#Legal_Disclaimer">liability</a>, <a href="https://www.w3.org/Consortium/Legal/ipr-notice#W3C_Trademarks">trademark</a> and <a href="https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document" rel="license">permissive document license</a> rules apply. </p>
+   <hr title="Separator for header">
+  </div>
+  <div class="p-summary" data-fill-with="abstract">
+   <h2 class="no-num no-toc no-ref heading settled" id="abstract"><span class="content">Abstract</span></h2>
+   <p>A cross-platform binary storage format for sparse data, particularly sparse matrices.</p>
+  </div>
+  <h2 class="no-num no-toc no-ref heading settled" id="sotd"><span class="content">Status of this document</span></h2>
+  <div data-fill-with="status">
+   <p></p>
+  </div>
+  <div data-fill-with="at-risk"></div>
+  <nav data-fill-with="table-of-contents" id="toc">
+   <h2 class="no-num no-toc no-ref" id="contents">Table of Contents</h2>
+   <ol class="toc" role="directory">
+    <li><a href="#intro"><span class="secno">1</span> <span class="content">Introduction</span></a>
+    <li><a href="#defs"><span class="secno">2</span> <span class="content">Definitions</span></a>
+    <li>
+     <a href="#descriptor"><span class="secno">3</span> <span class="content">Binsparse JSON Descriptors</span></a>
+     <ol class="toc">
+      <li><a href="#key_version"><span class="secno">3.1</span> <span class="content">Version</span></a>
+      <li><a href="#key_shape"><span class="secno">3.2</span> <span class="content">Shape</span></a>
+      <li><a href="#key_fill"><span class="secno">3.3</span> <span class="content">Fill</span></a>
+      <li>
+       <a href="#key_format"><span class="secno">3.4</span> <span class="content">Format</span></a>
+       <ol class="toc">
+        <li>
+         <a href="#predefined_formats"><span class="secno">3.4.1</span> <span class="content">Pre-defined Formats</span></a>
+         <ol class="toc">
+          <li><a href="#dvec_format"><span class="secno">3.4.1.1</span> <span class="content">DVEC</span></a>
+          <li><a href="#dmatr_format"><span class="secno">3.4.1.2</span> <span class="content">DMATR</span></a>
+          <li><a href="#dmatc_format"><span class="secno">3.4.1.3</span> <span class="content">DMATC</span></a>
+          <li><a href="#DMAT_format"><span class="secno">3.4.1.4</span> <span class="content">DMAT</span></a>
+          <li><a href="#cvec_format"><span class="secno">3.4.1.5</span> <span class="content">CVEC</span></a>
+          <li><a href="#csr_format"><span class="secno">3.4.1.6</span> <span class="content">CSR</span></a>
+          <li><a href="#csc_format"><span class="secno">3.4.1.7</span> <span class="content">CSC</span></a>
+          <li><a href="#dcsr_format"><span class="secno">3.4.1.8</span> <span class="content">DCSR</span></a>
+          <li><a href="#dcsc_format"><span class="secno">3.4.1.9</span> <span class="content">DCSC</span></a>
+          <li><a href="#coor_format"><span class="secno">3.4.1.10</span> <span class="content">COOR</span></a>
+          <li><a href="#cooc_format"><span class="secno">3.4.1.11</span> <span class="content">COOC</span></a>
+          <li><a href="#coo_format"><span class="secno">3.4.1.12</span> <span class="content">COO</span></a>
+         </ol>
+        <li>
+         <a href="#custom_formats"><span class="secno">3.4.2</span> <span class="content">Version 2.0 only: Custom Formats</span></a>
+         <ol class="toc">
+          <li><a href="#element_level"><span class="secno">3.4.2.1</span> <span class="content">Element</span></a>
+          <li><a href="#dense_level"><span class="secno">3.4.2.2</span> <span class="content">Dense</span></a>
+          <li><a href="#sparse_level"><span class="secno">3.4.2.3</span> <span class="content">Sparse</span></a>
+         </ol>
+        <li>
+         <a href="#equivalent_formats"><span class="secno">3.4.3</span> <span class="content">Equivalent Formats</span></a>
+         <ol class="toc">
+          <li><a href="#dvec_format_equiv"><span class="secno">3.4.3.1</span> <span class="content">DVEC</span></a>
+          <li><a href="#dmatr_format_equiv"><span class="secno">3.4.3.2</span> <span class="content">DMATR</span></a>
+          <li><a href="#dmatr_format_equiv①"><span class="secno">3.4.3.3</span> <span class="content">DMATC</span></a>
+          <li><a href="#cvec_format_equiv"><span class="secno">3.4.3.4</span> <span class="content">CVEC</span></a>
+          <li><a href="#csr_format_equiv"><span class="secno">3.4.3.5</span> <span class="content">CSR</span></a>
+          <li><a href="#csc_format_equiv"><span class="secno">3.4.3.6</span> <span class="content">CSC</span></a>
+          <li><a href="#dcsr_format_equiv"><span class="secno">3.4.3.7</span> <span class="content">DCSR</span></a>
+          <li><a href="#dcsc_format_equiv"><span class="secno">3.4.3.8</span> <span class="content">DCSC</span></a>
+          <li><a href="#coor_format_equiv"><span class="secno">3.4.3.9</span> <span class="content">COOR</span></a>
+          <li><a href="#cooc_format_equiv"><span class="secno">3.4.3.10</span> <span class="content">COOC</span></a>
+         </ol>
+       </ol>
+      <li><a href="#key_data_types"><span class="secno">3.5</span> <span class="content">Data Types</span></a>
+      <li>
+       <a href="#value_modifiers"><span class="secno">3.6</span> <span class="content">Value Modifiers</span></a>
+       <ol class="toc">
+        <li><a href="#complex_level"><span class="secno">3.6.1</span> <span class="content">Complex Values (complex)</span></a>
+        <li><a href="#iso_level"><span class="secno">3.6.2</span> <span class="content">All Values the Same (ISO)</span></a>
+       </ol>
+      <li>
+       <a href="#key_structure"><span class="secno">3.7</span> <span class="content">Structure</span></a>
+       <ol class="toc">
+        <li>
+         <a href="#predefined_structure"><span class="secno">3.7.1</span> <span class="content">Pre-Defined Structures</span></a>
+         <ol class="toc">
+          <li><a href="#symmetric_lower_structure"><span class="secno">3.7.1.1</span> <span class="content">symmetric_lower</span></a>
+          <li><a href="#symmetric_upper_structure"><span class="secno">3.7.1.2</span> <span class="content">symmetric_upper</span></a>
+          <li><a href="#hermitian_lower_structure"><span class="secno">3.7.1.3</span> <span class="content">hermitian_lower</span></a>
+          <li><a href="#hermitian_upper_structure"><span class="secno">3.7.1.4</span> <span class="content">hermitian_upper</span></a>
+          <li><a href="#skew_symmetric_lower_structure"><span class="secno">3.7.1.5</span> <span class="content">skew_symmetric_lower</span></a>
+          <li><a href="#skew_symmetric_upper_structure"><span class="secno">3.7.1.6</span> <span class="content">skew_symmetric_upper</span></a>
+         </ol>
+       </ol>
+     </ol>
+    <li>
+     <a href="#binary_container"><span class="secno">4</span> <span class="content">Binary Containers</span></a>
+     <ol class="toc">
+      <li><a href="#supported_containers"><span class="secno">4.1</span> <span class="content">Supported Binary Containers</span></a>
+     </ol>
+    <li>
+     <a href="#w3c-conformance"><span class="secno"></span> <span class="content">Conformance</span></a>
+     <ol class="toc">
+      <li><a href="#w3c-conventions"><span class="secno"></span> <span class="content">Document conventions</span></a>
+      <li><a href="#w3c-conformant-algorithms"><span class="secno"></span> <span class="content">Conformant Algorithms</span></a>
+     </ol>
+    <li>
+     <a href="#references"><span class="secno"></span> <span class="content">References</span></a>
+     <ol class="toc">
+      <li><a href="#normative"><span class="secno"></span> <span class="content">Normative References</span></a>
+     </ol>
+   </ol>
+  </nav>
+  <main>
+   <h2 class="heading settled" data-level="1" id="intro"><span class="secno">1. </span><span class="content">Introduction</span><a class="self-link" href="#intro"></a></h2>
+   <p>The Binsparse Specification (name tentative) provides a cross-platform format
+for efficiently storing data, particularly sparse multidimensional arrays, in
+binary format. Binsparse is designed to be both a standalone and embeddable
+format.  It consists of two parts:</p>
+   <ul>
+    <li data-md>
+     <p>a JSON <em>descriptor</em> detailing the structure of the chosen binary storage format</p>
+    <li data-md>
+     <p>one or more <em>binary arrays</em>, each stored under a predefined dataset name based
+on the format</p>
+   </ul>
+   <p>Both the descriptor and binary arrays are stored in a supported <em>binary container</em>.</p>
+   <h2 class="heading settled" data-level="2" id="defs"><span class="secno">2. </span><span class="content">Definitions</span><a class="self-link" href="#defs"></a></h2>
+   <p>Binsparse is intended to support multidimensional <em>sparse arrays</em>, meaning arrays
+in which not every location has a value.  We refer to each location in the array
+with a value as a <em>stored value</em>.  Stored values have associated with them a <em>scalar value</em>, which is the value stored in that location in the array, and one
+or more <em>indices</em>, which describe the location where the stored value is located
+in the array. Some or all of these indices may be stored explicitly, or they may
+be implicitly derived, depending on storage format.  When stored explicitly,
+indices are 0-based positive integers.</p>
+   <h2 class="heading settled" data-level="3" id="descriptor"><span class="secno">3. </span><span class="content">Binsparse JSON Descriptors</span><a class="self-link" href="#descriptor"></a></h2>
+   <p>Binsparse descriptors are key-value metadata that describe the binary format of sparse
+data.  The key-value data is namespaced as "binsparse" to avoid any conflict with other
+metadata in the container. The required entries in the "binsparse" entry are listed
+below. Optional attributes may be defined to hold additional metadata and must be stored
+outside of the "binsparse" namespace.</p>
+   <div class="example" id="example-c3d21291">
+    <a class="self-link" href="#example-c3d21291"></a> 
+    <p>Example of a JSON descriptor for a compressed-sparse column (CSC) matrix with 10
+rows and 12 columns, containing float32 values, along with user-defined
+attributes.</p>
+<pre class="language-json highlight"><c- p>{</c->
+  <c- f>"binsparse"</c-><c- p>:</c-> <c- p>{</c->
+    <c- f>"version"</c-><c- p>:</c-> <c- u>"0.1"</c-><c- p>,</c->
+    <c- f>"format"</c-><c- p>:</c-> <c- u>"CSC"</c-><c- p>,</c->
+    <c- f>"shape"</c-><c- p>:</c-> <c- p>[</c-><c- mi>10</c-><c- p>,</c-> <c- mi>12</c-><c- p>],</c->
+    <c- f>"data_types"</c-><c- p>:</c-> <c- p>{</c->
+      <c- f>"pointers_to_1"</c-><c- p>:</c-> <c- u>"uint64"</c-><c- p>,</c->
+      <c- f>"indices_1"</c-><c- p>:</c-> <c- u>"uint64"</c-><c- p>,</c->
+      <c- f>"values"</c-><c- p>:</c-> <c- u>"float32"</c->
+    <c- p>}</c->
+  <c- p>},</c->
+  <c- f>"original_source"</c-><c- p>:</c-> <c- u>"https://url/of/original/file.mtx"</c-><c- p>,</c->
+  <c- f>"author"</c-><c- p>:</c-> <c- u>"John Doe"</c->
+<c- p>}</c->
+</pre>
+   </div>
+   <h3 class="heading settled" data-level="3.1" id="key_version"><span class="secno">3.1. </span><span class="content">Version</span><a class="self-link" href="#key_version"></a></h3>
+   <p>Version indicates the version of the Binsparse specification used here.
+This is a two digit specifier of the form <code>major.minor</code>.
+Any minor updates should be backwards compatible with the previous version, e.g. must be a superset of the previous versions within the major release series.
+Major versions may break backwards compatibility.</p>
+   <h3 class="heading settled" data-level="3.2" id="key_shape"><span class="secno">3.2. </span><span class="content">Shape</span><a class="self-link" href="#key_shape"></a></h3>
+   <p>The <code>shape</code> key must be present and shall define the shape of the sparse tensor.
+It shall contain a JSON array of integers, with index <code>i</code> containing the size of
+the <code>i</code>'th dimension. For matrices, index <code>0</code> shall contain the number of rows,
+and index <code>1</code> shall contain the number of columns. For vectors, index <code>0</code> shall
+contain the vector’s dimension.</p>
+   <p class="note" role="note"><span>Note:</span> a matrix has shape [<code>number_of_rows</code>, <code>number_of_columns</code>] regardless of whether
+the format orientation is row-wise or column-wise.</p>
+   <h3 class="heading settled" data-level="3.3" id="key_fill"><span class="secno">3.3. </span><span class="content">Fill</span><a class="self-link" href="#key_fill"></a></h3>
+    The <code>fill</code> key may be present. If the <code>fill</code> key is present, it shall have a
+boolean value. If the value is true, it signifies the presence of a <code>fill_value</code> array, whose single element defines the value at indices not specified
+by the sparse tensor structure. 
+   <h3 class="heading settled" data-level="3.4" id="key_format"><span class="secno">3.4. </span><span class="content">Format</span><a class="self-link" href="#key_format"></a></h3>
+   <p>The <code>format</code> key must be present and shall describe the binary storage format
+of dense arrays used to represent the sparse array. The format
+defined by the <code>format</code> key determines the named binary arrays that shall exist
+in the binary storage container.</p>
+   <h4 class="heading settled" data-level="3.4.1" id="predefined_formats"><span class="secno">3.4.1. </span><span class="content">Pre-defined Formats</span><a class="self-link" href="#predefined_formats"></a></h4>
+   <p>The following is a list of all pre-defined formats and the arrays that shall
+be present in the binary container. <code>number_of_elements</code> refers to the number
+of stored values, <code>number_of_rows</code> refers to the number of rows, and <code>number_of_columns</code> refers to the number of columns.</p>
+   <h5 class="heading settled" data-level="3.4.1.1" id="dvec_format"><span class="secno">3.4.1.1. </span><span class="content">DVEC</span><a class="self-link" href="#dvec_format"></a></h5>
+   <p>Dense Vector format</p>
+   <dl>
+    <dt data-md>values
+    <dd data-md>
+     <p>Array of size <code>number_of_elements</code> containing stored values.</p>
+   </dl>
+   <p>The element of the vector located at index <code>i</code> has scalar value <code>values[i]</code>.</p>
+   <h5 class="heading settled" data-level="3.4.1.2" id="dmatr_format"><span class="secno">3.4.1.2. </span><span class="content">DMATR</span><a class="self-link" href="#dmatr_format"></a></h5>
+   <p>Row-Major Dense Matrix format</p>
+   <dl>
+    <dt data-md>values
+    <dd data-md>
+     <p>Array of size <code>number_of_elements</code> containing stored values.</p>
+   </dl>
+   <p>The element of the vector located at index <code>i, j</code> has scalar value <code>values[i * number_of_columns + j]</code>.</p>
+   <h5 class="heading settled" data-level="3.4.1.3" id="dmatc_format"><span class="secno">3.4.1.3. </span><span class="content">DMATC</span><a class="self-link" href="#dmatc_format"></a></h5>
+   <p>Column-Major Dense Matrix format</p>
+   <dl>
+    <dt data-md>values
+    <dd data-md>
+     <p>Array of size <code>number_of_elements</code> containing stored values.</p>
+   </dl>
+   <p>The element of the vector located at index <code>i, j</code> has scalar value <code>values[i + j * number_of_rows]</code>.</p>
+   <h5 class="heading settled" data-level="3.4.1.4" id="DMAT_format"><span class="secno">3.4.1.4. </span><span class="content">DMAT</span><a class="self-link" href="#DMAT_format"></a></h5>
+   <p>DMAT format is an alias for <a href="#dmatr_format">§ 3.4.1.2 DMATR</a> format.</p>
+   <h5 class="heading settled" data-level="3.4.1.5" id="cvec_format"><span class="secno">3.4.1.5. </span><span class="content">CVEC</span><a class="self-link" href="#cvec_format"></a></h5>
+   <p>Compressed Sparse Vector format</p>
+   <dl>
+    <dt data-md>indices_0
+    <dd data-md>
+     <p>Array of size <code>number_of_elements</code> containing indices.</p>
+    <dt data-md>values
+    <dd data-md>
+     <p>Array of size <code>number_of_elements</code> containing stored values.</p>
+   </dl>
+   <p>The element of the vector located at index <code>indices_0[i]</code> has scalar value <code>values[i]</code>.  Elements shall be sorted by index and must not be duplicated.</p>
+   <h5 class="heading settled" data-level="3.4.1.6" id="csr_format"><span class="secno">3.4.1.6. </span><span class="content">CSR</span><a class="self-link" href="#csr_format"></a></h5>
+   <p>Compressed-Sparse Row format</p>
+   <dl>
+    <dt data-md>pointers_to_1
+    <dd data-md>
+     <p>Array of size <code>number_of_rows + 1</code> containing start and end positions by row.</p>
+    <dt data-md>indices_1
+    <dd data-md>
+     <p>Array of size <code>number_of_elements</code> containing 0-based column indices.</p>
+    <dt data-md>values
+    <dd data-md>
+     <p>Array of size <code>number_of_elements</code> containing stored values.</p>
+   </dl>
+   <p>The column indices of the stored values located in row <code>i</code> are located in the range <code>[pointers_to_1[i], pointers_to_1[i+1])</code> in the <code>indices_1</code> array. The scalar values for
+each of those stored values is stored in the corresponding index in the <code>values</code> array.</p>
+   <p>Within a row, elements shall be sorted by column index and must not be duplicated.</p>
+   <h5 class="heading settled" data-level="3.4.1.7" id="csc_format"><span class="secno">3.4.1.7. </span><span class="content">CSC</span><a class="self-link" href="#csc_format"></a></h5>
+   <p>Compressed-Sparse Column format</p>
+   <dl>
+    <dt data-md>pointers_to_1
+    <dd data-md>
+     <p>Array of size <code>number_of_columns + 1</code> containing start and end positions by column.</p>
+    <dt data-md>indices_1
+    <dd data-md>
+     <p>Array of size <code>number_of_elements</code> containing 0-based row indices.</p>
+    <dt data-md>values
+    <dd data-md>
+     <p>Array of size <code>number_of_elements</code> containing stored values.</p>
+   </dl>
+   <p>The rows indices of the stored values located in column <code>j</code> are located in the range <code>[pointers_to_1[j], pointers_to_1[j+1])</code> in the <code>indices_1</code> array. The scalar values for
+each of those stored values is stored in the corresponding index in the <code>values</code> array.</p>
+   <p>Within a column, elements shall be sorted by row index and must not be duplicated.</p>
+   <h5 class="heading settled" data-level="3.4.1.8" id="dcsr_format"><span class="secno">3.4.1.8. </span><span class="content">DCSR</span><a class="self-link" href="#dcsr_format"></a></h5>
+   <p>Doubly Compressed-Sparse Row format</p>
+   <dl>
+    <dt data-md>indices_0
+    <dd data-md>
+     <p>Array of size <code>number_of_nonempty_rows</code> containing 0-based row indices corresponding
+  to positions within <code>pointers_to_1</code>.</p>
+    <dt data-md>pointers_to_1
+    <dd data-md>
+     <p>Array of size <code>number_of_nonempty_rows + 1</code> containing start and end positions.</p>
+    <dt data-md>indices_1
+    <dd data-md>
+     <p>Array of size <code>number_of_elements</code> containing 0-based column indices.</p>
+    <dt data-md>values
+    <dd data-md>
+     <p>Array of size <code>number_of_elements</code> containing stored values.</p>
+   </dl>
+   <p>DCSR is similar to CSR, except that rows which are entirely empty are not stored. <code>pointers_to_1</code> contains no repeated values. Because the position within <code>pointers_to_1</code> no longer dictates the
+corresponding row index, <code>indices_0</code> provides the row index.</p>
+   <p>Rows shall be sorted and must not be duplicated.
+Within each row, elements shall be sorted by column index and must not be duplicated.</p>
+   <h5 class="heading settled" data-level="3.4.1.9" id="dcsc_format"><span class="secno">3.4.1.9. </span><span class="content">DCSC</span><a class="self-link" href="#dcsc_format"></a></h5>
+   <p>Doubly Compressed-Sparse Column format</p>
+   <dl>
+    <dt data-md>indices_0
+    <dd data-md>
+     <p>Array of size <code>number_of_nonempty_columns</code> containing 0-based column indices
+  corresponding to positions within <code>pointers_to_1</code>.</p>
+    <dt data-md>pointers_to_1
+    <dd data-md>
+     <p>Array of size <code>number_of_nonempty_columns + 1</code> containing start and end positions.</p>
+    <dt data-md>indices_1
+    <dd data-md>
+     <p>Array of size <code>number_of_elements</code> containing 0-based row indices.</p>
+    <dt data-md>values
+    <dd data-md>
+     <p>Array of size <code>number_of_elements</code> containing stored values.</p>
+   </dl>
+   <p>DCSC is similar to CSC, except that columns which are entirely empty are not stored. <code>pointers_to_1</code> contains no repeated values. Because the position within <code>pointers_to_1</code> no longer dictates the
+corresponding column index, <code>indices_0</code> provides the column index.</p>
+   <p>Columns shall be sorted and not duplicated.
+Within each column, elements shall be sorted by row index and must not be duplicated.</p>
+   <h5 class="heading settled" data-level="3.4.1.10" id="coor_format"><span class="secno">3.4.1.10. </span><span class="content">COOR</span><a class="self-link" href="#coor_format"></a></h5>
+   <p>Row-wise Coordinate format</p>
+   <dl>
+    <dt data-md>indices_0
+    <dd data-md>
+     <p>Array of size <code>number_of_elements</code> containing 0-based row indices.</p>
+    <dt data-md>indices_1
+    <dd data-md>
+     <p>Array of size <code>number_of_elements</code> containing 0-based column indices.</p>
+    <dt data-md>values
+    <dd data-md>
+     <p>Array of size <code>number_of_elements</code> containing stored values.</p>
+   </dl>
+   <p>Pairs of (row index, column index) shall be sorted first by row and then by column.
+Pairs must not be duplicated.</p>
+   <h5 class="heading settled" data-level="3.4.1.11" id="cooc_format"><span class="secno">3.4.1.11. </span><span class="content">COOC</span><a class="self-link" href="#cooc_format"></a></h5>
+   <p>Column-wise Coordinate format</p>
+   <dl>
+    <dt data-md>indices_0
+    <dd data-md>
+     <p>Array of size <code>number_of_elements</code> containing 0-based column indices.</p>
+    <dt data-md>indices_1
+    <dd data-md>
+     <p>Array of size <code>number_of_elements</code> containing 0-based row indices.</p>
+    <dt data-md>values
+    <dd data-md>
+     <p>Array of size <code>number_of_elements</code> containing stored values.</p>
+   </dl>
+   <p>Pairs of (column index, row index) shall be sorted first by column and then by row.
+Pairs must not be duplicated.</p>
+   <h5 class="heading settled" data-level="3.4.1.12" id="coo_format"><span class="secno">3.4.1.12. </span><span class="content">COO</span><a class="self-link" href="#coo_format"></a></h5>
+   <p>Coordinate format is an alias for <a href="#coor_format">§ 3.4.1.10 COOR</a> format.</p>
+   <h4 class="heading settled" data-level="3.4.2" id="custom_formats"><span class="secno">3.4.2. </span><span class="content">Version 2.0 only: Custom Formats</span><a class="self-link" href="#custom_formats"></a></h4>
+   <p>The contents of this section will be finalized with the release of Binsparse
+V2.0, and are subject to change until then.</p>
+   <p>Binsparse describes custom multidimensional formats hierarchically.  We can
+understand these formats as arrays of arrays, where the parent array and
+child arrays might use different formats. For example, we could have a dense
+outer array which contains sparse inner arrays, so the first index would be
+dense and the second index would be sparse. To achieve efficient storage, all
+arrays in the same level are stored contiguously in a specialized datastructure
+called a level.</p>
+   <p>A level is a collection of zero or more arrays which all have the same format.
+The elements of arrays in a level may be subarrays in a sublevel. The global
+array we wish to store is represented by a level that holds a single root array.</p>
+   <p>For example, the simplest level is the element format, which represents a
+collection of scalars.  We can represent a collection of dense vectors with a
+dense level format. Each vector in the collection would be composed from
+contiguous scalars in an element level (analogously to the numpy.stack
+operator). We can represent a collection of sparse vectors using a sparse level.
+The sparse level format represents sparse vectors by listing the locations of
+nonzeros, and storing only the nonzero scalars inside an element level.</p>
+   <p>In addition to storing scalars, dense and sparse levels may themselves store
+multidimensional arrays. This leads to multiple ways to store sparse matrices
+and tensors. For example, a dense vector of sparse vectors is equivalent to the
+CSR matrix format, and a sparse vector of sparse vectors is equivalent to the
+hypersparse DCSR matrix format.</p>
+   <p>When defining a custom format, the outermost <code>subformat</code> key is defined as the
+root level descriptor (a level which will only hold one array). If a level holds
+many different arrays, we refer to the <code>p</code>th array as the array in position <code>p</code>.</p>
+   <p>Levels are row-major by default (adding an outer level adds a row dimension).
+The format descriptor may optionally define a <code>transpose</code> key, equal to a list of
+the described dimensions in the order they should appear. If the tensor we wish
+to represent is <code>A</code> and the tensor described by the format descriptor is <code>B</code>,
+then <code>A[i_1, ..., i_n] = B[i_(transpose[1]), ..., i_(transpose[n])]</code>. <code>transpose</code> must
+be a permutation.</p>
+   <p>If the format key is a dictionary, the <code>level</code> key must be present and shall
+describe the storage format of the level used to represent the sparse array.</p>
+   <p>The level descriptors are dictionaries defined as follows:</p>
+   <h5 class="heading settled" data-level="3.4.2.1" id="element_level"><span class="secno">3.4.2.1. </span><span class="content">Element</span><a class="self-link" href="#element_level"></a></h5>
+   <p>If the level key is "element", the level represents zero or more scalars.</p>
+   <dl>
+    <dt data-md>values
+    <dd data-md>
+     <p>Array of size <code>number_of_positions</code> whose <code>p</code>th element holds the value of the scalar at position <code>p</code>.</p>
+   </dl>
+   <h5 class="heading settled" data-level="3.4.2.2" id="dense_level"><span class="secno">3.4.2.2. </span><span class="content">Dense</span><a class="self-link" href="#dense_level"></a></h5>
+   <p>If the level key is "dense", the <code>subformat</code> key must be present.  The <code>rank</code> key must be present, and set to an integer <code>r</code> greater than or equal to 1.  The
+dense level represents zero or more r-dimensional dense arrays whose elements
+are themselves arrays specified by <code>subformat</code>. For example, a dense level
+of
+rank 2 represents a collection of dense matrices of subarrays.</p>
+   <p>Assuming that the level describes arrays of shape <code>I_0, ..., I_(N - 1)</code>, the
+array at position <code>p</code> in a dense level of rank <code>r</code> is an array whose slice</p>
+   <p><code>A[i_0, ..., i_(r - 1), :, ..., :]</code></p>
+   <p>is described by the row-major position</p>
+   <p><code>q = (((((p * I_0) + i_0) * I_1) + i_1) * I_2 + i_2) * ... + i_(r - 1)</code></p>
+   <p>of the sublevel.</p>
+   <h5 class="heading settled" data-level="3.4.2.3" id="sparse_level"><span class="secno">3.4.2.3. </span><span class="content">Sparse</span><a class="self-link" href="#sparse_level"></a></h5>
+   <p>If the level key is "sparse", the <code>subformat</code> key must be present.  The <code>rank</code> key must be present, and set to an integer <code>r</code> greater than or equal to <code>1</code>.  The sparse level represents zero or more <code>r</code>-dimensional sparse arrays
+whose non-implicit elements are themselves arrays specified by <code>subformat</code>. For
+example, a sparse level of rank 1 represents a collection of sparse vectors of
+subarrays.</p>
+   <p>Assume that this level represents <code>n</code>-dimensional subarrays and the root array
+is <code>N</code>-dimensional.  The sparse level implies the following binary arrays are
+present:</p>
+   <dl>
+    <dt data-md>pointers_to_(N - n)
+    <dd data-md>
+     <p>Array of size <code>number_of_positions + 1</code> whose 1st element is equal to <code>0</code> and whose <code>p + 1</code>th element is equal to the sum of <code>pointers_to_(N - n)[p]</code> and the number of explicitly represented slices in the <code>p</code>th position.</p>
+    <dt data-md>indices_(N - n), ..., indices(N - n + r - 1)
+    <dd data-md>
+     <p>There are <code>r</code> such arrays. When <code>A[i_0, ..., i_(r - 1), :, ..., :]</code> is explicitly represented by the subarray in position <code>q</code>, <code>indices_(N-n+s)[q] = i_s</code>. The arrays must be ordered such that the tuples <code>(indices_(N-n)[q], ..., indices_(N-n+r-1)[q])</code> are unique and appear in lexicographic order for all <code>q</code> in each range <code>pointers_to_(N-n)[p] &lt;= q &lt; pointers_to_(N-n)[p + 1]</code>. This array must contain no other elements.</p>
+   </dl>
+   <p>Special note: If the sparse level is the root level, the <code>pointers</code> array should
+be ommitted, as its first value will be <code>0</code> and its last value will be the
+length of any of the <code>indices</code> arrays in this level.</p>
+   <h4 class="heading settled" data-level="3.4.3" id="equivalent_formats"><span class="secno">3.4.3. </span><span class="content">Equivalent Formats</span><a class="self-link" href="#equivalent_formats"></a></h4>
+   <p>The following formats are equivalent</p>
+   <h5 class="heading settled" data-level="3.4.3.1" id="dvec_format_equiv"><span class="secno">3.4.3.1. </span><span class="content">DVEC</span><a class="self-link" href="#dvec_format_equiv"></a></h5>
+<pre class="language-json highlight"><c- f>"format"</c-><c- p>:</c-> <c- p>{</c->
+  <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
+    <c- f>"level"</c-><c- p>:</c-> <c- u>"dense"</c-><c- p>,</c->
+    <c- f>"rank"</c-><c- p>:</c-> <c- mi>1</c-><c- p>,</c->
+    <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
+      <c- f>"level"</c-><c- p>:</c-> <c- u>"element"</c-><c- p>,</c->
+    <c- p>}</c->
+  <c- p>}</c->
+<c- p>}</c->
+</pre>
+   <h5 class="heading settled" data-level="3.4.3.2" id="dmatr_format_equiv"><span class="secno">3.4.3.2. </span><span class="content">DMATR</span><a class="self-link" href="#dmatr_format_equiv"></a></h5>
+<pre class="language-json highlight"><c- f>"format"</c-><c- p>:</c-> <c- p>{</c->
+  <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
+    <c- f>"level"</c-><c- p>:</c-> <c- u>"dense"</c-><c- p>,</c->
+    <c- f>"rank"</c-><c- p>:</c-> <c- mi>1</c-><c- p>,</c->
+    <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
+      <c- f>"level"</c-><c- p>:</c-> <c- u>"dense"</c-><c- p>,</c->
+      <c- f>"rank"</c-><c- p>:</c-> <c- mi>1</c-><c- p>,</c->
+      <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
+        <c- f>"level"</c-><c- p>:</c-> <c- u>"element"</c-><c- p>,</c->
+      <c- p>}</c->
+    <c- p>}</c->
+  <c- p>}</c->
+<c- p>}</c->
+</pre>
+   <h5 class="heading settled" data-level="3.4.3.3" id="dmatr_format_equiv①"><span class="secno">3.4.3.3. </span><span class="content">DMATC</span><a class="self-link" href="#dmatr_format_equiv①"></a></h5>
+<pre class="language-json highlight"><c- f>"format"</c-><c- p>:</c-> <c- p>{</c->
+  <c- f>"transpose"</c-><c- p>:</c-> <c- p>[</c-><c- mi>1</c-><c- p>,</c-> <c- mi>0</c-><c- p>],</c->
+  <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
+    <c- f>"level"</c-><c- p>:</c-> <c- u>"dense"</c-><c- p>,</c->
+    <c- f>"rank"</c-><c- p>:</c-> <c- mi>1</c-><c- p>,</c->
+    <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
+      <c- f>"level"</c-><c- p>:</c-> <c- u>"dense"</c-><c- p>,</c->
+      <c- f>"rank"</c-><c- p>:</c-> <c- mi>1</c-><c- p>,</c->
+      <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
+        <c- f>"level"</c-><c- p>:</c-> <c- u>"element"</c-><c- p>,</c->
+      <c- p>}</c->
+    <c- p>}</c->
+  <c- p>}</c->
+<c- p>}</c->
+</pre>
+   <h5 class="heading settled" data-level="3.4.3.4" id="cvec_format_equiv"><span class="secno">3.4.3.4. </span><span class="content">CVEC</span><a class="self-link" href="#cvec_format_equiv"></a></h5>
+<pre class="language-json highlight"><c- f>"format"</c-><c- p>:</c-> <c- p>{</c->
+  <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
+    <c- f>"level"</c-><c- p>:</c-> <c- u>"sparse"</c-><c- p>,</c->
+    <c- f>"rank"</c-><c- p>:</c-> <c- mi>1</c-><c- p>,</c->
+    <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
+      <c- f>"level"</c-><c- p>:</c-> <c- u>"element"</c-><c- p>,</c->
+    <c- p>}</c->
+  <c- p>}</c->
+<c- p>}</c->
+</pre>
+   <h5 class="heading settled" data-level="3.4.3.5" id="csr_format_equiv"><span class="secno">3.4.3.5. </span><span class="content">CSR</span><a class="self-link" href="#csr_format_equiv"></a></h5>
+<pre class="language-json highlight"><c- f>"format"</c-><c- p>:</c-> <c- p>{</c->
+  <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
+    <c- f>"level"</c-><c- p>:</c-> <c- u>"dense"</c-><c- p>,</c->
+    <c- f>"rank"</c-><c- p>:</c-> <c- mi>1</c-><c- p>,</c->
+    <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
+      <c- f>"level"</c-><c- p>:</c-> <c- u>"sparse"</c-><c- p>,</c->
+      <c- f>"rank"</c-><c- p>:</c-> <c- mi>1</c-><c- p>,</c->
+      <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
+        <c- f>"level"</c-><c- p>:</c-> <c- u>"element"</c-><c- p>,</c->
+      <c- p>}</c->
+    <c- p>}</c->
+  <c- p>}</c->
+<c- p>}</c->
+</pre>
+   <h5 class="heading settled" data-level="3.4.3.6" id="csc_format_equiv"><span class="secno">3.4.3.6. </span><span class="content">CSC</span><a class="self-link" href="#csc_format_equiv"></a></h5>
+<pre class="language-json highlight"><c- f>"format"</c-><c- p>:</c-> <c- p>{</c->
+  <c- f>"transpose"</c-><c- p>:</c-> <c- p>[</c-><c- mi>1</c-><c- p>,</c-> <c- mi>0</c-><c- p>],</c->
+  <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
+    <c- f>"level"</c-><c- p>:</c-> <c- u>"dense"</c-><c- p>,</c->
+    <c- f>"rank"</c-><c- p>:</c-> <c- mi>1</c-><c- p>,</c->
+    <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
+      <c- f>"level"</c-><c- p>:</c-> <c- u>"sparse"</c-><c- p>,</c->
+      <c- f>"rank"</c-><c- p>:</c-> <c- mi>1</c-><c- p>,</c->
+      <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
+        <c- f>"level"</c-><c- p>:</c-> <c- u>"element"</c-><c- p>,</c->
+      <c- p>}</c->
+    <c- p>}</c->
+  <c- p>}</c->
+<c- p>}</c->
+</pre>
+   <h5 class="heading settled" data-level="3.4.3.7" id="dcsr_format_equiv"><span class="secno">3.4.3.7. </span><span class="content">DCSR</span><a class="self-link" href="#dcsr_format_equiv"></a></h5>
+<pre class="language-json highlight"><c- f>"format"</c-><c- p>:</c-> <c- p>{</c->
+  <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
+    <c- f>"level"</c-><c- p>:</c-> <c- u>"sparse"</c-><c- p>,</c->
+    <c- f>"rank"</c-><c- p>:</c-> <c- mi>1</c-><c- p>,</c->
+    <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
+      <c- f>"level"</c-><c- p>:</c-> <c- u>"sparse"</c-><c- p>,</c->
+      <c- f>"rank"</c-><c- p>:</c-> <c- mi>1</c-><c- p>,</c->
+      <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
+        <c- f>"level"</c-><c- p>:</c-> <c- u>"element"</c-><c- p>,</c->
+      <c- p>}</c->
+    <c- p>}</c->
+  <c- p>}</c->
+<c- p>}</c->
+</pre>
+   <h5 class="heading settled" data-level="3.4.3.8" id="dcsc_format_equiv"><span class="secno">3.4.3.8. </span><span class="content">DCSC</span><a class="self-link" href="#dcsc_format_equiv"></a></h5>
+<pre class="language-json highlight"><c- f>"format"</c-><c- p>:</c-> <c- p>{</c->
+  <c- f>"transpose"</c-><c- p>:</c-> <c- p>[</c-><c- mi>1</c-><c- p>,</c-> <c- mi>0</c-><c- p>],</c->
+  <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
+    <c- f>"level"</c-><c- p>:</c-> <c- u>"sparse"</c-><c- p>,</c->
+    <c- f>"rank"</c-><c- p>:</c-> <c- mi>1</c-><c- p>,</c->
+    <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
+      <c- f>"level"</c-><c- p>:</c-> <c- u>"sparse"</c-><c- p>,</c->
+      <c- f>"rank"</c-><c- p>:</c-> <c- mi>1</c-><c- p>,</c->
+      <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
+        <c- f>"level"</c-><c- p>:</c-> <c- u>"element"</c-><c- p>,</c->
+      <c- p>}</c->
+    <c- p>}</c->
+  <c- p>}</c->
+<c- p>}</c->
+</pre>
+   <h5 class="heading settled" data-level="3.4.3.9" id="coor_format_equiv"><span class="secno">3.4.3.9. </span><span class="content">COOR</span><a class="self-link" href="#coor_format_equiv"></a></h5>
+<pre class="language-json highlight"><c- f>"format"</c-><c- p>:</c-> <c- p>{</c->
+  <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
+    <c- f>"level"</c-><c- p>:</c-> <c- u>"sparse"</c-><c- p>,</c->
+    <c- f>"rank"</c-><c- p>:</c-> <c- mi>2</c-><c- p>,</c->
+    <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
+      <c- f>"level"</c-><c- p>:</c-> <c- u>"element"</c-><c- p>,</c->
+    <c- p>}</c->
+  <c- p>}</c->
+<c- p>}</c->
+</pre>
+   <h5 class="heading settled" data-level="3.4.3.10" id="cooc_format_equiv"><span class="secno">3.4.3.10. </span><span class="content">COOC</span><a class="self-link" href="#cooc_format_equiv"></a></h5>
+   <p>Column-wise Coordinate format</p>
+<pre class="language-json highlight"><c- f>"format"</c-><c- p>:</c-> <c- p>{</c->
+  <c- f>"transpose"</c-><c- p>:</c-> <c- p>[</c-><c- mi>1</c-><c- p>,</c-> <c- mi>0</c-><c- p>],</c->
+  <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
+    <c- f>"level"</c-><c- p>:</c-> <c- u>"sparse"</c-><c- p>,</c->
+    <c- f>"rank"</c-><c- p>:</c-> <c- mi>2</c-><c- p>,</c->
+    <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
+      <c- f>"level"</c-><c- p>:</c-> <c- u>"element"</c-><c- p>,</c->
+    <c- p>}</c->
+  <c- p>}</c->
+<c- p>}</c->
+</pre>
+   <h3 class="heading settled" data-level="3.5" id="key_data_types"><span class="secno">3.5. </span><span class="content">Data Types</span><a class="self-link" href="#key_data_types"></a></h3>
+   <p>The <code>data_types</code> key must be present and shall define the data types of all required
+arrays based on the <a href="#key_format">§ 3.4 Format</a>. The data type declares the type of both the
+on-disk array as well as the in-memory array.</p>
+   <p>For a given <a href="#key_format">§ 3.4 Format</a>, all named binary arrays for that format shall have a
+corresponding name in <code>data_types</code>.</p>
+   <p>The following strings shall be used to describe data types:</p>
+   <dl>
+    <dt data-md>"uint8"
+    <dd data-md>
+     <p>unsigned 8-bit integer</p>
+    <dt data-md>"uint16"
+    <dd data-md>
+     <p>unsigned 16-bit integer</p>
+    <dt data-md>"uint32"
+    <dd data-md>
+     <p>unsigned 32-bit integer</p>
+    <dt data-md>"uint64"
+    <dd data-md>
+     <p>unsigned 64-bit integer</p>
+    <dt data-md>"int8"
+    <dd data-md>
+     <p>signed 8-bit integer</p>
+    <dt data-md>"int16"
+    <dd data-md>
+     <p>signed 16-bit integer</p>
+    <dt data-md>"int32"
+    <dd data-md>
+     <p>signed 32-bit integer</p>
+    <dt data-md>"int64"
+    <dd data-md>
+     <p>signed 64-bit integer</p>
+    <dt data-md>"float32"
+    <dd data-md>
+     <p>IEEE binary32 floating point number</p>
+    <dt data-md>"float64"
+    <dd data-md>
+     <p>IEEE binary64 floating point number</p>
+    <dt data-md>"bint8"
+    <dd data-md>
+     <p>An unsigned 8-bit integer, to be reinterpreted as a Boolean number, however
+that is represented in the host language. The value 0 shall map to false and the
+value 1 shall map to true. When parsing, implementations may choose to interpret
+values other than 0 or 1 as true, or throw an error.</p>
+   </dl>
+   <h3 class="heading settled" data-level="3.6" id="value_modifiers"><span class="secno">3.6. </span><span class="content">Value Modifiers</span><a class="self-link" href="#value_modifiers"></a></h3>
+   <p>When the value array is meant to be reinterpreted before reading, a special bracket syntax is
+provided to indicate modifications to the underlying element level.</p>
+   <h4 class="heading settled" data-level="3.6.1" id="complex_level"><span class="secno">3.6.1. </span><span class="content">Complex Values (complex)</span><a class="self-link" href="#complex_level"></a></h4>
+   <p>When a value array is composed of alternating real and imaginary components of
+complex numbers, the type is written as <code>complex[&lt;type>]</code>. For example, a value
+array of complex <code>float64</code> would have a datatype of <code>complex[float64]</code> The real
+component of the <code>i</code>th element in the modified array shall be stored at position <code>2i</code> in the original array, and the imaginary component of the <code>i</code>th element in
+the modified array shall be at position <code>2i + 1</code> in the underlying array.
+The <code>complex</code> value modifier may only be used with the types <code>float32</code> and <code>float64</code>.</p>
+   <h4 class="heading settled" data-level="3.6.2" id="iso_level"><span class="secno">3.6.2. </span><span class="content">All Values the Same (ISO)</span><a class="self-link" href="#iso_level"></a></h4>
+   <p>When all values of a sparse array are the same identical value, the type is
+written as <code>iso[&lt;type>]</code>. This indicates that the array will store only a single
+element which is common to all stored indices. All elements in the modified
+array shall be stored at position 0 of the underlying array.</p>
+   <div class="example" id="example-3356e28c">
+    <a class="self-link" href="#example-3356e28c"></a> 
+    <p>Example of a CSR Matrix whose values are all 7.</p>
+    <table>
+     <thead>
+      <tr>
+       <th>
+       <th>0
+       <th>1
+       <th>2
+       <th>3
+       <th>4
+     <tbody>
+      <tr>
+       <th>0
+       <td>.
+       <td>.
+       <td>.
+       <td>7
+       <td>.
+      <tr>
+       <th>1
+       <td>.
+       <td>7
+       <td>.
+       <td>.
+       <td>7
+      <tr>
+       <th>2
+       <td>.
+       <td>.
+       <td>.
+       <td>.
+       <td>.
+      <tr>
+       <th>3
+       <td>.
+       <td>7
+       <td>7
+       <td>.
+       <td>.
+      <tr>
+       <th>4
+       <td>.
+       <td>.
+       <td>.
+       <td>7
+       <td>.
+    </table>
+<pre class="language-json highlight"><c- p>{</c->
+  <c- f>"version"</c-><c- p>:</c-> <c- u>"0.1"</c-><c- p>,</c->
+  <c- f>"format"</c-><c- p>:</c-> <c- u>"CSR"</c-><c- p>,</c->
+  <c- f>"shape"</c-><c- p>:</c-> <c- p>[</c-><c- mi>5</c-><c- p>,</c-> <c- mi>5</c-><c- p>],</c->
+  <c- f>"data_types"</c-><c- p>:</c-> <c- p>{</c->
+    <c- f>"pointers_to_1"</c-><c- p>:</c-> <c- u>"uint64"</c-><c- p>,</c->
+    <c- f>"indices_1"</c-><c- p>:</c-> <c- u>"uint64"</c-><c- p>,</c->
+    <c- f>"values"</c-><c- p>:</c-> <c- u>"iso[int8]"</c->
+  <c- p>}</c->
+<c- p>}</c->
+</pre>
+    <ul>
+     <li data-md>
+      <p><code>pointers_to_1</code> = [0, 1, 3, 3, 5, 6]</p>
+     <li data-md>
+      <p><code>indices_1</code> = [3, 1, 4, 1, 2, 3]</p>
+     <li data-md>
+      <p><code>values</code> = [7]</p>
+    </ul>
+   </div>
+   <p class="note" role="note"><span>Note:</span> Structure-only matrices (allowed in matrix market format) can be stored
+      using this technique with a value of 1. This adds only a small amount of
+      overhead while describing essentially the same matrix.</p>
+   <h3 class="heading settled" data-level="3.7" id="key_structure"><span class="secno">3.7. </span><span class="content">Structure</span><a class="self-link" href="#key_structure"></a></h3>
+    The <code>structure</code> key, if present, denotes a special matrix structure in which
+only one triangle of the matrix is stored and the structure and values in the
+other triangle are inferred. 
+   <h4 class="heading settled" data-level="3.7.1" id="predefined_structure"><span class="secno">3.7.1. </span><span class="content">Pre-Defined Structures</span><a class="self-link" href="#predefined_structure"></a></h4>
+   <p>The follow pre-defined values can be supplied for the <code>structure</code> key to indicate
+the structure of the matrix.</p>
+   <h5 class="heading settled" data-level="3.7.1.1" id="symmetric_lower_structure"><span class="secno">3.7.1.1. </span><span class="content">symmetric_lower</span><a class="self-link" href="#symmetric_lower_structure"></a></h5>
+   <p>The <code>symmetric_lower</code> value indicates that the matrix has a symmetric structure
+with only the lower triangle stored.  For all matrix entries with row and column
+indices <code>i,j</code> and value <code>v</code>, <code>i >= j</code>.  If <code>i != j</code>, the entry implies the
+presence of an entry at row and column index <code>j,i</code> with value <code>v</code>.</p>
+   <h5 class="heading settled" data-level="3.7.1.2" id="symmetric_upper_structure"><span class="secno">3.7.1.2. </span><span class="content">symmetric_upper</span><a class="self-link" href="#symmetric_upper_structure"></a></h5>
+   <p>The <code>symmetric_upper</code> value indicates that the matrix has a symmetric structure
+with only the upper triangle stored.  For all matrix entries with row and column
+indices <code>i,j</code> and value <code>v</code>, <code>i &lt;= j</code>.  If <code>i != j</code>, the entry implies the
+presence of an entry at row and column index <code>j,i</code> with value <code>v</code>.</p>
+   <h5 class="heading settled" data-level="3.7.1.3" id="hermitian_lower_structure"><span class="secno">3.7.1.3. </span><span class="content">hermitian_lower</span><a class="self-link" href="#hermitian_lower_structure"></a></h5>
+   <p>The <code>hermitian_lower</code> value indicates that the matrix has a Hermitian structure
+with only the lower triangle stored.  For all matrix entries with row and column
+indices <code>i,j</code> and value <code>v</code>, <code>i >= j</code>.  If <code>i != j</code>, the entry implies the
+presence of an entry at row and column index <code>j,i</code> with a value equal to the
+complex conjugate of <code>v</code>.  The matrix’s value type must be complex.</p>
+   <h5 class="heading settled" data-level="3.7.1.4" id="hermitian_upper_structure"><span class="secno">3.7.1.4. </span><span class="content">hermitian_upper</span><a class="self-link" href="#hermitian_upper_structure"></a></h5>
+   <p>The <code>hermitian_upper</code> value indicates that the matrix has a Hermitian structure
+with only the upper triangle stored.  For all matrix entries with row and column
+indices <code>i,j</code> and value <code>v</code>, <code>i &lt;= j</code>.  If <code>i != j</code>, the entry implies the
+presence of an entry at row and column index <code>j,i</code> with a value equal to the
+complex conjugate of <code>v</code>.  The matrix’s value type must be complex.</p>
+   <h5 class="heading settled" data-level="3.7.1.5" id="skew_symmetric_lower_structure"><span class="secno">3.7.1.5. </span><span class="content">skew_symmetric_lower</span><a class="self-link" href="#skew_symmetric_lower_structure"></a></h5>
+   <p>The <code>skew_symmetric_lower</code> value indicates that the matrix has a skew-symmetric structure
+with only the lower triangle stored.  For all matrix entries with row and column
+indices <code>i,j</code> and value <code>v</code>, <code>i >= j</code>.  If <code>i != j</code>, the entry implies the
+presence of an entry at row and column index <code>j,i</code> with value <code>-v</code>.</p>
+   <h5 class="heading settled" data-level="3.7.1.6" id="skew_symmetric_upper_structure"><span class="secno">3.7.1.6. </span><span class="content">skew_symmetric_upper</span><a class="self-link" href="#skew_symmetric_upper_structure"></a></h5>
+   <p>The <code>symmetric_upper</code> value indicates that the matrix has a skew-symmetric structure
+with only the upper triangle stored.  For all matrix entries with row and column
+indices <code>i,j</code> and value <code>v</code>, <code>i &lt;= j</code>.  If <code>i != j</code>, the entry implies the
+presence of an entry at row and column index <code>j,i</code> with value <code>-v</code>.</p>
+   <div class="example" id="example-74d23677">
+    <a class="self-link" href="#example-74d23677"></a> 
+    <p>Example of a symmetric CSR matrix.</p>
+    <table>
+     <thead>
+      <tr>
+       <th>
+       <th>0
+       <th>1
+       <th>2
+       <th>3
+       <th>4
+     <tbody>
+      <tr>
+       <th>0
+       <td>1
+       <td>.
+       <td>.
+       <td>.
+       <td>.
+      <tr>
+       <th>1
+       <td>2
+       <td>9
+       <td>.
+       <td>.
+       <td>.
+      <tr>
+       <th>2
+       <td>7
+       <td>.
+       <td>2
+       <td>.
+       <td>.
+      <tr>
+       <th>3
+       <td>.
+       <td>2
+       <td>.
+       <td>3
+       <td>.
+      <tr>
+       <th>4
+       <td>.
+       <td>.
+       <td>3
+       <td>.
+       <td>7
+    </table>
+<pre class="language-json highlight"><c- p>{</c->
+  <c- f>"version"</c-><c- p>:</c-> <c- u>"0.1"</c-><c- p>,</c->
+  <c- f>"format"</c-><c- p>:</c-> <c- u>"CSR"</c-><c- p>,</c->
+  <c- f>"shape"</c-><c- p>:</c-> <c- p>[</c-><c- mi>5</c-><c- p>,</c-> <c- mi>5</c-><c- p>],</c->
+  <c- f>"structure"</c-><c- p>:</c-> <c- u>"symmetric_lower"</c-><c- p>,</c->
+  <c- f>"data_types"</c-><c- p>:</c-> <c- p>{</c->
+    <c- f>"pointers_to_1"</c-><c- p>:</c-> <c- u>"uint64"</c-><c- p>,</c->
+    <c- f>"indices_1"</c-><c- p>:</c-> <c- u>"uint64"</c-><c- p>,</c->
+    <c- f>"values"</c-><c- p>:</c-> <c- u>"int8"</c->
+  <c- p>}</c->
+<c- p>}</c->
+</pre>
+    <ul>
+     <li data-md>
+      <p><code>pointers_to_1</code> = [0, 1, 3, 5, 7, 9]</p>
+     <li data-md>
+      <p><code>indices_1</code> = [0, 0, 1, 0, 2, 1, 3, 2, 4]</p>
+     <li data-md>
+      <p><code>values</code> = [1, 2, 9, 7, 2, 2, 3, 3, 7]</p>
+    </ul>
+   </div>
+   <h2 class="heading settled" data-level="4" id="binary_container"><span class="secno">4. </span><span class="content">Binary Containers</span><a class="self-link" href="#binary_container"></a></h2>
+    Binary containers must store binary arrays in a standardized, cross-platform
+manner, using the corresponding dataset names previously defined. 
+   <h3 class="heading settled" data-level="4.1" id="supported_containers"><span class="secno">4.1. </span><span class="content">Supported Binary Containers</span><a class="self-link" href="#supported_containers"></a></h3>
+   <p>Currently supported binary containers include HDF5 and NetCDF (but should include more).</p>
+  </main>
+  <div data-fill-with="conformance">
+   <h2 class="no-ref no-num heading settled" id="w3c-conformance"><span class="content">Conformance</span><a class="self-link" href="#w3c-conformance"></a></h2>
+   <h3 class="no-ref no-num heading settled" id="w3c-conventions"><span class="content">Document conventions</span><a class="self-link" href="#w3c-conventions"></a></h3>
+   <p>Conformance requirements are expressed
+    with a combination of descriptive assertions
+    and RFC 2119 terminology.
+    The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL”
+    in the normative parts of this document
+    are to be interpreted as described in RFC 2119.
+    However, for readability,
+    these words do not appear in all uppercase letters in this specification. </p>
+   <p>All of the text of this specification is normative
+    except sections explicitly marked as non-normative, examples, and notes. <a data-link-type="biblio" href="#biblio-rfc2119">[RFC2119]</a> </p>
+   <p>Examples in this specification are introduced with the words “for example”
+    or are set apart from the normative text
+    with <code>class="example"</code>,
+    like this: </p>
+   <div class="example" id="w3c-example">
+    <a class="self-link" href="#w3c-example"></a> 
+    <p>This is an example of an informative example. </p>
+   </div>
+   <p>Informative notes begin with the word “Note”
+    and are set apart from the normative text
+    with <code>class="note"</code>,
+    like this: </p>
+   <p class="note" role="note">Note, this is an informative note.</p>
+   <h3 class="no-ref no-num heading settled" id="w3c-conformant-algorithms"><span class="content">Conformant Algorithms</span><a class="self-link" href="#w3c-conformant-algorithms"></a></h3>
+   <p>Requirements phrased in the imperative as part of algorithms
+    (such as "strip any leading space characters"
+    or "return false and abort these steps")
+    are to be interpreted with the meaning of the key word
+    ("must", "should", "may", etc)
+    used in introducing the algorithm. </p>
+   <p>Conformance requirements phrased as algorithms or specific steps
+    can be implemented in any manner,
+    so long as the end result is equivalent.
+    In particular, the algorithms defined in this specification
+    are intended to be easy to understand
+    and are not intended to be performant.
+    Implementers are encouraged to optimize. </p>
+  </div>
+<script src="https://www.w3.org/scripts/TR/2021/fixup.js"></script>
+  <h2 class="no-num no-ref heading settled" id="references"><span class="content">References</span><a class="self-link" href="#references"></a></h2>
+  <h3 class="no-num no-ref heading settled" id="normative"><span class="content">Normative References</span><a class="self-link" href="#normative"></a></h3>
+  <dl>
+   <dt id="biblio-rfc2119">[RFC2119]
+   <dd>S. Bradner. <a href="https://datatracker.ietf.org/doc/html/rfc2119"><cite>Key words for use in RFCs to Indicate Requirement Levels</cite></a>. March 1997. Best Current Practice. URL: <a href="https://datatracker.ietf.org/doc/html/rfc2119">https://datatracker.ietf.org/doc/html/rfc2119</a>
+  </dl>
