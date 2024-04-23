@@ -18,8 +18,8 @@ for (vec_key, x) in [
     "bar" => sparse([0, 0, 13, 0, 0, 16, 0, 0, 19]),
 ]
     for (fmt_key, fmt) in [
-        "VEC" => Fiber!(SparseList(Element(zero(eltype(x))))),
-        "DVEC" => Fiber!(Dense(Element(zero(eltype(x))))),
+        "VEC" => Tensor(SparseList(Element(zero(eltype(x))))),
+        "DVEC" => Tensor(Dense(Element(zero(eltype(x))))),
     ]
         fmt = dropdefaults!(fmt, x)
         example_dir = joinpath(@__DIR__, "reference", "$(vec_key)_$(fmt_key)")
@@ -35,14 +35,14 @@ for (mtx_key, A) in [
     "farm" => SparseMatrixCSC(matrixdepot("Meszaros/farm")),
 ]
     for (fmt_key, fmt) in [
-        "CSR" => swizzle(Fiber!(Dense(SparseList(Element(zero(eltype(A)))))), 2, 1),
-        "CSC" => Fiber!(Dense(SparseList(Element(zero(eltype(A)))))),
-        "DMAT" => swizzle(Fiber!(Dense(Dense(Element(zero(eltype(A)))))), 2, 1),
-        "DMATR" => Fiber!(Dense(Dense(Element(zero(eltype(A)))))),
-        "DCSR" => swizzle(Fiber!(SparseList(SparseList(Element(zero(eltype(A)))))), 2, 1),
-        "DCSC" => Fiber!(SparseList(SparseList(Element(zero(eltype(A)))))),
-        "COO" => swizzle(Fiber!(SparseCOO{2}(Element(zero(eltype(A))))), 2, 1),
-        "COOC" => Fiber!(SparseCOO{2}(Element(zero(eltype(A))))),
+        "CSR" => swizzle(Tensor(Dense(SparseList(Element(zero(eltype(A)))))), 2, 1),
+        "CSC" => Tensor(Dense(SparseList(Element(zero(eltype(A)))))),
+        "DMAT" => swizzle(Tensor(Dense(Dense(Element(zero(eltype(A)))))), 2, 1),
+        "DMATR" => Tensor(Dense(Dense(Element(zero(eltype(A)))))),
+        "DCSR" => swizzle(Tensor(SparseList(SparseList(Element(zero(eltype(A)))))), 2, 1),
+        "DCSC" => Tensor(SparseList(SparseList(Element(zero(eltype(A)))))),
+        "COO" => swizzle(Tensor(SparseCOO{2}(Element(zero(eltype(A))))), 2, 1),
+        "COOC" => Tensor(SparseCOO{2}(Element(zero(eltype(A))))),
     ]
         fmt = copyto!(fmt, A)
         example_dir = joinpath(@__DIR__, "reference", "$(mtx_key)_$(fmt_key)")
