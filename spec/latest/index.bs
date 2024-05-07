@@ -822,6 +822,22 @@ Example of a symmetric CSR matrix.
 
 </div>
 
+Attributes {#key_attributes}
+--------------------------
+The `attributes` key shall denote a dictionary of optional attributes containing
+keys with information about the stored matrix and the data it represents.
+Attributes are optional and may be ignored by a compliant parser.
+
+### Defined Attributes
+
+#### number_of_diagonal_elements #### {#number_of_diagonal_elements_attributes}
+`number_of_diagonal_elements` shall contain an integer value corresponding to
+the number of elements on the stored matrix's diagonal.
+
+Note: implementations are highly encouraged to provide the
+`number_of_diagonal_elements` attribute for matrices with a symmetric,
+skew-symmetric, or Hermitian structure.
+
 Binary Containers {#binary_container}
 =====================================
 Binary containers must store binary arrays in a standardized, cross-platform

@@ -535,7 +535,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">Binary Sparse Format Specification Version 0.1</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#UD">Unofficial Proposal Draft</a>, <time class="dt-updated" datetime="2024-03-19">19 March 2024</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#UD">Unofficial Proposal Draft</a>, <time class="dt-updated" datetime="2024-05-07">7 May 2024</time></p>
    <details open>
     <summary>More details about this document</summary>
     <div data-fill-with="spec-metadata">
@@ -638,6 +638,15 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
           <li><a href="#hermitian_upper_structure"><span class="secno">3.7.1.4</span> <span class="content">hermitian_upper</span></a>
           <li><a href="#skew_symmetric_lower_structure"><span class="secno">3.7.1.5</span> <span class="content">skew_symmetric_lower</span></a>
           <li><a href="#skew_symmetric_upper_structure"><span class="secno">3.7.1.6</span> <span class="content">skew_symmetric_upper</span></a>
+         </ol>
+       </ol>
+      <li>
+       <a href="#key_attributes"><span class="secno">3.8</span> <span class="content">Attributes</span></a>
+       <ol class="toc">
+        <li>
+         <a href="#defined-attributes"><span class="secno">3.8.1</span> <span class="content">Defined Attributes</span></a>
+         <ol class="toc">
+          <li><a href="#number_of_diagonal_elements_attributes"><span class="secno">3.8.1.1</span> <span class="content">number_of_diagonal_elements</span></a>
          </ol>
        </ol>
      </ol>
@@ -1334,6 +1343,16 @@ presence of an entry at row and column index <code>j,i</code> with value <code>-
       <p><code>values</code> = [1, 2, 9, 7, 2, 2, 3, 3, 7]</p>
     </ul>
    </div>
+   <h3 class="heading settled" data-level="3.8" id="key_attributes"><span class="secno">3.8. </span><span class="content">Attributes</span><a class="self-link" href="#key_attributes"></a></h3>
+    The <code>attributes</code> key shall denote a dictionary of optional attributes containing
+keys with information about the stored matrix and the data it represents.
+Attributes are optional and may be ignored by a compliant parser. 
+   <h4 class="heading settled" data-level="3.8.1" id="defined-attributes"><span class="secno">3.8.1. </span><span class="content">Defined Attributes</span><a class="self-link" href="#defined-attributes"></a></h4>
+   <h5 class="heading settled" data-level="3.8.1.1" id="number_of_diagonal_elements_attributes"><span class="secno">3.8.1.1. </span><span class="content">number_of_diagonal_elements</span><a class="self-link" href="#number_of_diagonal_elements_attributes"></a></h5>
+    <code>number_of_diagonal_elements</code> shall contain an integer value corresponding to
+the number of elements on the stored matrix’s diagonal. 
+   <p class="note" role="note"><span>Note:</span> implementations are highly encouraged to provide the <code>number_of_diagonal_elements</code> attribute for matrices with a symmetric,
+skew-symmetric, or Hermitian structure.</p>
    <h2 class="heading settled" data-level="4" id="binary_container"><span class="secno">4. </span><span class="content">Binary Containers</span><a class="self-link" href="#binary_container"></a></h2>
     Binary containers must store binary arrays in a standardized, cross-platform
 manner, using the corresponding dataset names previously defined. 
