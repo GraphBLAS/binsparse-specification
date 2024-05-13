@@ -305,7 +305,7 @@ and tensors. For example, a dense vector of sparse vectors is equivalent to the
 CSR matrix format, and a sparse vector of sparse vectors is equivalent to the
 hypersparse DCSR matrix format.
 
-When defining a custom format, the outermost `subformat` key is defined as the
+When defining a custom format, the outermost `level` key is defined as the
 root level descriptor (a level which will only hold one array). If a level holds
 many different arrays, we refer to the `p`th array as the array in position `p`.
 
@@ -316,24 +316,25 @@ to represent is `A` and the tensor described by the format descriptor is `B`,
 then `A[i_1, ..., i_n] = B[i_(transpose[1]), ..., i_(transpose[n])]`. `transpose` must
 be a permutation.
 
-If the format key is a dictionary, the `level` key must be present and shall
-describe the storage format of the level used to represent the sparse array.
+If the `custom` key is present, it holds a dictionary for custom formats. The
+root level is stored under the `level` key. Each level mush have a `level_desc`
+attribute which describe the storage format of the level.
 
 The level descriptors are dictionaries defined as follows:
 
 #### Element #### {#element_level}
 
-If the level key is "element", the level represents zero or more scalars.
+If the level descriptor is "element", the level represents zero or more scalars.
 
 : values
 :: Array of size `number_of_positions` whose `p`th element holds the value of the scalar at position `p`.
 
 #### Dense #### {#dense_level}
 
-If the level key is "dense", the `subformat` key must be present.  The `rank`
+If the level descriptor is "dense", the `level` key must be present.  The `rank`
 key must be present, and set to an integer `r` greater than or equal to 1.  The
 dense level represents zero or more r-dimensional dense arrays whose elements
-are themselves arrays specified by `subformat`. For example, a dense level
+are themselves arrays specified by `level`. For example, a dense level
 of
 rank 2 represents a collection of dense matrices of subarrays. 
 
@@ -350,10 +351,10 @@ of the sublevel.
 
 #### Sparse #### {#sparse_level}
 
-If the level key is "sparse", the `subformat` key must be present.  The
+If the level descriptor is "sparse", the `level` key must be present.  The
 `rank` key must be present, and set to an integer `r` greater than or equal to
 `1`.  The sparse level represents zero or more `r`-dimensional sparse arrays
-whose non-implicit elements are themselves arrays specified by `subformat`. For
+whose non-implicit elements are themselves arrays specified by `level`. For
 example, a sparse level of rank 1 represents a collection of sparse vectors of
 subarrays.
 
@@ -374,17 +375,17 @@ length of any of the `indices` arrays in this level.
 
 ### Equivalent Formats ### {#equivalent_formats}
 
-The following formats are equivalent
+The following formats are equivalent. Parsers which support custom formats should also write `format` aliases when appropriate.
 
 #### DVEC #### {#dvec_format_equiv}
 
 ```json
-"format": {
-  "subformat": {
-    "level": "dense",
+"custom": {
+  "level": {
+    "level_desc": "dense",
     "rank": 1,
-    "subformat": {
-      "level": "element",
+    "level": {
+      "level_desc": "element",
     }
   }
 }
@@ -393,15 +394,15 @@ The following formats are equivalent
 #### DMATR #### {#dmatr_format_equiv}
 
 ```json
-"format": {
-  "subformat": {
-    "level": "dense",
+"custom": {
+  "level": {
+    "level_desc": "dense",
     "rank": 1,
-    "subformat": {
-      "level": "dense",
+    "level": {
+      "level_desc": "dense",
       "rank": 1,
-      "subformat": {
-        "level": "element",
+      "level": {
+        "level_desc": "element",
       }
     }
   }
@@ -411,16 +412,16 @@ The following formats are equivalent
 #### DMATC #### {#dmatr_format_equiv}
 
 ```json
-"format": {
+"custom": {
   "transpose": [1, 0],
-  "subformat": {
-    "level": "dense",
+  "level": {
+    "level_desc": "dense",
     "rank": 1,
-    "subformat": {
-      "level": "dense",
+    "level": {
+      "level_desc": "dense",
       "rank": 1,
-      "subformat": {
-        "level": "element",
+      "level": {
+        "level_desc": "element",
       }
     }
   }
@@ -430,12 +431,12 @@ The following formats are equivalent
 #### CVEC #### {#cvec_format_equiv}
 
 ```json
-"format": {
-  "subformat": {
-    "level": "sparse",
+"custom": {
+  "level": {
+    "level_desc": "sparse",
     "rank": 1,
-    "subformat": {
-      "level": "element",
+    "level": {
+      "level_desc": "element",
     }
   }
 }
@@ -444,15 +445,15 @@ The following formats are equivalent
 #### CSR #### {#csr_format_equiv}
 
 ```json
-"format": {
-  "subformat": {
-    "level": "dense",
+"custom": {
+  "level": {
+    "level_desc": "dense",
     "rank": 1,
-    "subformat": {
-      "level": "sparse",
+    "level": {
+      "level_desc": "sparse",
       "rank": 1,
-      "subformat": {
-        "level": "element",
+      "level": {
+        "level_desc": "element",
       }
     }
   }
@@ -462,16 +463,16 @@ The following formats are equivalent
 #### CSC #### {#csc_format_equiv}
 
 ```json
-"format": {
+"custom": {
   "transpose": [1, 0],
-  "subformat": {
-    "level": "dense",
+  "level": {
+    "level_desc": "dense",
     "rank": 1,
-    "subformat": {
-      "level": "sparse",
+    "level": {
+      "level_desc": "sparse",
       "rank": 1,
-      "subformat": {
-        "level": "element",
+      "level": {
+        "level_desc": "element",
       }
     }
   }
@@ -481,15 +482,15 @@ The following formats are equivalent
 #### DCSR #### {#dcsr_format_equiv}
 
 ```json
-"format": {
-  "subformat": {
-    "level": "sparse",
+"custom": {
+  "level": {
+    "level_desc": "sparse",
     "rank": 1,
-    "subformat": {
-      "level": "sparse",
+    "level": {
+      "level_desc": "sparse",
       "rank": 1,
-      "subformat": {
-        "level": "element",
+      "level": {
+        "level_desc": "element",
       }
     }
   }
@@ -499,16 +500,16 @@ The following formats are equivalent
 #### DCSC #### {#dcsc_format_equiv}
 
 ```json
-"format": {
+"custom": {
   "transpose": [1, 0],
-  "subformat": {
-    "level": "sparse",
+  "level": {
+    "level_desc": "sparse",
     "rank": 1,
-    "subformat": {
-      "level": "sparse",
+    "level": {
+      "level_desc": "sparse",
       "rank": 1,
-      "subformat": {
-        "level": "element",
+      "level": {
+        "level_desc": "element",
       }
     }
   }
@@ -518,12 +519,12 @@ The following formats are equivalent
 #### COOR #### {#coor_format_equiv}
 
 ```json
-"format": {
-  "subformat": {
-    "level": "sparse",
+"custom": {
+  "level": {
+    "level_desc": "sparse",
     "rank": 2,
-    "subformat": {
-      "level": "element",
+    "level": {
+      "level_desc": "element",
     }
   }
 }
@@ -534,13 +535,13 @@ The following formats are equivalent
 Column-wise Coordinate format
 
 ```json
-"format": {
+"custom": {
   "transpose": [1, 0],
-  "subformat": {
-    "level": "sparse",
+  "level": {
+    "level_desc": "sparse",
     "rank": 2,
-    "subformat": {
-      "level": "element",
+    "level": {
+      "level_desc": "element",
     }
   }
 }
