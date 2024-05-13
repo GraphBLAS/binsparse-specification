@@ -274,10 +274,10 @@ Pairs must not be duplicated.
 
 Coordinate format is an alias for [[#coor_format]] format.
 
-### Version 2.0 only: Custom Formats ### {#custom_formats}
+### Custom Formats ### {#custom_formats}
 
-The contents of this section will be finalized with the release of Binsparse
-V2.0, and are subject to change until then.
+The contents of this section are optional for all parsers, but enable
+customizable sparse formats for matrices and tensors.
 
 Binsparse describes custom multidimensional formats hierarchically.  We can
 understand these formats as arrays of arrays, where the parent array and
