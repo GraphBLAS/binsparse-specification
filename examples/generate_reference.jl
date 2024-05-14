@@ -30,7 +30,7 @@ for (vec_key, x) in [
 end
 
 for (mtx_key, A) in [
-    "mycielskian3" => SparseMatrixCSC(matrixdepot("Mycielski/mycielskian3")),
+    #"mycielskian3" => SparseMatrixCSC(matrixdepot("Mycielski/mycielskian3")), #TODO this matrix is symmetric but Finch doesn't have a way to communicate that to binsparse.
     "b1_ss" => SparseMatrixCSC(matrixdepot("Grund/b1_ss")),
     "farm" => SparseMatrixCSC(matrixdepot("Meszaros/farm")),
 ]
