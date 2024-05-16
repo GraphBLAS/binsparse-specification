@@ -535,7 +535,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">Binary Sparse Format Specification Version 0.1</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#UD">Unofficial Proposal Draft</a>, <time class="dt-updated" datetime="2024-05-07">7 May 2024</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#UD">Unofficial Proposal Draft</a>, <time class="dt-updated" datetime="2024-05-16">16 May 2024</time></p>
    <details open>
     <summary>More details about this document</summary>
     <div data-fill-with="spec-metadata">
@@ -577,76 +577,77 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
      <ol class="toc">
       <li><a href="#key_version"><span class="secno">3.1</span> <span class="content">Version</span></a>
       <li><a href="#key_shape"><span class="secno">3.2</span> <span class="content">Shape</span></a>
-      <li><a href="#key_fill"><span class="secno">3.3</span> <span class="content">Fill</span></a>
+      <li><a href="#key_number_of_stored_values"><span class="secno">3.3</span> <span class="content">Number of Stored Values</span></a>
+      <li><a href="#key_fill"><span class="secno">3.4</span> <span class="content">Fill</span></a>
       <li>
-       <a href="#key_format"><span class="secno">3.4</span> <span class="content">Format</span></a>
+       <a href="#key_format"><span class="secno">3.5</span> <span class="content">Format</span></a>
        <ol class="toc">
         <li>
-         <a href="#predefined_formats"><span class="secno">3.4.1</span> <span class="content">Pre-defined Formats</span></a>
+         <a href="#predefined_formats"><span class="secno">3.5.1</span> <span class="content">Pre-defined Formats</span></a>
          <ol class="toc">
-          <li><a href="#dvec_format"><span class="secno">3.4.1.1</span> <span class="content">DVEC</span></a>
-          <li><a href="#dmatr_format"><span class="secno">3.4.1.2</span> <span class="content">DMATR</span></a>
-          <li><a href="#dmatc_format"><span class="secno">3.4.1.3</span> <span class="content">DMATC</span></a>
-          <li><a href="#DMAT_format"><span class="secno">3.4.1.4</span> <span class="content">DMAT</span></a>
-          <li><a href="#cvec_format"><span class="secno">3.4.1.5</span> <span class="content">CVEC</span></a>
-          <li><a href="#csr_format"><span class="secno">3.4.1.6</span> <span class="content">CSR</span></a>
-          <li><a href="#csc_format"><span class="secno">3.4.1.7</span> <span class="content">CSC</span></a>
-          <li><a href="#dcsr_format"><span class="secno">3.4.1.8</span> <span class="content">DCSR</span></a>
-          <li><a href="#dcsc_format"><span class="secno">3.4.1.9</span> <span class="content">DCSC</span></a>
-          <li><a href="#coor_format"><span class="secno">3.4.1.10</span> <span class="content">COOR</span></a>
-          <li><a href="#cooc_format"><span class="secno">3.4.1.11</span> <span class="content">COOC</span></a>
-          <li><a href="#coo_format"><span class="secno">3.4.1.12</span> <span class="content">COO</span></a>
+          <li><a href="#dvec_format"><span class="secno">3.5.1.1</span> <span class="content">DVEC</span></a>
+          <li><a href="#dmatr_format"><span class="secno">3.5.1.2</span> <span class="content">DMATR</span></a>
+          <li><a href="#dmatc_format"><span class="secno">3.5.1.3</span> <span class="content">DMATC</span></a>
+          <li><a href="#DMAT_format"><span class="secno">3.5.1.4</span> <span class="content">DMAT</span></a>
+          <li><a href="#cvec_format"><span class="secno">3.5.1.5</span> <span class="content">CVEC</span></a>
+          <li><a href="#csr_format"><span class="secno">3.5.1.6</span> <span class="content">CSR</span></a>
+          <li><a href="#csc_format"><span class="secno">3.5.1.7</span> <span class="content">CSC</span></a>
+          <li><a href="#dcsr_format"><span class="secno">3.5.1.8</span> <span class="content">DCSR</span></a>
+          <li><a href="#dcsc_format"><span class="secno">3.5.1.9</span> <span class="content">DCSC</span></a>
+          <li><a href="#coor_format"><span class="secno">3.5.1.10</span> <span class="content">COOR</span></a>
+          <li><a href="#cooc_format"><span class="secno">3.5.1.11</span> <span class="content">COOC</span></a>
+          <li><a href="#coo_format"><span class="secno">3.5.1.12</span> <span class="content">COO</span></a>
          </ol>
         <li>
-         <a href="#custom_formats"><span class="secno">3.4.2</span> <span class="content">Version 2.0 only: Custom Formats</span></a>
+         <a href="#custom_formats"><span class="secno">3.5.2</span> <span class="content">Version 2.0 only: Custom Formats</span></a>
          <ol class="toc">
-          <li><a href="#element_level"><span class="secno">3.4.2.1</span> <span class="content">Element</span></a>
-          <li><a href="#dense_level"><span class="secno">3.4.2.2</span> <span class="content">Dense</span></a>
-          <li><a href="#sparse_level"><span class="secno">3.4.2.3</span> <span class="content">Sparse</span></a>
+          <li><a href="#element_level"><span class="secno">3.5.2.1</span> <span class="content">Element</span></a>
+          <li><a href="#dense_level"><span class="secno">3.5.2.2</span> <span class="content">Dense</span></a>
+          <li><a href="#sparse_level"><span class="secno">3.5.2.3</span> <span class="content">Sparse</span></a>
          </ol>
         <li>
-         <a href="#equivalent_formats"><span class="secno">3.4.3</span> <span class="content">Equivalent Formats</span></a>
+         <a href="#equivalent_formats"><span class="secno">3.5.3</span> <span class="content">Equivalent Formats</span></a>
          <ol class="toc">
-          <li><a href="#dvec_format_equiv"><span class="secno">3.4.3.1</span> <span class="content">DVEC</span></a>
-          <li><a href="#dmatr_format_equiv"><span class="secno">3.4.3.2</span> <span class="content">DMATR</span></a>
-          <li><a href="#dmatr_format_equiv①"><span class="secno">3.4.3.3</span> <span class="content">DMATC</span></a>
-          <li><a href="#cvec_format_equiv"><span class="secno">3.4.3.4</span> <span class="content">CVEC</span></a>
-          <li><a href="#csr_format_equiv"><span class="secno">3.4.3.5</span> <span class="content">CSR</span></a>
-          <li><a href="#csc_format_equiv"><span class="secno">3.4.3.6</span> <span class="content">CSC</span></a>
-          <li><a href="#dcsr_format_equiv"><span class="secno">3.4.3.7</span> <span class="content">DCSR</span></a>
-          <li><a href="#dcsc_format_equiv"><span class="secno">3.4.3.8</span> <span class="content">DCSC</span></a>
-          <li><a href="#coor_format_equiv"><span class="secno">3.4.3.9</span> <span class="content">COOR</span></a>
-          <li><a href="#cooc_format_equiv"><span class="secno">3.4.3.10</span> <span class="content">COOC</span></a>
-         </ol>
-       </ol>
-      <li><a href="#key_data_types"><span class="secno">3.5</span> <span class="content">Data Types</span></a>
-      <li>
-       <a href="#value_modifiers"><span class="secno">3.6</span> <span class="content">Value Modifiers</span></a>
-       <ol class="toc">
-        <li><a href="#complex_level"><span class="secno">3.6.1</span> <span class="content">Complex Values (complex)</span></a>
-        <li><a href="#iso_level"><span class="secno">3.6.2</span> <span class="content">All Values the Same (ISO)</span></a>
-       </ol>
-      <li>
-       <a href="#key_structure"><span class="secno">3.7</span> <span class="content">Structure</span></a>
-       <ol class="toc">
-        <li>
-         <a href="#predefined_structure"><span class="secno">3.7.1</span> <span class="content">Pre-Defined Structures</span></a>
-         <ol class="toc">
-          <li><a href="#symmetric_lower_structure"><span class="secno">3.7.1.1</span> <span class="content">symmetric_lower</span></a>
-          <li><a href="#symmetric_upper_structure"><span class="secno">3.7.1.2</span> <span class="content">symmetric_upper</span></a>
-          <li><a href="#hermitian_lower_structure"><span class="secno">3.7.1.3</span> <span class="content">hermitian_lower</span></a>
-          <li><a href="#hermitian_upper_structure"><span class="secno">3.7.1.4</span> <span class="content">hermitian_upper</span></a>
-          <li><a href="#skew_symmetric_lower_structure"><span class="secno">3.7.1.5</span> <span class="content">skew_symmetric_lower</span></a>
-          <li><a href="#skew_symmetric_upper_structure"><span class="secno">3.7.1.6</span> <span class="content">skew_symmetric_upper</span></a>
+          <li><a href="#dvec_format_equiv"><span class="secno">3.5.3.1</span> <span class="content">DVEC</span></a>
+          <li><a href="#dmatr_format_equiv"><span class="secno">3.5.3.2</span> <span class="content">DMATR</span></a>
+          <li><a href="#dmatr_format_equiv①"><span class="secno">3.5.3.3</span> <span class="content">DMATC</span></a>
+          <li><a href="#cvec_format_equiv"><span class="secno">3.5.3.4</span> <span class="content">CVEC</span></a>
+          <li><a href="#csr_format_equiv"><span class="secno">3.5.3.5</span> <span class="content">CSR</span></a>
+          <li><a href="#csc_format_equiv"><span class="secno">3.5.3.6</span> <span class="content">CSC</span></a>
+          <li><a href="#dcsr_format_equiv"><span class="secno">3.5.3.7</span> <span class="content">DCSR</span></a>
+          <li><a href="#dcsc_format_equiv"><span class="secno">3.5.3.8</span> <span class="content">DCSC</span></a>
+          <li><a href="#coor_format_equiv"><span class="secno">3.5.3.9</span> <span class="content">COOR</span></a>
+          <li><a href="#cooc_format_equiv"><span class="secno">3.5.3.10</span> <span class="content">COOC</span></a>
          </ol>
        </ol>
+      <li><a href="#key_data_types"><span class="secno">3.6</span> <span class="content">Data Types</span></a>
       <li>
-       <a href="#key_attributes"><span class="secno">3.8</span> <span class="content">Attributes</span></a>
+       <a href="#value_modifiers"><span class="secno">3.7</span> <span class="content">Value Modifiers</span></a>
+       <ol class="toc">
+        <li><a href="#complex_level"><span class="secno">3.7.1</span> <span class="content">Complex Values (complex)</span></a>
+        <li><a href="#iso_level"><span class="secno">3.7.2</span> <span class="content">All Values the Same (ISO)</span></a>
+       </ol>
+      <li>
+       <a href="#key_structure"><span class="secno">3.8</span> <span class="content">Structure</span></a>
        <ol class="toc">
         <li>
-         <a href="#defined-attributes"><span class="secno">3.8.1</span> <span class="content">Defined Attributes</span></a>
+         <a href="#predefined_structure"><span class="secno">3.8.1</span> <span class="content">Pre-Defined Structures</span></a>
          <ol class="toc">
-          <li><a href="#number_of_diagonal_elements_attributes"><span class="secno">3.8.1.1</span> <span class="content">number_of_diagonal_elements</span></a>
+          <li><a href="#symmetric_lower_structure"><span class="secno">3.8.1.1</span> <span class="content">symmetric_lower</span></a>
+          <li><a href="#symmetric_upper_structure"><span class="secno">3.8.1.2</span> <span class="content">symmetric_upper</span></a>
+          <li><a href="#hermitian_lower_structure"><span class="secno">3.8.1.3</span> <span class="content">hermitian_lower</span></a>
+          <li><a href="#hermitian_upper_structure"><span class="secno">3.8.1.4</span> <span class="content">hermitian_upper</span></a>
+          <li><a href="#skew_symmetric_lower_structure"><span class="secno">3.8.1.5</span> <span class="content">skew_symmetric_lower</span></a>
+          <li><a href="#skew_symmetric_upper_structure"><span class="secno">3.8.1.6</span> <span class="content">skew_symmetric_upper</span></a>
+         </ol>
+       </ol>
+      <li>
+       <a href="#key_attributes"><span class="secno">3.9</span> <span class="content">Attributes</span></a>
+       <ol class="toc">
+        <li>
+         <a href="#defined-attributes"><span class="secno">3.9.1</span> <span class="content">Defined Attributes</span></a>
+         <ol class="toc">
+          <li><a href="#number_of_diagonal_elements_attributes"><span class="secno">3.9.1.1</span> <span class="content">number_of_diagonal_elements</span></a>
          </ol>
        </ol>
      </ol>
@@ -696,16 +697,17 @@ data.  The key-value data is namespaced as "binsparse" to avoid any conflict wit
 metadata in the container. The required entries in the "binsparse" entry are listed
 below. Optional attributes may be defined to hold additional metadata and must be stored
 outside of the "binsparse" namespace.</p>
-   <div class="example" id="example-c3d21291">
-    <a class="self-link" href="#example-c3d21291"></a> 
+   <div class="example" id="example-2bb9fcf1">
+    <a class="self-link" href="#example-2bb9fcf1"></a> 
     <p>Example of a JSON descriptor for a compressed-sparse column (CSC) matrix with 10
-rows and 12 columns, containing float32 values, along with user-defined
+rows and 12 columns, containing 20 float32 values, along with user-defined
 attributes.</p>
 <pre class="language-json highlight"><c- p>{</c->
   <c- f>"binsparse"</c-><c- p>:</c-> <c- p>{</c->
     <c- f>"version"</c-><c- p>:</c-> <c- u>"0.1"</c-><c- p>,</c->
     <c- f>"format"</c-><c- p>:</c-> <c- u>"CSC"</c-><c- p>,</c->
     <c- f>"shape"</c-><c- p>:</c-> <c- p>[</c-><c- mi>10</c-><c- p>,</c-> <c- mi>12</c-><c- p>],</c->
+    <c- f>"number_of_stored_values"</c-><c- p>:</c-> <c- mi>20</c-><c- p>,</c->
     <c- f>"data_types"</c-><c- p>:</c-> <c- p>{</c->
       <c- f>"pointers_to_1"</c-><c- p>:</c-> <c- u>"uint64"</c-><c- p>,</c->
       <c- f>"indices_1"</c-><c- p>:</c-> <c- u>"uint64"</c-><c- p>,</c->
@@ -730,20 +732,27 @@ and index <code>1</code> shall contain the number of columns. For vectors, index
 contain the vector’s dimension.</p>
    <p class="note" role="note"><span>Note:</span> a matrix has shape [<code>number_of_rows</code>, <code>number_of_columns</code>] regardless of whether
 the format orientation is row-wise or column-wise.</p>
-   <h3 class="heading settled" data-level="3.3" id="key_fill"><span class="secno">3.3. </span><span class="content">Fill</span><a class="self-link" href="#key_fill"></a></h3>
+   <h3 class="heading settled" data-level="3.3" id="key_number_of_stored_values"><span class="secno">3.3. </span><span class="content">Number of Stored Values</span><a class="self-link" href="#key_number_of_stored_values"></a></h3>
+   <p>The <code>number_of_stored_values</code> key must be present and shall define the number
+of explicit values that are stored as explicit entries in the sparse tensor
+format.</p>
+   <p class="note" role="note"><span>Note:</span> For sparse tensors with all values the same (ISO), <code>number_of_stored_values</code> still refers to the number of explicit entries in the sparse tensor format whose
+indices are stored, regardless of the fact that the individual scalar values
+themselves are not explicitly stored.</p>
+   <h3 class="heading settled" data-level="3.4" id="key_fill"><span class="secno">3.4. </span><span class="content">Fill</span><a class="self-link" href="#key_fill"></a></h3>
     The <code>fill</code> key may be present. If the <code>fill</code> key is present, it shall have a
 boolean value. If the value is true, it signifies the presence of a <code>fill_value</code> array, whose single element defines the value at indices not specified
 by the sparse tensor structure. 
-   <h3 class="heading settled" data-level="3.4" id="key_format"><span class="secno">3.4. </span><span class="content">Format</span><a class="self-link" href="#key_format"></a></h3>
+   <h3 class="heading settled" data-level="3.5" id="key_format"><span class="secno">3.5. </span><span class="content">Format</span><a class="self-link" href="#key_format"></a></h3>
    <p>The <code>format</code> key must be present and shall describe the binary storage format
 of dense arrays used to represent the sparse array. The format
 defined by the <code>format</code> key determines the named binary arrays that shall exist
 in the binary storage container.</p>
-   <h4 class="heading settled" data-level="3.4.1" id="predefined_formats"><span class="secno">3.4.1. </span><span class="content">Pre-defined Formats</span><a class="self-link" href="#predefined_formats"></a></h4>
+   <h4 class="heading settled" data-level="3.5.1" id="predefined_formats"><span class="secno">3.5.1. </span><span class="content">Pre-defined Formats</span><a class="self-link" href="#predefined_formats"></a></h4>
    <p>The following is a list of all pre-defined formats and the arrays that shall
 be present in the binary container. <code>number_of_elements</code> refers to the number
 of stored values, <code>number_of_rows</code> refers to the number of rows, and <code>number_of_columns</code> refers to the number of columns.</p>
-   <h5 class="heading settled" data-level="3.4.1.1" id="dvec_format"><span class="secno">3.4.1.1. </span><span class="content">DVEC</span><a class="self-link" href="#dvec_format"></a></h5>
+   <h5 class="heading settled" data-level="3.5.1.1" id="dvec_format"><span class="secno">3.5.1.1. </span><span class="content">DVEC</span><a class="self-link" href="#dvec_format"></a></h5>
    <p>Dense Vector format</p>
    <dl>
     <dt data-md>values
@@ -751,7 +760,7 @@ of stored values, <code>number_of_rows</code> refers to the number of rows, and 
      <p>Array of size <code>number_of_elements</code> containing stored values.</p>
    </dl>
    <p>The element of the vector located at index <code>i</code> has scalar value <code>values[i]</code>.</p>
-   <h5 class="heading settled" data-level="3.4.1.2" id="dmatr_format"><span class="secno">3.4.1.2. </span><span class="content">DMATR</span><a class="self-link" href="#dmatr_format"></a></h5>
+   <h5 class="heading settled" data-level="3.5.1.2" id="dmatr_format"><span class="secno">3.5.1.2. </span><span class="content">DMATR</span><a class="self-link" href="#dmatr_format"></a></h5>
    <p>Row-Major Dense Matrix format</p>
    <dl>
     <dt data-md>values
@@ -759,7 +768,7 @@ of stored values, <code>number_of_rows</code> refers to the number of rows, and 
      <p>Array of size <code>number_of_elements</code> containing stored values.</p>
    </dl>
    <p>The element of the vector located at index <code>i, j</code> has scalar value <code>values[i * number_of_columns + j]</code>.</p>
-   <h5 class="heading settled" data-level="3.4.1.3" id="dmatc_format"><span class="secno">3.4.1.3. </span><span class="content">DMATC</span><a class="self-link" href="#dmatc_format"></a></h5>
+   <h5 class="heading settled" data-level="3.5.1.3" id="dmatc_format"><span class="secno">3.5.1.3. </span><span class="content">DMATC</span><a class="self-link" href="#dmatc_format"></a></h5>
    <p>Column-Major Dense Matrix format</p>
    <dl>
     <dt data-md>values
@@ -767,9 +776,9 @@ of stored values, <code>number_of_rows</code> refers to the number of rows, and 
      <p>Array of size <code>number_of_elements</code> containing stored values.</p>
    </dl>
    <p>The element of the vector located at index <code>i, j</code> has scalar value <code>values[i + j * number_of_rows]</code>.</p>
-   <h5 class="heading settled" data-level="3.4.1.4" id="DMAT_format"><span class="secno">3.4.1.4. </span><span class="content">DMAT</span><a class="self-link" href="#DMAT_format"></a></h5>
-   <p>DMAT format is an alias for <a href="#dmatr_format">§ 3.4.1.2 DMATR</a> format.</p>
-   <h5 class="heading settled" data-level="3.4.1.5" id="cvec_format"><span class="secno">3.4.1.5. </span><span class="content">CVEC</span><a class="self-link" href="#cvec_format"></a></h5>
+   <h5 class="heading settled" data-level="3.5.1.4" id="DMAT_format"><span class="secno">3.5.1.4. </span><span class="content">DMAT</span><a class="self-link" href="#DMAT_format"></a></h5>
+   <p>DMAT format is an alias for <a href="#dmatr_format">§ 3.5.1.2 DMATR</a> format.</p>
+   <h5 class="heading settled" data-level="3.5.1.5" id="cvec_format"><span class="secno">3.5.1.5. </span><span class="content">CVEC</span><a class="self-link" href="#cvec_format"></a></h5>
    <p>Compressed Sparse Vector format</p>
    <dl>
     <dt data-md>indices_0
@@ -780,7 +789,7 @@ of stored values, <code>number_of_rows</code> refers to the number of rows, and 
      <p>Array of size <code>number_of_elements</code> containing stored values.</p>
    </dl>
    <p>The element of the vector located at index <code>indices_0[i]</code> has scalar value <code>values[i]</code>.  Elements shall be sorted by index and must not be duplicated.</p>
-   <h5 class="heading settled" data-level="3.4.1.6" id="csr_format"><span class="secno">3.4.1.6. </span><span class="content">CSR</span><a class="self-link" href="#csr_format"></a></h5>
+   <h5 class="heading settled" data-level="3.5.1.6" id="csr_format"><span class="secno">3.5.1.6. </span><span class="content">CSR</span><a class="self-link" href="#csr_format"></a></h5>
    <p>Compressed-Sparse Row format</p>
    <dl>
     <dt data-md>pointers_to_1
@@ -796,7 +805,7 @@ of stored values, <code>number_of_rows</code> refers to the number of rows, and 
    <p>The column indices of the stored values located in row <code>i</code> are located in the range <code>[pointers_to_1[i], pointers_to_1[i+1])</code> in the <code>indices_1</code> array. The scalar values for
 each of those stored values is stored in the corresponding index in the <code>values</code> array.</p>
    <p>Within a row, elements shall be sorted by column index and must not be duplicated.</p>
-   <h5 class="heading settled" data-level="3.4.1.7" id="csc_format"><span class="secno">3.4.1.7. </span><span class="content">CSC</span><a class="self-link" href="#csc_format"></a></h5>
+   <h5 class="heading settled" data-level="3.5.1.7" id="csc_format"><span class="secno">3.5.1.7. </span><span class="content">CSC</span><a class="self-link" href="#csc_format"></a></h5>
    <p>Compressed-Sparse Column format</p>
    <dl>
     <dt data-md>pointers_to_1
@@ -812,7 +821,7 @@ each of those stored values is stored in the corresponding index in the <code>va
    <p>The rows indices of the stored values located in column <code>j</code> are located in the range <code>[pointers_to_1[j], pointers_to_1[j+1])</code> in the <code>indices_1</code> array. The scalar values for
 each of those stored values is stored in the corresponding index in the <code>values</code> array.</p>
    <p>Within a column, elements shall be sorted by row index and must not be duplicated.</p>
-   <h5 class="heading settled" data-level="3.4.1.8" id="dcsr_format"><span class="secno">3.4.1.8. </span><span class="content">DCSR</span><a class="self-link" href="#dcsr_format"></a></h5>
+   <h5 class="heading settled" data-level="3.5.1.8" id="dcsr_format"><span class="secno">3.5.1.8. </span><span class="content">DCSR</span><a class="self-link" href="#dcsr_format"></a></h5>
    <p>Doubly Compressed-Sparse Row format</p>
    <dl>
     <dt data-md>indices_0
@@ -833,7 +842,7 @@ each of those stored values is stored in the corresponding index in the <code>va
 corresponding row index, <code>indices_0</code> provides the row index.</p>
    <p>Rows shall be sorted and must not be duplicated.
 Within each row, elements shall be sorted by column index and must not be duplicated.</p>
-   <h5 class="heading settled" data-level="3.4.1.9" id="dcsc_format"><span class="secno">3.4.1.9. </span><span class="content">DCSC</span><a class="self-link" href="#dcsc_format"></a></h5>
+   <h5 class="heading settled" data-level="3.5.1.9" id="dcsc_format"><span class="secno">3.5.1.9. </span><span class="content">DCSC</span><a class="self-link" href="#dcsc_format"></a></h5>
    <p>Doubly Compressed-Sparse Column format</p>
    <dl>
     <dt data-md>indices_0
@@ -854,7 +863,7 @@ Within each row, elements shall be sorted by column index and must not be duplic
 corresponding column index, <code>indices_0</code> provides the column index.</p>
    <p>Columns shall be sorted and not duplicated.
 Within each column, elements shall be sorted by row index and must not be duplicated.</p>
-   <h5 class="heading settled" data-level="3.4.1.10" id="coor_format"><span class="secno">3.4.1.10. </span><span class="content">COOR</span><a class="self-link" href="#coor_format"></a></h5>
+   <h5 class="heading settled" data-level="3.5.1.10" id="coor_format"><span class="secno">3.5.1.10. </span><span class="content">COOR</span><a class="self-link" href="#coor_format"></a></h5>
    <p>Row-wise Coordinate format</p>
    <dl>
     <dt data-md>indices_0
@@ -869,7 +878,7 @@ Within each column, elements shall be sorted by row index and must not be duplic
    </dl>
    <p>Pairs of (row index, column index) shall be sorted first by row and then by column.
 Pairs must not be duplicated.</p>
-   <h5 class="heading settled" data-level="3.4.1.11" id="cooc_format"><span class="secno">3.4.1.11. </span><span class="content">COOC</span><a class="self-link" href="#cooc_format"></a></h5>
+   <h5 class="heading settled" data-level="3.5.1.11" id="cooc_format"><span class="secno">3.5.1.11. </span><span class="content">COOC</span><a class="self-link" href="#cooc_format"></a></h5>
    <p>Column-wise Coordinate format</p>
    <dl>
     <dt data-md>indices_0
@@ -884,9 +893,9 @@ Pairs must not be duplicated.</p>
    </dl>
    <p>Pairs of (column index, row index) shall be sorted first by column and then by row.
 Pairs must not be duplicated.</p>
-   <h5 class="heading settled" data-level="3.4.1.12" id="coo_format"><span class="secno">3.4.1.12. </span><span class="content">COO</span><a class="self-link" href="#coo_format"></a></h5>
-   <p>Coordinate format is an alias for <a href="#coor_format">§ 3.4.1.10 COOR</a> format.</p>
-   <h4 class="heading settled" data-level="3.4.2" id="custom_formats"><span class="secno">3.4.2. </span><span class="content">Version 2.0 only: Custom Formats</span><a class="self-link" href="#custom_formats"></a></h4>
+   <h5 class="heading settled" data-level="3.5.1.12" id="coo_format"><span class="secno">3.5.1.12. </span><span class="content">COO</span><a class="self-link" href="#coo_format"></a></h5>
+   <p>Coordinate format is an alias for <a href="#coor_format">§ 3.5.1.10 COOR</a> format.</p>
+   <h4 class="heading settled" data-level="3.5.2" id="custom_formats"><span class="secno">3.5.2. </span><span class="content">Version 2.0 only: Custom Formats</span><a class="self-link" href="#custom_formats"></a></h4>
    <p>The contents of this section will be finalized with the release of Binsparse
 V2.0, and are subject to change until then.</p>
    <p>Binsparse describes custom multidimensional formats hierarchically.  We can
@@ -923,14 +932,14 @@ be a permutation.</p>
    <p>If the format key is a dictionary, the <code>level</code> key must be present and shall
 describe the storage format of the level used to represent the sparse array.</p>
    <p>The level descriptors are dictionaries defined as follows:</p>
-   <h5 class="heading settled" data-level="3.4.2.1" id="element_level"><span class="secno">3.4.2.1. </span><span class="content">Element</span><a class="self-link" href="#element_level"></a></h5>
+   <h5 class="heading settled" data-level="3.5.2.1" id="element_level"><span class="secno">3.5.2.1. </span><span class="content">Element</span><a class="self-link" href="#element_level"></a></h5>
    <p>If the level key is "element", the level represents zero or more scalars.</p>
    <dl>
     <dt data-md>values
     <dd data-md>
      <p>Array of size <code>number_of_positions</code> whose <code>p</code>th element holds the value of the scalar at position <code>p</code>.</p>
    </dl>
-   <h5 class="heading settled" data-level="3.4.2.2" id="dense_level"><span class="secno">3.4.2.2. </span><span class="content">Dense</span><a class="self-link" href="#dense_level"></a></h5>
+   <h5 class="heading settled" data-level="3.5.2.2" id="dense_level"><span class="secno">3.5.2.2. </span><span class="content">Dense</span><a class="self-link" href="#dense_level"></a></h5>
    <p>If the level key is "dense", the <code>subformat</code> key must be present.  The <code>rank</code> key must be present, and set to an integer <code>r</code> greater than or equal to 1.  The
 dense level represents zero or more r-dimensional dense arrays whose elements
 are themselves arrays specified by <code>subformat</code>. For example, a dense level
@@ -942,7 +951,7 @@ array at position <code>p</code> in a dense level of rank <code>r</code> is an a
    <p>is described by the row-major position</p>
    <p><code>q = (((((p * I_0) + i_0) * I_1) + i_1) * I_2 + i_2) * ... + i_(r - 1)</code></p>
    <p>of the sublevel.</p>
-   <h5 class="heading settled" data-level="3.4.2.3" id="sparse_level"><span class="secno">3.4.2.3. </span><span class="content">Sparse</span><a class="self-link" href="#sparse_level"></a></h5>
+   <h5 class="heading settled" data-level="3.5.2.3" id="sparse_level"><span class="secno">3.5.2.3. </span><span class="content">Sparse</span><a class="self-link" href="#sparse_level"></a></h5>
    <p>If the level key is "sparse", the <code>subformat</code> key must be present.  The <code>rank</code> key must be present, and set to an integer <code>r</code> greater than or equal to <code>1</code>.  The sparse level represents zero or more <code>r</code>-dimensional sparse arrays
 whose non-implicit elements are themselves arrays specified by <code>subformat</code>. For
 example, a sparse level of rank 1 represents a collection of sparse vectors of
@@ -961,9 +970,9 @@ present:</p>
    <p>Special note: If the sparse level is the root level, the <code>pointers</code> array should
 be ommitted, as its first value will be <code>0</code> and its last value will be the
 length of any of the <code>indices</code> arrays in this level.</p>
-   <h4 class="heading settled" data-level="3.4.3" id="equivalent_formats"><span class="secno">3.4.3. </span><span class="content">Equivalent Formats</span><a class="self-link" href="#equivalent_formats"></a></h4>
+   <h4 class="heading settled" data-level="3.5.3" id="equivalent_formats"><span class="secno">3.5.3. </span><span class="content">Equivalent Formats</span><a class="self-link" href="#equivalent_formats"></a></h4>
    <p>The following formats are equivalent</p>
-   <h5 class="heading settled" data-level="3.4.3.1" id="dvec_format_equiv"><span class="secno">3.4.3.1. </span><span class="content">DVEC</span><a class="self-link" href="#dvec_format_equiv"></a></h5>
+   <h5 class="heading settled" data-level="3.5.3.1" id="dvec_format_equiv"><span class="secno">3.5.3.1. </span><span class="content">DVEC</span><a class="self-link" href="#dvec_format_equiv"></a></h5>
 <pre class="language-json highlight"><c- f>"format"</c-><c- p>:</c-> <c- p>{</c->
   <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
     <c- f>"level"</c-><c- p>:</c-> <c- u>"dense"</c-><c- p>,</c->
@@ -974,7 +983,7 @@ length of any of the <code>indices</code> arrays in this level.</p>
   <c- p>}</c->
 <c- p>}</c->
 </pre>
-   <h5 class="heading settled" data-level="3.4.3.2" id="dmatr_format_equiv"><span class="secno">3.4.3.2. </span><span class="content">DMATR</span><a class="self-link" href="#dmatr_format_equiv"></a></h5>
+   <h5 class="heading settled" data-level="3.5.3.2" id="dmatr_format_equiv"><span class="secno">3.5.3.2. </span><span class="content">DMATR</span><a class="self-link" href="#dmatr_format_equiv"></a></h5>
 <pre class="language-json highlight"><c- f>"format"</c-><c- p>:</c-> <c- p>{</c->
   <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
     <c- f>"level"</c-><c- p>:</c-> <c- u>"dense"</c-><c- p>,</c->
@@ -989,7 +998,7 @@ length of any of the <code>indices</code> arrays in this level.</p>
   <c- p>}</c->
 <c- p>}</c->
 </pre>
-   <h5 class="heading settled" data-level="3.4.3.3" id="dmatr_format_equiv①"><span class="secno">3.4.3.3. </span><span class="content">DMATC</span><a class="self-link" href="#dmatr_format_equiv①"></a></h5>
+   <h5 class="heading settled" data-level="3.5.3.3" id="dmatr_format_equiv①"><span class="secno">3.5.3.3. </span><span class="content">DMATC</span><a class="self-link" href="#dmatr_format_equiv①"></a></h5>
 <pre class="language-json highlight"><c- f>"format"</c-><c- p>:</c-> <c- p>{</c->
   <c- f>"transpose"</c-><c- p>:</c-> <c- p>[</c-><c- mi>1</c-><c- p>,</c-> <c- mi>0</c-><c- p>],</c->
   <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
@@ -1005,7 +1014,7 @@ length of any of the <code>indices</code> arrays in this level.</p>
   <c- p>}</c->
 <c- p>}</c->
 </pre>
-   <h5 class="heading settled" data-level="3.4.3.4" id="cvec_format_equiv"><span class="secno">3.4.3.4. </span><span class="content">CVEC</span><a class="self-link" href="#cvec_format_equiv"></a></h5>
+   <h5 class="heading settled" data-level="3.5.3.4" id="cvec_format_equiv"><span class="secno">3.5.3.4. </span><span class="content">CVEC</span><a class="self-link" href="#cvec_format_equiv"></a></h5>
 <pre class="language-json highlight"><c- f>"format"</c-><c- p>:</c-> <c- p>{</c->
   <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
     <c- f>"level"</c-><c- p>:</c-> <c- u>"sparse"</c-><c- p>,</c->
@@ -1016,7 +1025,7 @@ length of any of the <code>indices</code> arrays in this level.</p>
   <c- p>}</c->
 <c- p>}</c->
 </pre>
-   <h5 class="heading settled" data-level="3.4.3.5" id="csr_format_equiv"><span class="secno">3.4.3.5. </span><span class="content">CSR</span><a class="self-link" href="#csr_format_equiv"></a></h5>
+   <h5 class="heading settled" data-level="3.5.3.5" id="csr_format_equiv"><span class="secno">3.5.3.5. </span><span class="content">CSR</span><a class="self-link" href="#csr_format_equiv"></a></h5>
 <pre class="language-json highlight"><c- f>"format"</c-><c- p>:</c-> <c- p>{</c->
   <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
     <c- f>"level"</c-><c- p>:</c-> <c- u>"dense"</c-><c- p>,</c->
@@ -1031,7 +1040,7 @@ length of any of the <code>indices</code> arrays in this level.</p>
   <c- p>}</c->
 <c- p>}</c->
 </pre>
-   <h5 class="heading settled" data-level="3.4.3.6" id="csc_format_equiv"><span class="secno">3.4.3.6. </span><span class="content">CSC</span><a class="self-link" href="#csc_format_equiv"></a></h5>
+   <h5 class="heading settled" data-level="3.5.3.6" id="csc_format_equiv"><span class="secno">3.5.3.6. </span><span class="content">CSC</span><a class="self-link" href="#csc_format_equiv"></a></h5>
 <pre class="language-json highlight"><c- f>"format"</c-><c- p>:</c-> <c- p>{</c->
   <c- f>"transpose"</c-><c- p>:</c-> <c- p>[</c-><c- mi>1</c-><c- p>,</c-> <c- mi>0</c-><c- p>],</c->
   <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
@@ -1047,7 +1056,7 @@ length of any of the <code>indices</code> arrays in this level.</p>
   <c- p>}</c->
 <c- p>}</c->
 </pre>
-   <h5 class="heading settled" data-level="3.4.3.7" id="dcsr_format_equiv"><span class="secno">3.4.3.7. </span><span class="content">DCSR</span><a class="self-link" href="#dcsr_format_equiv"></a></h5>
+   <h5 class="heading settled" data-level="3.5.3.7" id="dcsr_format_equiv"><span class="secno">3.5.3.7. </span><span class="content">DCSR</span><a class="self-link" href="#dcsr_format_equiv"></a></h5>
 <pre class="language-json highlight"><c- f>"format"</c-><c- p>:</c-> <c- p>{</c->
   <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
     <c- f>"level"</c-><c- p>:</c-> <c- u>"sparse"</c-><c- p>,</c->
@@ -1062,7 +1071,7 @@ length of any of the <code>indices</code> arrays in this level.</p>
   <c- p>}</c->
 <c- p>}</c->
 </pre>
-   <h5 class="heading settled" data-level="3.4.3.8" id="dcsc_format_equiv"><span class="secno">3.4.3.8. </span><span class="content">DCSC</span><a class="self-link" href="#dcsc_format_equiv"></a></h5>
+   <h5 class="heading settled" data-level="3.5.3.8" id="dcsc_format_equiv"><span class="secno">3.5.3.8. </span><span class="content">DCSC</span><a class="self-link" href="#dcsc_format_equiv"></a></h5>
 <pre class="language-json highlight"><c- f>"format"</c-><c- p>:</c-> <c- p>{</c->
   <c- f>"transpose"</c-><c- p>:</c-> <c- p>[</c-><c- mi>1</c-><c- p>,</c-> <c- mi>0</c-><c- p>],</c->
   <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
@@ -1078,7 +1087,7 @@ length of any of the <code>indices</code> arrays in this level.</p>
   <c- p>}</c->
 <c- p>}</c->
 </pre>
-   <h5 class="heading settled" data-level="3.4.3.9" id="coor_format_equiv"><span class="secno">3.4.3.9. </span><span class="content">COOR</span><a class="self-link" href="#coor_format_equiv"></a></h5>
+   <h5 class="heading settled" data-level="3.5.3.9" id="coor_format_equiv"><span class="secno">3.5.3.9. </span><span class="content">COOR</span><a class="self-link" href="#coor_format_equiv"></a></h5>
 <pre class="language-json highlight"><c- f>"format"</c-><c- p>:</c-> <c- p>{</c->
   <c- f>"subformat"</c-><c- p>:</c-> <c- p>{</c->
     <c- f>"level"</c-><c- p>:</c-> <c- u>"sparse"</c-><c- p>,</c->
@@ -1089,7 +1098,7 @@ length of any of the <code>indices</code> arrays in this level.</p>
   <c- p>}</c->
 <c- p>}</c->
 </pre>
-   <h5 class="heading settled" data-level="3.4.3.10" id="cooc_format_equiv"><span class="secno">3.4.3.10. </span><span class="content">COOC</span><a class="self-link" href="#cooc_format_equiv"></a></h5>
+   <h5 class="heading settled" data-level="3.5.3.10" id="cooc_format_equiv"><span class="secno">3.5.3.10. </span><span class="content">COOC</span><a class="self-link" href="#cooc_format_equiv"></a></h5>
    <p>Column-wise Coordinate format</p>
 <pre class="language-json highlight"><c- f>"format"</c-><c- p>:</c-> <c- p>{</c->
   <c- f>"transpose"</c-><c- p>:</c-> <c- p>[</c-><c- mi>1</c-><c- p>,</c-> <c- mi>0</c-><c- p>],</c->
@@ -1102,11 +1111,11 @@ length of any of the <code>indices</code> arrays in this level.</p>
   <c- p>}</c->
 <c- p>}</c->
 </pre>
-   <h3 class="heading settled" data-level="3.5" id="key_data_types"><span class="secno">3.5. </span><span class="content">Data Types</span><a class="self-link" href="#key_data_types"></a></h3>
+   <h3 class="heading settled" data-level="3.6" id="key_data_types"><span class="secno">3.6. </span><span class="content">Data Types</span><a class="self-link" href="#key_data_types"></a></h3>
    <p>The <code>data_types</code> key must be present and shall define the data types of all required
-arrays based on the <a href="#key_format">§ 3.4 Format</a>. The data type declares the type of both the
+arrays based on the <a href="#key_format">§ 3.5 Format</a>. The data type declares the type of both the
 on-disk array as well as the in-memory array.</p>
-   <p>For a given <a href="#key_format">§ 3.4 Format</a>, all named binary arrays for that format shall have a
+   <p>For a given <a href="#key_format">§ 3.5 Format</a>, all named binary arrays for that format shall have a
 corresponding name in <code>data_types</code>.</p>
    <p>The following strings shall be used to describe data types:</p>
    <dl>
@@ -1147,23 +1156,23 @@ that is represented in the host language. The value 0 shall map to false and the
 value 1 shall map to true. When parsing, implementations may choose to interpret
 values other than 0 or 1 as true, or throw an error.</p>
    </dl>
-   <h3 class="heading settled" data-level="3.6" id="value_modifiers"><span class="secno">3.6. </span><span class="content">Value Modifiers</span><a class="self-link" href="#value_modifiers"></a></h3>
+   <h3 class="heading settled" data-level="3.7" id="value_modifiers"><span class="secno">3.7. </span><span class="content">Value Modifiers</span><a class="self-link" href="#value_modifiers"></a></h3>
    <p>When the value array is meant to be reinterpreted before reading, a special bracket syntax is
 provided to indicate modifications to the underlying element level.</p>
-   <h4 class="heading settled" data-level="3.6.1" id="complex_level"><span class="secno">3.6.1. </span><span class="content">Complex Values (complex)</span><a class="self-link" href="#complex_level"></a></h4>
+   <h4 class="heading settled" data-level="3.7.1" id="complex_level"><span class="secno">3.7.1. </span><span class="content">Complex Values (complex)</span><a class="self-link" href="#complex_level"></a></h4>
    <p>When a value array is composed of alternating real and imaginary components of
 complex numbers, the type is written as <code>complex[&lt;type>]</code>. For example, a value
 array of complex <code>float64</code> would have a datatype of <code>complex[float64]</code> The real
 component of the <code>i</code>th element in the modified array shall be stored at position <code>2i</code> in the original array, and the imaginary component of the <code>i</code>th element in
 the modified array shall be at position <code>2i + 1</code> in the underlying array.
 The <code>complex</code> value modifier may only be used with the types <code>float32</code> and <code>float64</code>.</p>
-   <h4 class="heading settled" data-level="3.6.2" id="iso_level"><span class="secno">3.6.2. </span><span class="content">All Values the Same (ISO)</span><a class="self-link" href="#iso_level"></a></h4>
+   <h4 class="heading settled" data-level="3.7.2" id="iso_level"><span class="secno">3.7.2. </span><span class="content">All Values the Same (ISO)</span><a class="self-link" href="#iso_level"></a></h4>
    <p>When all values of a sparse array are the same identical value, the type is
 written as <code>iso[&lt;type>]</code>. This indicates that the array will store only a single
 element which is common to all stored indices. All elements in the modified
 array shall be stored at position 0 of the underlying array.</p>
-   <div class="example" id="example-3356e28c">
-    <a class="self-link" href="#example-3356e28c"></a> 
+   <div class="example" id="example-4ccc8d70">
+    <a class="self-link" href="#example-4ccc8d70"></a> 
     <p>Example of a CSR Matrix whose values are all 7.</p>
     <table>
      <thead>
@@ -1215,6 +1224,7 @@ array shall be stored at position 0 of the underlying array.</p>
   <c- f>"version"</c-><c- p>:</c-> <c- u>"0.1"</c-><c- p>,</c->
   <c- f>"format"</c-><c- p>:</c-> <c- u>"CSR"</c-><c- p>,</c->
   <c- f>"shape"</c-><c- p>:</c-> <c- p>[</c-><c- mi>5</c-><c- p>,</c-> <c- mi>5</c-><c- p>],</c->
+  <c- f>"number_of_stored_values"</c-><c- p>:</c-> <c- mi>6</c-><c- p>,</c->
   <c- f>"data_types"</c-><c- p>:</c-> <c- p>{</c->
     <c- f>"pointers_to_1"</c-><c- p>:</c-> <c- u>"uint64"</c-><c- p>,</c->
     <c- f>"indices_1"</c-><c- p>:</c-> <c- u>"uint64"</c-><c- p>,</c->
@@ -1234,47 +1244,47 @@ array shall be stored at position 0 of the underlying array.</p>
    <p class="note" role="note"><span>Note:</span> Structure-only matrices (allowed in matrix market format) can be stored
       using this technique with a value of 1. This adds only a small amount of
       overhead while describing essentially the same matrix.</p>
-   <h3 class="heading settled" data-level="3.7" id="key_structure"><span class="secno">3.7. </span><span class="content">Structure</span><a class="self-link" href="#key_structure"></a></h3>
+   <h3 class="heading settled" data-level="3.8" id="key_structure"><span class="secno">3.8. </span><span class="content">Structure</span><a class="self-link" href="#key_structure"></a></h3>
     The <code>structure</code> key, if present, denotes a special matrix structure in which
 only one triangle of the matrix is stored and the structure and values in the
 other triangle are inferred. 
-   <h4 class="heading settled" data-level="3.7.1" id="predefined_structure"><span class="secno">3.7.1. </span><span class="content">Pre-Defined Structures</span><a class="self-link" href="#predefined_structure"></a></h4>
+   <h4 class="heading settled" data-level="3.8.1" id="predefined_structure"><span class="secno">3.8.1. </span><span class="content">Pre-Defined Structures</span><a class="self-link" href="#predefined_structure"></a></h4>
    <p>The follow pre-defined values can be supplied for the <code>structure</code> key to indicate
 the structure of the matrix.</p>
-   <h5 class="heading settled" data-level="3.7.1.1" id="symmetric_lower_structure"><span class="secno">3.7.1.1. </span><span class="content">symmetric_lower</span><a class="self-link" href="#symmetric_lower_structure"></a></h5>
+   <h5 class="heading settled" data-level="3.8.1.1" id="symmetric_lower_structure"><span class="secno">3.8.1.1. </span><span class="content">symmetric_lower</span><a class="self-link" href="#symmetric_lower_structure"></a></h5>
    <p>The <code>symmetric_lower</code> value indicates that the matrix has a symmetric structure
 with only the lower triangle stored.  For all matrix entries with row and column
 indices <code>i,j</code> and value <code>v</code>, <code>i >= j</code>.  If <code>i != j</code>, the entry implies the
 presence of an entry at row and column index <code>j,i</code> with value <code>v</code>.</p>
-   <h5 class="heading settled" data-level="3.7.1.2" id="symmetric_upper_structure"><span class="secno">3.7.1.2. </span><span class="content">symmetric_upper</span><a class="self-link" href="#symmetric_upper_structure"></a></h5>
+   <h5 class="heading settled" data-level="3.8.1.2" id="symmetric_upper_structure"><span class="secno">3.8.1.2. </span><span class="content">symmetric_upper</span><a class="self-link" href="#symmetric_upper_structure"></a></h5>
    <p>The <code>symmetric_upper</code> value indicates that the matrix has a symmetric structure
 with only the upper triangle stored.  For all matrix entries with row and column
 indices <code>i,j</code> and value <code>v</code>, <code>i &lt;= j</code>.  If <code>i != j</code>, the entry implies the
 presence of an entry at row and column index <code>j,i</code> with value <code>v</code>.</p>
-   <h5 class="heading settled" data-level="3.7.1.3" id="hermitian_lower_structure"><span class="secno">3.7.1.3. </span><span class="content">hermitian_lower</span><a class="self-link" href="#hermitian_lower_structure"></a></h5>
+   <h5 class="heading settled" data-level="3.8.1.3" id="hermitian_lower_structure"><span class="secno">3.8.1.3. </span><span class="content">hermitian_lower</span><a class="self-link" href="#hermitian_lower_structure"></a></h5>
    <p>The <code>hermitian_lower</code> value indicates that the matrix has a Hermitian structure
 with only the lower triangle stored.  For all matrix entries with row and column
 indices <code>i,j</code> and value <code>v</code>, <code>i >= j</code>.  If <code>i != j</code>, the entry implies the
 presence of an entry at row and column index <code>j,i</code> with a value equal to the
 complex conjugate of <code>v</code>.  The matrix’s value type must be complex.</p>
-   <h5 class="heading settled" data-level="3.7.1.4" id="hermitian_upper_structure"><span class="secno">3.7.1.4. </span><span class="content">hermitian_upper</span><a class="self-link" href="#hermitian_upper_structure"></a></h5>
+   <h5 class="heading settled" data-level="3.8.1.4" id="hermitian_upper_structure"><span class="secno">3.8.1.4. </span><span class="content">hermitian_upper</span><a class="self-link" href="#hermitian_upper_structure"></a></h5>
    <p>The <code>hermitian_upper</code> value indicates that the matrix has a Hermitian structure
 with only the upper triangle stored.  For all matrix entries with row and column
 indices <code>i,j</code> and value <code>v</code>, <code>i &lt;= j</code>.  If <code>i != j</code>, the entry implies the
 presence of an entry at row and column index <code>j,i</code> with a value equal to the
 complex conjugate of <code>v</code>.  The matrix’s value type must be complex.</p>
-   <h5 class="heading settled" data-level="3.7.1.5" id="skew_symmetric_lower_structure"><span class="secno">3.7.1.5. </span><span class="content">skew_symmetric_lower</span><a class="self-link" href="#skew_symmetric_lower_structure"></a></h5>
+   <h5 class="heading settled" data-level="3.8.1.5" id="skew_symmetric_lower_structure"><span class="secno">3.8.1.5. </span><span class="content">skew_symmetric_lower</span><a class="self-link" href="#skew_symmetric_lower_structure"></a></h5>
    <p>The <code>skew_symmetric_lower</code> value indicates that the matrix has a skew-symmetric structure
 with only the lower triangle stored.  For all matrix entries with row and column
 indices <code>i,j</code> and value <code>v</code>, <code>i >= j</code>.  If <code>i != j</code>, the entry implies the
 presence of an entry at row and column index <code>j,i</code> with value <code>-v</code>.</p>
-   <h5 class="heading settled" data-level="3.7.1.6" id="skew_symmetric_upper_structure"><span class="secno">3.7.1.6. </span><span class="content">skew_symmetric_upper</span><a class="self-link" href="#skew_symmetric_upper_structure"></a></h5>
+   <h5 class="heading settled" data-level="3.8.1.6" id="skew_symmetric_upper_structure"><span class="secno">3.8.1.6. </span><span class="content">skew_symmetric_upper</span><a class="self-link" href="#skew_symmetric_upper_structure"></a></h5>
    <p>The <code>symmetric_upper</code> value indicates that the matrix has a skew-symmetric structure
 with only the upper triangle stored.  For all matrix entries with row and column
 indices <code>i,j</code> and value <code>v</code>, <code>i &lt;= j</code>.  If <code>i != j</code>, the entry implies the
 presence of an entry at row and column index <code>j,i</code> with value <code>-v</code>.</p>
-   <div class="example" id="example-74d23677">
-    <a class="self-link" href="#example-74d23677"></a> 
+   <div class="example" id="example-66bd6788">
+    <a class="self-link" href="#example-66bd6788"></a> 
     <p>Example of a symmetric CSR matrix.</p>
     <table>
      <thead>
@@ -1326,6 +1336,7 @@ presence of an entry at row and column index <code>j,i</code> with value <code>-
   <c- f>"version"</c-><c- p>:</c-> <c- u>"0.1"</c-><c- p>,</c->
   <c- f>"format"</c-><c- p>:</c-> <c- u>"CSR"</c-><c- p>,</c->
   <c- f>"shape"</c-><c- p>:</c-> <c- p>[</c-><c- mi>5</c-><c- p>,</c-> <c- mi>5</c-><c- p>],</c->
+  <c- f>"number_of_stored_values"</c-><c- p>:</c-> <c- mi>9</c-><c- p>,</c->
   <c- f>"structure"</c-><c- p>:</c-> <c- u>"symmetric_lower"</c-><c- p>,</c->
   <c- f>"data_types"</c-><c- p>:</c-> <c- p>{</c->
     <c- f>"pointers_to_1"</c-><c- p>:</c-> <c- u>"uint64"</c-><c- p>,</c->
@@ -1342,13 +1353,19 @@ presence of an entry at row and column index <code>j,i</code> with value <code>-
      <li data-md>
       <p><code>values</code> = [1, 2, 9, 7, 2, 2, 3, 3, 7]</p>
     </ul>
+    <p class="note" role="note"><span>Note:</span> <code>number_of_stored_values</code> reflects the number of entries explicitly stored
+in the sparse tensor format.  This means that for symmetric, Hermittion, and
+skew-symmetric matrices, <code>number_of_stored_values</code> reflects the number of values
+that are stored, not the number of logical values in both matrix triangles.
+If the optional attribute <code>number_of_diagonal_elements</code> is provided, the
+number of logical values in both triangles can be computed in constant time.</p>
    </div>
-   <h3 class="heading settled" data-level="3.8" id="key_attributes"><span class="secno">3.8. </span><span class="content">Attributes</span><a class="self-link" href="#key_attributes"></a></h3>
+   <h3 class="heading settled" data-level="3.9" id="key_attributes"><span class="secno">3.9. </span><span class="content">Attributes</span><a class="self-link" href="#key_attributes"></a></h3>
     The <code>attributes</code> key shall denote a dictionary of optional attributes containing
 keys with information about the stored matrix and the data it represents.
 Attributes are optional and may be ignored by a compliant parser. 
-   <h4 class="heading settled" data-level="3.8.1" id="defined-attributes"><span class="secno">3.8.1. </span><span class="content">Defined Attributes</span><a class="self-link" href="#defined-attributes"></a></h4>
-   <h5 class="heading settled" data-level="3.8.1.1" id="number_of_diagonal_elements_attributes"><span class="secno">3.8.1.1. </span><span class="content">number_of_diagonal_elements</span><a class="self-link" href="#number_of_diagonal_elements_attributes"></a></h5>
+   <h4 class="heading settled" data-level="3.9.1" id="defined-attributes"><span class="secno">3.9.1. </span><span class="content">Defined Attributes</span><a class="self-link" href="#defined-attributes"></a></h4>
+   <h5 class="heading settled" data-level="3.9.1.1" id="number_of_diagonal_elements_attributes"><span class="secno">3.9.1.1. </span><span class="content">number_of_diagonal_elements</span><a class="self-link" href="#number_of_diagonal_elements_attributes"></a></h5>
     <code>number_of_diagonal_elements</code> shall contain an integer value corresponding to
 the number of elements on the stored matrix’s diagonal. 
    <p class="note" role="note"><span>Note:</span> implementations are highly encouraged to provide the <code>number_of_diagonal_elements</code> attribute for matrices with a symmetric,
