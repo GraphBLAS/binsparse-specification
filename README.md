@@ -15,10 +15,10 @@ Here is a table listing the current tensor frameworks that support the format:
 
 | Language | Framework | Status | Notes |
 | -------- | ------ | ------ | ----- |
-| C | [binsparse-reference-c](https://github.com/GraphBLAS/binsparse-reference-c) | under development | converts between binsparse V1.0 and custom in-memory sparse matrices |
-| C++ | [binsparse-reference-impl](https://github.com/GraphBLAS/binsparse-reference-impl) | under development | converts between binsparse V1.0 and custom in-memory sparse matrices | 
-| Julia | [Finch.jl](https://willowahrens.io/Finch.jl/dev/fileio/) | under development | converts between binsparse V1.0 and V2.0 and Finch matrices and tensors |
-| Python | [binsparse-python](https://github.com/ivirshup/binsparse-python) | under development | converts between binsparse V1.0 and scipy.sparse matrices |
+| C | [binsparse-reference-c](https://github.com/GraphBLAS/binsparse-reference-c) | under development | converts between binsparse and in-memory sparse matrices |
+| C++ | [binsparse-reference-impl](https://github.com/GraphBLAS/binsparse-reference-impl) | under development | converts between binsparse and in-memory sparse matrices | 
+| Julia | [Finch.jl](https://willowahrens.io/Finch.jl/dev/fileio/) | under development | converts between binsparse and Finch matrices and tensors, supports custom format spec |
+| Python | [binsparse-python](https://github.com/ivirshup/binsparse-python) | under development | converts between binsparse and scipy.sparse matrices |
 
 ### Editing
 
