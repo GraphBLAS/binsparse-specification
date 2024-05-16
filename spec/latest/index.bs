@@ -56,7 +56,7 @@ outside of the "binsparse" namespace.
 <div class=example>
 
 Example of a JSON descriptor for a compressed-sparse column (CSC) matrix with 10
-rows and 12 columns, containing float32 values, along with user-defined
+rows and 12 columns, containing 20 float32 values, along with user-defined
 attributes.
 
 ```json
@@ -65,6 +65,7 @@ attributes.
     "version": "0.1",
     "format": "CSC",
     "shape": [10, 12],
+    "number_of_stored_values": 20,
     "data_types": {
       "pointers_to_1": "uint64",
       "indices_1": "uint64",
@@ -97,6 +98,18 @@ contain the vector's dimension.
 
 Note: a matrix has shape [`number_of_rows`, `number_of_columns`] regardless of whether
 the format orientation is row-wise or column-wise.
+
+Number of Stored Values {#key_number_of_stored_values}
+------------------------------------------------------
+
+The `number_of_stored_values` key must be present and shall define the number
+of explicit values that are stored as explicit entries in the sparse tensor
+format.
+
+Note: For sparse tensors with all values the same (ISO), `number_of_stored_values`
+still refers to the number of explicit entries in the sparse tensor format whose
+indices are stored, regardless of the fact that the individual scalar values
+themselves are not explicitly stored.
 
 Fill {#key_fill}
 --------------------
@@ -670,6 +683,7 @@ Example of a CSR Matrix whose values are all 7.
   "version": "0.1",
   "format": "CSR",
   "shape": [5, 5],
+  "number_of_stored_values": 6,
   "data_types": {
     "pointers_to_1": "uint64",
     "indices_1": "uint64",
@@ -807,6 +821,7 @@ Example of a symmetric CSR matrix.
   "version": "0.1",
   "format": "CSR",
   "shape": [5, 5],
+  "number_of_stored_values": 9,
   "structure": "symmetric_lower",
   "data_types": {
     "pointers_to_1": "uint64",
@@ -819,6 +834,13 @@ Example of a symmetric CSR matrix.
 - `pointers_to_1` = [0, 1, 3, 5, 7, 9]
 - `indices_1` = [0, 0, 1, 0, 2, 1, 3, 2, 4]
 - `values` = [1, 2, 9, 7, 2, 2, 3, 3, 7]
+
+Note: `number_of_stored_values` reflects the number of entries explicitly stored
+in the sparse tensor format.  This means that for symmetric, Hermittion, and
+skew-symmetric matrices, `number_of_stored_values` reflects the number of values
+that are stored, not the number of logical values in both matrix triangles.
+If the optional attribute `number_of_diagonal_elements` is provided, the
+number of logical values in both triangles can be computed in constant time.
 
 </div>
 
