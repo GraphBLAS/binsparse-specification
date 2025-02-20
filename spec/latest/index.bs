@@ -4,7 +4,6 @@ Shortname: binsparse
 Level: 1
 Status: LS-COMMIT
 Status: w3c/UD
-Group: GraphBLAS
 URL: https://graphblas.org/binsparse-specification/
 Repository: https://github.com/GraphBLAS/binsparse-specification
 Editor: Benjamin Brock, Intel
