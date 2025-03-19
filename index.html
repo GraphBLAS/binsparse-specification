@@ -535,7 +535,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">Binary Sparse Format Specification Version 0.1</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#UD">Unofficial Proposal Draft</a>, <time class="dt-updated" datetime="2024-05-16">16 May 2024</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#UD">Unofficial Proposal Draft</a>, <time class="dt-updated" datetime="2025-03-19">19 March 2025</time></p>
    <details open>
     <summary>More details about this document</summary>
     <div data-fill-with="spec-metadata">
@@ -555,7 +555,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
     </div>
    </details>
    <div data-fill-with="warning"></div>
-   <p class="copyright" data-fill-with="copyright"><a href="https://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2024 <a href="https://www.w3.org/"><abbr title="World Wide Web Consortium">W3C</abbr></a><sup>®</sup> (<a href="https://www.csail.mit.edu/"><abbr title="Massachusetts Institute of Technology">MIT</abbr></a>, <a href="https://www.ercim.eu/"><abbr title="European Research Consortium for Informatics and Mathematics">ERCIM</abbr></a>, <a href="https://www.keio.ac.jp/">Keio</a>, <a href="https://ev.buaa.edu.cn/">Beihang</a>). W3C <a href="https://www.w3.org/Consortium/Legal/ipr-notice#Legal_Disclaimer">liability</a>, <a href="https://www.w3.org/Consortium/Legal/ipr-notice#W3C_Trademarks">trademark</a> and <a href="https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document" rel="license">permissive document license</a> rules apply. </p>
+   <p class="copyright" data-fill-with="copyright"><a href="https://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2025 <a href="https://www.w3.org/"><abbr title="World Wide Web Consortium">W3C</abbr></a><sup>®</sup> (<a href="https://www.csail.mit.edu/"><abbr title="Massachusetts Institute of Technology">MIT</abbr></a>, <a href="https://www.ercim.eu/"><abbr title="European Research Consortium for Informatics and Mathematics">ERCIM</abbr></a>, <a href="https://www.keio.ac.jp/">Keio</a>, <a href="https://ev.buaa.edu.cn/">Beihang</a>). W3C <a href="https://www.w3.org/Consortium/Legal/ipr-notice#Legal_Disclaimer">liability</a>, <a href="https://www.w3.org/Consortium/Legal/ipr-notice#W3C_Trademarks">trademark</a> and <a href="https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document" rel="license">permissive document license</a> rules apply. </p>
    <hr title="Separator for header">
   </div>
   <div class="p-summary" data-fill-with="abstract">
@@ -610,7 +610,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
          <ol class="toc">
           <li><a href="#dvec_format_equiv"><span class="secno">3.5.3.1</span> <span class="content">DVEC</span></a>
           <li><a href="#dmatr_format_equiv"><span class="secno">3.5.3.2</span> <span class="content">DMATR</span></a>
-          <li><a href="#dmatr_format_equiv①"><span class="secno">3.5.3.3</span> <span class="content">DMATC</span></a>
+          <li><a href="#dmatc_format_equiv"><span class="secno">3.5.3.3</span> <span class="content">DMATC</span></a>
           <li><a href="#cvec_format_equiv"><span class="secno">3.5.3.4</span> <span class="content">CVEC</span></a>
           <li><a href="#csr_format_equiv"><span class="secno">3.5.3.5</span> <span class="content">CSR</span></a>
           <li><a href="#csc_format_equiv"><span class="secno">3.5.3.6</span> <span class="content">CSC</span></a>
@@ -645,7 +645,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
        <a href="#key_attributes"><span class="secno">3.9</span> <span class="content">Attributes</span></a>
        <ol class="toc">
         <li>
-         <a href="#defined-attributes"><span class="secno">3.9.1</span> <span class="content">Defined Attributes</span></a>
+         <a href="#defined_attributes"><span class="secno">3.9.1</span> <span class="content">Defined Attributes {#defined_attributes}</span></a>
          <ol class="toc">
           <li><a href="#number_of_diagonal_elements_attributes"><span class="secno">3.9.1.1</span> <span class="content">number_of_diagonal_elements</span></a>
          </ol>
@@ -998,7 +998,7 @@ length of any of the <code>indices</code> arrays in this level.</p>
   <c- p>}</c->
 <c- p>}</c->
 </pre>
-   <h5 class="heading settled" data-level="3.5.3.3" id="dmatr_format_equiv①"><span class="secno">3.5.3.3. </span><span class="content">DMATC</span><a class="self-link" href="#dmatr_format_equiv①"></a></h5>
+   <h5 class="heading settled" data-level="3.5.3.3" id="dmatc_format_equiv"><span class="secno">3.5.3.3. </span><span class="content">DMATC</span><a class="self-link" href="#dmatc_format_equiv"></a></h5>
 <pre class="language-json highlight"><c- f>"custom"</c-><c- p>:</c-> <c- p>{</c->
   <c- f>"transpose"</c-><c- p>:</c-> <c- p>[</c-><c- mi>1</c-><c- p>,</c-> <c- mi>0</c-><c- p>],</c->
   <c- f>"level"</c-><c- p>:</c-> <c- p>{</c->
@@ -1364,7 +1364,7 @@ number of logical values in both triangles can be computed in constant time.</p>
     The <code>attributes</code> key shall denote a dictionary of optional attributes containing
 keys with information about the stored matrix and the data it represents.
 Attributes are optional and may be ignored by a compliant parser. 
-   <h4 class="heading settled" data-level="3.9.1" id="defined-attributes"><span class="secno">3.9.1. </span><span class="content">Defined Attributes</span><a class="self-link" href="#defined-attributes"></a></h4>
+   <h4 class="heading settled" data-level="3.9.1" id="defined_attributes"><span class="secno">3.9.1. </span><span class="content">Defined Attributes {#defined_attributes}</span><a class="self-link" href="#defined_attributes"></a></h4>
    <h5 class="heading settled" data-level="3.9.1.1" id="number_of_diagonal_elements_attributes"><span class="secno">3.9.1.1. </span><span class="content">number_of_diagonal_elements</span><a class="self-link" href="#number_of_diagonal_elements_attributes"></a></h5>
     <code>number_of_diagonal_elements</code> shall contain an integer value corresponding to
 the number of elements on the stored matrix’s diagonal. 

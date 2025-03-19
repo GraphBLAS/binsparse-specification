@@ -4,7 +4,6 @@ Shortname: binsparse
 Level: 1
 Status: LS-COMMIT
 Status: w3c/UD
-Group: GraphBLAS
 URL: https://graphblas.org/binsparse-specification/
 Repository: https://github.com/GraphBLAS/binsparse-specification
 Editor: Benjamin Brock, Intel
@@ -422,7 +421,7 @@ The following formats are equivalent. Parsers which support custom formats shoul
 }
 ```
 
-#### DMATC #### {#dmatr_format_equiv}
+#### DMATC #### {#dmatc_format_equiv}
 
 ```json
 "custom": {
@@ -851,7 +850,7 @@ The `attributes` key shall denote a dictionary of optional attributes containing
 keys with information about the stored matrix and the data it represents.
 Attributes are optional and may be ignored by a compliant parser.
 
-### Defined Attributes
+### Defined Attributes {#defined_attributes}
 
 #### number_of_diagonal_elements #### {#number_of_diagonal_elements_attributes}
 `number_of_diagonal_elements` shall contain an integer value corresponding to
