@@ -18,13 +18,32 @@ def issorted(array):
 
 class SparseTensor:
     @classmethod
-    def from_taco(cls, arrays, shape=None, structure=None, *, group_indices=False):
+    def from_taco(
+        cls, arrays, shape=None, structure=None, *, group_indices=False, as_binsparse=False
+    ):
         if structure is not None:
             structure = _from_taco(structure)
-        return cls(arrays, shape=shape, structure=structure, group_indices=group_indices)
+        return cls(
+            arrays,
+            shape=shape,
+            structure=structure,
+            group_indices=group_indices,
+            as_binsparse=as_binsparse,
+        )
 
-    def __init__(self, arrays, shape=None, structure=None, *, group_indices=False):
+    @classmethod
+    def from_binsparse(cls, arrays, shape=None, structure=None):
+        from ._bundle_binsparse import structure_from_binsparse
+
+        if structure is not None:
+            structure = structure_from_binsparse(structure)
+        return cls(arrays, shape=shape, structure=structure, as_binsparse=True)
+
+    def __init__(
+        self, arrays, shape=None, structure=None, *, group_indices=False, as_binsparse=False
+    ):
         self.group_indices = group_indices
+        self.as_binsparse = as_binsparse
         if not isinstance(arrays, (list, tuple)):
             raise TypeError("arrays argument must be a list or tuple of numpy arrays")
         if not arrays:
@@ -327,21 +346,37 @@ class SparseTensor:
 
         return to_bundled_groups(self)
 
-    def _repr_svg_(self, *, as_taco=False, as_groups=None):
+    @property
+    def binsparse_groups(self):
+        from ._bundle_binsparse import to_binsparse_groups
+
+        return to_binsparse_groups(self)
+
+    @property
+    def binsparse_structure(self):
+        from ._bundle_binsparse import to_binsparse_groups
+
+        return to_binsparse_groups(self, abbreviate=True)
+
+    def _repr_svg_(self, *, as_taco=False, as_groups=None, as_binsparse=None):
         try:
             from ._formatting import to_svg
         except ImportError:
             return
         if as_groups is None:
             as_groups = self.group_indices
-        return to_svg(self, as_taco=as_taco, as_groups=as_groups)
+        if as_binsparse is None:
+            as_binsparse = self.as_binsparse
+        return to_svg(self, as_taco=as_taco, as_groups=as_groups, as_binsparse=as_binsparse)
 
-    def __repr__(self, *, as_taco=False, as_groups=None):
+    def __repr__(self, *, as_taco=False, as_groups=None, as_binsparse=None):
         from ._formatting import to_text
 
         if as_groups is None:
             as_groups = self.group_indices
-        return to_text(self, as_taco=as_taco, as_groups=as_groups)
+        if as_binsparse is None:
+            as_binsparse = self.as_binsparse
+        return to_text(self, as_taco=as_taco, as_groups=as_groups, as_binsparse=as_binsparse)
 
 
 class TacoView:
