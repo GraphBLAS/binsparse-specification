@@ -274,7 +274,11 @@ def draw_pointer(canvas, x, y, w, ptr, *, center_right=False, skip_if_nonempty=F
         canvas[y][x + i] = c
 
 
-def to_text(self, *, squared=False, compact=None, as_taco=False, as_groups=False):
+def to_text(
+    self, *, squared=False, compact=None, as_taco=False, as_groups=False, as_binsparse=True
+):
+    if as_binsparse:
+        as_groups = True
     indices = self._indices
     pointers = self._pointers
     index_widths, pointers_widths, xoffsets, yoffsets = get_layout(
@@ -332,10 +336,13 @@ def to_text(self, *, squared=False, compact=None, as_taco=False, as_groups=False
             i -= 1
         draw_box(header, x, 0, w + 1, f"i{i} ", square=squared, dashed=index is None)
     for i, (x, w) in enumerate(zip(xoffsets[1::2], pointers_widths)):
+        if as_binsparse:
+            i += 1
         draw_pointer(header, x + 1, 1, w - 2, f"p{i}", center_right=False)
     draw_line(header, 0, 3, len("".join(header[0]).rstrip()), double=True)
 
     # Very top: group columns together and display dimension type
+    # (we'll redo the top for `as_binsparse` below)
     w = "".join(header[1]).rindex("|")
     top = ["-"] * (w + 1)
     top[w] = "|"
@@ -386,11 +393,44 @@ def to_text(self, *, squared=False, compact=None, as_taco=False, as_groups=False
         for start, stop in reversed(trim_ranges):
             combined = [trim(row, start, stop) for row in combined]
 
+        if as_binsparse:
+            # Redo the very top
+            top = ["-"] * len(combined[0])
+            bars = [0]
+            bars.extend(i - 1 for i, c in enumerate(combined[2]) if c == "p")
+            for x, (abbv, n) in zip(bars, self.binsparse_structure):
+                top[x] = "|"
+                x += 1
+                for c in abbv:
+                    top[x] = c
+                    x += 1
+                if n != 1:
+                    top[x] = "["
+                    x += 1
+                    for c in str(n):
+                        top[x] = c
+                        x += 1
+                    top[x] = "]"
+                    x += 1
+                top[x] = " "
+            top[-1] = "|"
+
+            combined[0] = "".join(top)
+
     return "\n".join(combined)
 
 
-def to_svg(self, *, squared=False, compact=None, as_taco=False, as_groups=False):
+def to_svg(
+    self, *, squared=False, compact=None, as_taco=False, as_groups=False, as_binsparse=False
+):
     from sphinxcontrib.svgbob._svgbob import to_svg as _to_svg
 
-    text = to_text(self, squared=squared, compact=compact, as_taco=as_taco, as_groups=as_groups)
+    text = to_text(
+        self,
+        squared=squared,
+        compact=compact,
+        as_taco=as_taco,
+        as_groups=as_groups,
+        as_binsparse=as_binsparse,
+    )
     return _to_svg(text)
