@@ -12,6 +12,7 @@ Editor: Jim Kitchen, Anaconda
 Editor: Erik Welch, NVIDIA
 Editor: Isaac Virshup, Helmholtz Munich
 Editor: Willow Ahrens, MIT
+Editor: Hameer Abbasi, Quansight
 Abstract: A cross-platform binary storage format for sparse data, particularly sparse matrices.
 Markup Shorthands: css no, markdown yes
 </pre>
@@ -381,7 +382,7 @@ present:
 :: There are `r` such arrays. When `A[i_0, ..., i_(r - 1), :, ..., :]` is explicitly represented by the subarray in position `q`, `indices_(N-n+s)[q] = i_s`. The arrays must be ordered such that the tuples `(indices_(N-n)[q], ..., indices_(N-n+r-1)[q])` are unique and appear in lexicographic order for all `q` in each range `pointers_to_(N-n)[p] <= q < pointers_to_(N-n)[p + 1]`. This array must contain no other elements.
 
 Special note: If the sparse level is the root level, the `pointers` array should
-be ommitted, as its first value will be `0` and its last value will be the
+be omitted, as its first value will be `0` and its last value will be the
 length of any of the `indices` arrays in this level.
 
 
