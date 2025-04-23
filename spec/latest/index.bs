@@ -371,6 +371,11 @@ whose non-implicit elements are themselves arrays specified by `level`. For
 example, a sparse level of rank 1 represents a collection of sparse vectors of
 subarrays.
 
+If the `coniguous` key `true`, it indicates that all pointer arrays
+form a single, contiguous 2-dimensional array. For the back-ends that
+do not support storing 2-dimensional arrays, a single 1-dimensional flat array
+may be used instead. The default value of `contiguous` is `false`.
+
 Assume that this level represents `n`-dimensional subarrays and the root array
 is `N`-dimensional.  The sparse level implies the following binary arrays are
 present:
@@ -378,8 +383,16 @@ present:
 : pointers_to_(N - n)
 :: Array of size `number_of_positions + 1` whose 1st element is equal to `0` and whose `p + 1`th element is equal to the sum of `pointers_to_(N - n)[p]` and the number of explicitly represented slices in the `p`th position.
 
+In addition, the following binary arrays are present if `contiguous` is `false`:
+
 : indices_(N - n), ..., indices(N - n + r - 1)
 :: There are `r` such arrays. When `A[i_0, ..., i_(r - 1), :, ..., :]` is explicitly represented by the subarray in position `q`, `indices_(N-n+s)[q] = i_s`. The arrays must be ordered such that the tuples `(indices_(N-n)[q], ..., indices_(N-n+r-1)[q])` are unique and appear in lexicographic order for all `q` in each range `pointers_to_(N-n)[p] <= q < pointers_to_(N-n)[p + 1]`. This array must contain no other elements.
+
+Or the following binary array is present if `contiguous` is `true`:
+
+: indices_from(N - n)_to(N - n + r - 1)
+:: This is a single 2-dimensional array. When `A[i_0, ..., i_(r - 1), :, ..., :]` is explicitly represented by the subarray in position `q`, `indices_from(N - n)_to(N - n + r - 1)[s, q] = i_s`. The arrays must be ordered such that the tuples `(indices_from(N - n)_to(N - n + r - 1)[:, q])` are unique and appear in lexicographic order for all `q` in each range `pointers_to_(N-n)[p] <= q < pointers_to_(N-n)[p + 1]`. This array must contain no other elements.
+
 
 Special note: If the sparse level is the root level, the `pointers` array should
 be omitted, as its first value will be `0` and its last value will be the
