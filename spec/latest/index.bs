@@ -378,7 +378,13 @@ present:
 :: Array of size `number_of_positions + 1` whose 1st element is equal to `0` and whose `p + 1`th element is equal to the sum of `pointers_to_(N - n)[p]` and the number of explicitly represented slices in the `p`th position.
 
 : indices_(N - n), ..., indices(N - n + r - 1)
-:: There are `r` such arrays. When `A[i_0, ..., i_(r - 1), :, ..., :]` is explicitly represented by the subarray in position `q`, `indices_(N-n+s)[q] = i_s`. The arrays must be ordered such that the tuples `(indices_(N-n)[q], ..., indices_(N-n+r-1)[q])` are unique and appear in lexicographic order for all `q` in each range `pointers_to_(N-n)[p] <= q < pointers_to_(N-n)[p + 1]`. This array must contain no other elements.
+:: There are `r` such arrays. When `A[i_0, ..., i_(r - 1), :, ..., :]` is explicitly represented by the subarray in position `q`, `indices_(N-n+s)[q] = i_s`. The tuples `(indices_(N-n)[q], ..., indices_(N-n+r-1)[q])` must be unique for all `q` in each range `pointers_to_(N-n)[p] <= q < pointers_to_(N-n)[p + 1]`. This array must contain no other elements.
+
+If the `sorted` key is present, it's Boolean value may be used to indicate
+whether the tuples `(indices_(N-n)[q], ..., indices_(N-n+r-1)[q])` appear in
+lexicographic order for all `q` in each range `pointers_to_(N-n)[p] <= q <
+pointers_to_(N-n)[p + 1]`. If the `sorted` key is not present, the tuples are
+assumed to be sorted.
 
 Special note: If the sparse level is the root level, the `pointers` array should
 be ommitted, as its first value will be `0` and its last value will be the
