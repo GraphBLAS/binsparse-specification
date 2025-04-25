@@ -384,6 +384,74 @@ Special note: If the sparse level is the root level, the `pointers` array should
 be ommitted, as its first value will be `0` and its last value will be the
 length of any of the `indices` arrays in this level.
 
+### Slicing and Dicing ### {#slice_and_dice}
+
+Several sparse matrix formats, such as [BSR](https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.bsr_array.html#scipy.sparse.bsr_array) or [GCXS](https://sparse.pydata.org/en/0.15.1/generated/sparse.GCXS.html), require multiple dimensions of the underlying storage to be split, transposed, and/or combined into other dimensions. For example, the BSR format stores a sparse matrix using dense, same-size tiles. If the original matrix `A` is `m` by `n`, the blocked matrix `B` is a sparse matrix of dense blocks, or a 4-tensor of size `m/b` by `n/b` by `b` by `b`. The relationship between the two could be described as `A[i, j] = B[floordiv(i, b), floordiv(j, b), mod(i, b), mod(j, b)]`.
+
+As another example, the GCXS format stores N-dimensional tensors using 2-dimensional matrices, by combining dimensions. For example, if the original tensor `A` is `m` by `n` by `p`, the underlying matrix `B` might be `m` by `n*p`. The relationship between the two could be described as `A[i, j, k] = B[i, j * p + k]`.
+
+In this section, we introduce an optional specification to split and combine dimensions.
+
+Note that dimensions may not be able to be split or combined evenly. For example, if our original matrix is of size `5` by `7`, there is no way to use `2` by `2` blocks to tile the matrix evenly. In this case, we can pad our original matrix, decompose it into a tensor, and declare that the final matrix is a window into the full `6` by `8` matrix we would represent. For this reason, we introduce slicing operations into the spec. 
+
+The spec adds the following keys representing operations to be applied:
+
+The `split_dims` key, when present, is a list of tuples of integer dimensions resulting from splitting the dimensions of the tensor. The dimensions in the `i`th tuple must multiply to the size of the `i`th dimension in the original tensor. The dimensions of the output tensor is defined to be the concatenation of the dimension tuples. The flattened output tensor should be equal to the flattened input tensor.
+
+The `combine_dims` key, when present, is a list of tuples of integers describing the dimensions to combine, and in which order. The `i`th dimension of the output is the product of the sizes of the dimensions listed in the `i`th tuple. The flattened output should be equal to the flattened input tensor after transposing it to the order specified by concatenating the tuples.
+
+The `slice` key, when present, is a list of tuples of integers describing the starting and ending index of each dimension. If the `i`th tuple is `(a, b)`, then the `i`th dimension of the output should contain indices starting at `a` and ending just before `b`.
+
+The operations when present are to be applied in the order `split_dims`, `combine_dims`, `slice`, followed by the `transpose` key if present.
+
+As an example, an `11` by `37` BCSR can be represented as:
+
+```json
+"shape": [3, 10, 4, 4]
+"custom": {
+  "level": {
+    "level_desc": "dense",
+    "rank": 1,
+    "level": {
+      "level_desc": "sparse",
+      "rank": 1,
+      "level": {
+        "level_desc": "dense",
+        "rank": 1,
+        "level": {
+          "level_desc": "dense",
+          "rank": 1,
+          "level": {
+            "level_desc": "element",
+          }
+        }
+      }
+    }
+  }
+}
+"combine_dims"=[(0, 2), (1, 3)],
+"slice"=[(0, 11), (0, 37)]
+```
+
+As another example, a `10` by `20` by `30` GCXS tensor can be represented as:
+
+```json
+"shape": [10, 600]
+"custom": {
+  "level": {
+    "level_desc": "dense",
+    "rank": 1,
+    "level": {
+      "level_desc": "sparse",
+      "rank": 1,
+      "level": {
+        "level_desc": "element",
+      }
+    }
+  }
+}
+"split_dims"=[(10,), (20, 30)],
+```
 
 ### Equivalent Formats ### {#equivalent_formats}
 
