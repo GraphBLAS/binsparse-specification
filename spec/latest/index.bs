@@ -868,5 +868,22 @@ manner, using the corresponding dataset names previously defined.
 Supported Binary Containers {#supported_containers}
 ---------------------------------------------------
 
-Currently supported binary containers include HDF5 and NetCDF (but should include more).
+Currently supported binary containers include HDF5, NPZ, Zarr, and an In-Memory interchange format.
 
+HDF5-Specific Considerations
+----------------------------
+
+In HDF5, arrays can be stored in nested "groups", similar to directories in a
+filesystem. We assume that each binsparse tensor will take the form of an HDF5
+group.  In addition to normal datasets stored in the group, some metadata for
+each group may be stored as an "attribute". The JSON header for a binsparse
+group is stored in the HDF5 group string attribute named "binsparse", and each
+constituent data array (e.g. `pointers_to_1`, `fill_value`), is stored as an
+HDF5 dataset with the name prescribed by this spec.
+
+NPY-Specific Considerations
+---------------------------
+The NPY file format is a simple file format provided by Numpy, which stores a
+single array to disk. A standard binsparse file in NPY consists of a directory
+containing the multiple binsparse data array files, together with a standard
+json string header file in the same directory named "binsparse.json".
