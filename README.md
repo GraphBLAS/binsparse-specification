@@ -19,7 +19,7 @@ Here is a table listing the current tensor frameworks that support the format:
 | C++ | [binsparse-reference-impl](https://github.com/GraphBLAS/binsparse-reference-impl) | under development | converts between binsparse and in-memory sparse matrices | 
 | Julia | [Finch.jl](https://finch-tensor.github.io/Finch.jl/stable/docs/fileio/) | complete | converts between binsparse and in-memory sparse matrices or tensors |
 | Python | [binsparse-python](https://github.com/ivirshup/binsparse-python) | under development | converts between binsparse and scipy.sparse matrices |
-| Python | [finch-tensor-python](https://github.com/finch-tensor/finch-tensor-python)) | complete | converts between binsparse and in-memory sparse matrices or tensors |
+| Python | [finch-tensor-python](https://github.com/finch-tensor/finch-tensor-python) | complete | converts between binsparse and in-memory sparse matrices or tensors |
 | C++ | TACO, [binsparse-taco-parser](https://github.com/tensor-compiler/taco-binsparse-parser) | complete | converts between binsparse and in-memory sparse matrices or tensors |
 
 ### Editing
