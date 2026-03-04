@@ -289,7 +289,9 @@ Coordinate format is an alias for [[#coor_format]] format.
 ### Custom Formats ### {#custom_formats}
 
 The contents of this section are optional for all parsers, but enable
-customizable sparse formats for matrices and tensors.
+customizable sparse formats for matrices and tensors. If the parser
+does not implement tensor formats, it should error when the "custom" key
+is present.
 
 Binsparse describes custom multidimensional formats hierarchically.  We can
 understand these formats as arrays of arrays, where the parent array and
